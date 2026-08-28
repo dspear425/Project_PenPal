@@ -1,0 +1,75 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #2d2a26;
+  background: #efe8dc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.page-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.7), transparent 34%),
+    linear-gradient(135deg, #f6f0e6 0%, #e9dfd0 100%);
+}
+
+.hero-card {
+  width: min(920px, 100%);
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(83, 67, 48, .12);
+  border-radius: 28px;
+  padding: clamp(28px, 5vw, 64px);
+  box-shadow: 0 24px 70px rgba(74, 61, 45, .12);
+}
+
+.brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
+.stamp {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border: 1.5px dashed #8a4e3d; border-radius: 10px; color: #8a4e3d; font-size: 22px;
+  transform: rotate(-3deg);
+}
+.brand-name { font-weight: 700; letter-spacing: .01em; }
+.eyebrow { margin: 0 0 12px; color: #8a4e3d; font-size: .82rem; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
+h1 { margin: 0; max-width: 720px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2.7rem, 7vw, 5.8rem); line-height: .98; font-weight: 600; color: #27231f; }
+.hero-copy { max-width: 700px; margin: 24px 0 0; font-size: clamp(1.05rem, 2vw, 1.3rem); line-height: 1.7; color: #625a51; }
+.hero-copy.compact { max-width: 560px; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 34px; }
+.primary, .secondary {
+  border-radius: 999px; padding: 14px 22px; font-weight: 750; border: 1px solid transparent;
+}
+.primary { background: #8a4e3d; color: white; }
+.primary:hover { background: #743f31; }
+.primary:disabled { opacity: .65; cursor: wait; }
+.secondary { background: transparent; color: #3b342e; border-color: #cfc2b3; }
+.secondary:hover { background: #f7f2ec; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 56px; }
+.feature-grid article { padding-top: 18px; border-top: 1px solid #d9cec1; display: grid; gap: 8px; }
+.feature-grid strong { font-size: 1rem; }
+.feature-grid span { color: #756c63; line-height: 1.55; font-size: .95rem; }
+.back, .text-button { border: 0; background: transparent; color: #7c493b; padding: 0; }
+.back { margin-bottom: 34px; font-weight: 700; }
+.auth-form { display: grid; gap: 18px; max-width: 520px; margin-top: 32px; }
+.auth-form label { display: grid; gap: 8px; font-weight: 700; color: #443d36; }
+.auth-form input {
+  width: 100%; border: 1px solid #cfc4b8; border-radius: 14px; padding: 14px 16px; background: #fffdf9; color: #2d2a26;
+  outline: none;
+}
+.auth-form input:focus { border-color: #8a4e3d; box-shadow: 0 0 0 3px rgba(138,78,61,.12); }
+.auth-form .primary { justify-self: start; margin-top: 4px; }
+.status-message { max-width: 520px; margin: 18px 0 0; padding: 12px 14px; background: #f5eee6; border-radius: 12px; color: #554b42; line-height: 1.5; }
+.text-button { margin-top: 20px; text-decoration: underline; text-underline-offset: 4px; }
+
+@media (max-width: 720px) {
+  .page-shell { padding: 12px; place-items: start center; }
+  .hero-card { border-radius: 20px; }
+  .brand-row { margin-bottom: 34px; }
+  .feature-grid { grid-template-columns: 1fr; margin-top: 42px; }
+}
