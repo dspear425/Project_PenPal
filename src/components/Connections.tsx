@@ -83,7 +83,12 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
 
       if (profileError) throw new Error(`Could not load member profiles: ${errorMessage(profileError)}`)
 
-      setProfiles(new Map((profileRows ?? []).map((profile) => [String(profile.id), profile as MemberProfile])))
+      const profileMap = new Map<string, MemberProfile>()
+      for (const row of profileRows ?? []) {
+        const member = row as MemberProfile
+        profileMap.set(String(member.id), member)
+      }
+      setProfiles(profileMap)
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
