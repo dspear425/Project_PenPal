@@ -17,9 +17,11 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey)
 // Keep true session changes (initial session, a new sign-in, and sign-out), while
 // suppressing routine refresh/refocus notifications for the same signed-in user.
 const originalOnAuthStateChange = supabase.auth.onAuthStateChange.bind(supabase.auth)
+type AuthStateCallback = Parameters<typeof originalOnAuthStateChange>[0]
+
 let activeUserId: string | null = null
 
-supabase.auth.onAuthStateChange = ((callback) =>
+supabase.auth.onAuthStateChange = ((callback: AuthStateCallback) =>
   originalOnAuthStateChange((event, session) => {
     const userId = session?.user.id ?? null
 
