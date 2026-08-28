@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import Correspondence from './Correspondence'
+import '../letters.css'
 
 export type PenPalRequest = {
   id: string
@@ -16,6 +18,13 @@ type MemberProfile = {
   display_name: string | null
   country: string | null
   about_me: string | null
+}
+
+type SelectedCorrespondence = {
+  relationshipId: string
+  otherUserId: string
+  otherName: string
+  otherCountry: string | null
 }
 
 type Props = {
@@ -42,6 +51,8 @@ function formatDate(value: string) {
 export default function Connections({ userId, onBack, onDiscover, onEditProfile, onSignOut }: Props) {
   const [requests, setRequests] = useState<PenPalRequest[]>([])
   const [profiles, setProfiles] = useState<Map<string, MemberProfile>>(new Map())
+  const [unreadByRelationship, setUnreadByRelationship] = useState<Map<string, number>>(new Map())
+  const [selectedCorrespondence, setSelectedCorrespondence] = useState<SelectedCorrespondence | null>(null)
   const [loading, setLoading] = useState(true)
   const [workingId, setWorkingId] = useState<string | null>(null)
   const [message, setMessage] = useState('')
@@ -71,24 +82,44 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
         typed.map((request) => request.sender_id === userId ? request.recipient_id : request.sender_id),
       ))
 
-      if (!otherIds.length) {
+      if (otherIds.length) {
+        const { data: profileRows, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, display_name, country, about_me')
+          .in('id', otherIds)
+
+        if (profileError) throw new Error(`Could not load member profiles: ${errorMessage(profileError)}`)
+
+        const profileMap = new Map<string, MemberProfile>()
+        for (const row of profileRows ?? []) {
+          const member = row as MemberProfile
+          profileMap.set(String(member.id), member)
+        }
+        setProfiles(profileMap)
+      } else {
         setProfiles(new Map())
-        return
       }
 
-      const { data: profileRows, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, display_name, country, about_me')
-        .in('id', otherIds)
+      const activeIds = typed.filter((request) => request.status === 'accepted').map((request) => request.id)
+      if (activeIds.length) {
+        const { data: unreadRows, error: unreadError } = await supabase
+          .from('letters')
+          .select('relationship_id')
+          .eq('recipient_id', userId)
+          .is('read_at', null)
+          .in('relationship_id', activeIds)
 
-      if (profileError) throw new Error(`Could not load member profiles: ${errorMessage(profileError)}`)
+        if (unreadError) throw new Error(`Could not load letter notifications: ${errorMessage(unreadError)}`)
 
-      const profileMap = new Map<string, MemberProfile>()
-      for (const row of profileRows ?? []) {
-        const member = row as MemberProfile
-        profileMap.set(String(member.id), member)
+        const counts = new Map<string, number>()
+        for (const row of unreadRows ?? []) {
+          const relationshipId = String(row.relationship_id)
+          counts.set(relationshipId, (counts.get(relationshipId) ?? 0) + 1)
+        }
+        setUnreadByRelationship(counts)
+      } else {
+        setUnreadByRelationship(new Map())
       }
-      setProfiles(profileMap)
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
@@ -127,10 +158,57 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
     () => requests.filter((request) => request.status === 'accepted'),
     [requests],
   )
+  const unreadTotal = useMemo(
+    () => Array.from(unreadByRelationship.values()).reduce((sum, count) => sum + count, 0),
+    [unreadByRelationship],
+  )
 
   function otherProfile(request: PenPalRequest) {
     const otherId = request.sender_id === userId ? request.recipient_id : request.sender_id
     return profiles.get(otherId)
+  }
+
+  function openCorrespondence(request: PenPalRequest) {
+    const otherUserId = request.sender_id === userId ? request.recipient_id : request.sender_id
+    const person = profiles.get(otherUserId)
+    setSelectedCorrespondence({
+      relationshipId: request.id,
+      otherUserId,
+      otherName: person?.display_name || 'Pen pal',
+      otherCountry: person?.country || null,
+    })
+  }
+
+  if (selectedCorrespondence) {
+    return (
+      <main className="page-shell discover-shell">
+        <section className="discover-card connections-card">
+          <header className="discover-header">
+            <div className="brand-row compact-brand">
+              <div className="stamp" aria-hidden="true">✉</div>
+              <span className="brand-name">Project PenPal</span>
+            </div>
+            <nav className="discover-nav" aria-label="Account navigation">
+              <button className="text-button discover-link" onClick={onDiscover}>Discover</button>
+              <button className="text-button discover-link" onClick={onEditProfile}>Edit profile</button>
+              <button className="text-button discover-link" onClick={onSignOut}>Sign out</button>
+            </nav>
+          </header>
+
+          <Correspondence
+            userId={userId}
+            relationshipId={selectedCorrespondence.relationshipId}
+            otherUserId={selectedCorrespondence.otherUserId}
+            otherName={selectedCorrespondence.otherName}
+            otherCountry={selectedCorrespondence.otherCountry}
+            onBack={() => {
+              setSelectedCorrespondence(null)
+              void loadConnections()
+            }}
+          />
+        </section>
+      </main>
+    )
   }
 
   return (
@@ -154,13 +232,23 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
           <div>
             <h1 className="discover-title">Connections worth keeping.</h1>
             <p className="hero-copy discover-copy">
-              Review new requests, see who you’re waiting on, and keep your accepted pen pals together in one place.
+              Review new requests, keep your accepted pen pals together, and continue your correspondence.
             </p>
           </div>
           <button className="secondary refresh-button" onClick={() => void loadConnections()} disabled={loading}>
             {loading ? 'Checking…' : 'Refresh'}
           </button>
         </div>
+
+        {unreadTotal > 0 && (
+          <div className="letter-alert" role="status">
+            <span className="letter-alert-icon" aria-hidden="true">✉</span>
+            <div>
+              <strong>{unreadTotal} new {unreadTotal === 1 ? 'letter' : 'letters'} waiting for you.</strong>
+              <span>Open the highlighted pen pal below to read {unreadTotal === 1 ? 'it' : 'them'}.</span>
+            </div>
+          </div>
+        )}
 
         {message && <p className="status-message discover-status">{message}</p>}
 
@@ -231,14 +319,18 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
                 <p className="connection-empty">Accepted friendships will appear here.</p>
               ) : active.map((request) => {
                 const person = otherProfile(request)
+                const unreadCount = unreadByRelationship.get(request.id) ?? 0
                 return (
-                  <article className="connection-item active-connection" key={request.id}>
+                  <article className={`connection-item active-connection ${unreadCount > 0 ? 'has-unread-letter' : ''}`} key={request.id}>
                     <div>
                       <span className="person-kicker">Pen pals since {formatDate(request.responded_at || request.created_at)}</span>
                       <h3>{person?.display_name || 'Pen pal'}{person?.country ? ` · ${person.country}` : ''}</h3>
                       {person?.about_me && <p className="request-state">{person.about_me}</p>}
                     </div>
-                    <button className="primary" disabled title="Letters are the next milestone">Write a letter</button>
+                    <button className="primary correspondence-button" onClick={() => openCorrespondence(request)}>
+                      <span>{unreadCount > 0 ? 'Read letters' : 'Write a letter'}</span>
+                      {unreadCount > 0 && <span className="letter-count-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+                    </button>
                   </article>
                 )
               })}
