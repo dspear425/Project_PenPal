@@ -91,6 +91,68 @@
   background: #fffaf4;
 }
 
+.has-unread-letter {
+  border-color: #b8755e;
+  box-shadow: 0 0 0 2px rgba(138, 78, 61, .08);
+}
+
+.letter-alert {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+  border: 1px solid #d6b4a5;
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: #fbf0e9;
+  color: #563d34;
+}
+
+.letter-alert-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #9f6b59;
+  border-radius: 10px;
+  color: #8a4e3d;
+  font-size: 20px;
+}
+
+.letter-alert div {
+  display: grid;
+  gap: 3px;
+}
+
+.letter-alert strong {
+  font-size: .96rem;
+}
+
+.letter-alert span:last-child {
+  color: #75675e;
+  font-size: .86rem;
+}
+
+.correspondence-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.letter-count-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: white;
+  color: #8a4e3d;
+  font-size: .76rem;
+  font-weight: 900;
+}
+
 @media (max-width: 720px) {
   .connection-item {
     align-items: flex-start;
@@ -99,5 +161,9 @@
 
   .connection-actions {
     width: 100%;
+  }
+
+  .letter-alert {
+    align-items: flex-start;
   }
 }
