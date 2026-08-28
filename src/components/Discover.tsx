@@ -7,12 +7,20 @@ type Interest = {
   name: string
 }
 
+type RequestRow = {
+  id: string
+  sender_id: string
+  recipient_id: string
+  status: 'pending' | 'accepted'
+}
+
 type Props = {
   userId: string
   currentProfile: CurrentProfile
   currentInterestIds: number[]
   interestCatalog: Interest[]
   onBack: () => void
+  onConnections: () => void
   onEditProfile: () => void
   onSignOut: () => void
 }
@@ -37,12 +45,17 @@ export default function Discover({
   currentInterestIds,
   interestCatalog,
   onBack,
+  onConnections,
   onEditProfile,
   onSignOut,
 }: Props) {
   const [matches, setMatches] = useState<MatchResult[]>([])
+  const [connectionsByMember, setConnectionsByMember] = useState<Map<string, RequestRow>>(new Map())
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
+  const [composingFor, setComposingFor] = useState<string | null>(null)
+  const [introMessage, setIntroMessage] = useState('')
+  const [requestingId, setRequestingId] = useState<string | null>(null)
 
   const interestNameById = useMemo(
     () => new Map(interestCatalog.map((interest) => [interest.id, interest.name])),
@@ -71,16 +84,25 @@ export default function Discover({
       const candidates = (profileRows ?? []) as MatchProfile[]
       if (!candidates.length) {
         setMatches([])
+        setConnectionsByMember(new Map())
         return
       }
 
       const candidateIds = candidates.map((candidate) => candidate.id)
-      const { data: interestRows, error: interestError } = await supabase
-        .from('profile_interests')
-        .select('profile_id, interest_id')
-        .in('profile_id', candidateIds)
+      const [{ data: interestRows, error: interestError }, { data: requestRows, error: requestError }] = await Promise.all([
+        supabase
+          .from('profile_interests')
+          .select('profile_id, interest_id')
+          .in('profile_id', candidateIds),
+        supabase
+          .from('penpal_requests')
+          .select('id, sender_id, recipient_id, status')
+          .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
+          .in('status', ['pending', 'accepted']),
+      ])
 
       if (interestError) throw new Error(`Could not load member interests: ${errorMessage(interestError)}`)
+      if (requestError) throw new Error(`Could not load pen-pal requests: ${errorMessage(requestError)}`)
 
       const interestsByProfile = new Map<string, number[]>()
       for (const row of interestRows ?? []) {
@@ -100,11 +122,61 @@ export default function Discover({
         )
         .sort((a, b) => b.score - a.score)
 
+      const requestMap = new Map<string, RequestRow>()
+      for (const request of (requestRows ?? []) as RequestRow[]) {
+        const otherId = request.sender_id === userId ? request.recipient_id : request.sender_id
+        requestMap.set(otherId, request)
+      }
+
       setMatches(ranked)
+      setConnectionsByMember(requestMap)
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function sendRequest(recipientId: string) {
+    setRequestingId(recipientId)
+    setMessage('')
+
+    try {
+      const intro = introMessage.trim()
+      if (intro.length > 500) {
+        setMessage('Your introduction must be 500 characters or fewer.')
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('penpal_requests')
+        .insert({
+          sender_id: userId,
+          recipient_id: recipientId,
+          intro_message: intro || null,
+          status: 'pending',
+        })
+        .select('id, sender_id, recipient_id, status')
+        .single()
+
+      if (error) {
+        if ('code' in error && error.code === '23505') {
+          throw new Error('A pending request or active pen-pal connection already exists with this member.')
+        }
+        throw error
+      }
+
+      setConnectionsByMember((previous) => {
+        const next = new Map(previous)
+        next.set(recipientId, data as RequestRow)
+        return next
+      })
+      setComposingFor(null)
+      setIntroMessage('')
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setRequestingId(null)
     }
   }
 
@@ -117,6 +189,7 @@ export default function Discover({
             <span className="brand-name">Project PenPal</span>
           </div>
           <nav className="discover-nav" aria-label="Account navigation">
+            <button className="text-button discover-link" onClick={onConnections}>Pen pals</button>
             <button className="text-button discover-link" onClick={onEditProfile}>Edit profile</button>
             <button className="text-button discover-link" onClick={onSignOut}>Sign out</button>
           </nav>
@@ -147,10 +220,6 @@ export default function Discover({
               Your matching system is working, but there are no other completed, discoverable
               profiles yet. Once another member finishes a profile, they’ll appear here automatically.
             </p>
-            <p className="empty-note">
-              For testing, create a second account with another email address and give it a different
-              set of interests and writing preferences.
-            </p>
           </section>
         )}
 
@@ -160,6 +229,11 @@ export default function Discover({
             const sharedInterestNames = match.sharedInterestIds
               .map((id) => interestNameById.get(id))
               .filter((value): value is string => Boolean(value))
+            const existingConnection = connectionsByMember.get(match.profile.id)
+            const isOutgoing = existingConnection?.status === 'pending' && existingConnection.sender_id === userId
+            const isIncoming = existingConnection?.status === 'pending' && existingConnection.recipient_id === userId
+            const isAccepted = existingConnection?.status === 'accepted'
+            const isComposing = composingFor === match.profile.id
 
             return (
               <article className="match-card" key={match.profile.id}>
@@ -192,11 +266,39 @@ export default function Discover({
                   </div>
                 )}
 
+                {isComposing && !existingConnection && (
+                  <div className="request-composer">
+                    <label>
+                      Say hello <span>optional · {introMessage.length}/500</span>
+                      <textarea
+                        rows={4}
+                        maxLength={500}
+                        value={introMessage}
+                        onChange={(event) => setIntroMessage(event.target.value)}
+                        placeholder={`Introduce yourself to ${match.profile.display_name || 'this member'}…`}
+                      />
+                    </label>
+                    <div className="request-composer-actions">
+                      <button className="primary" type="button" disabled={requestingId === match.profile.id} onClick={() => void sendRequest(match.profile.id)}>
+                        {requestingId === match.profile.id ? 'Sending…' : 'Send request'}
+                      </button>
+                      <button className="secondary" type="button" onClick={() => { setComposingFor(null); setIntroMessage('') }}>Cancel</button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="match-actions">
-                  <button className="primary" type="button" disabled title="Pen-pal requests are the next feature">
-                    Request pen pal
-                  </button>
-                  <span>Requests are coming in the next build.</span>
+                  {isAccepted ? (
+                    <><button className="primary" type="button" disabled>Already pen pals</button><span>Your connection is active.</span></>
+                  ) : isOutgoing ? (
+                    <><button className="primary" type="button" disabled>Request sent</button><button className="text-button inline-link" type="button" onClick={onConnections}>View requests</button></>
+                  ) : isIncoming ? (
+                    <><button className="primary" type="button" onClick={onConnections}>Respond to request</button><span>They already asked to connect.</span></>
+                  ) : !isComposing ? (
+                    <button className="primary" type="button" onClick={() => { setComposingFor(match.profile.id); setIntroMessage('') }}>
+                      Request pen pal
+                    </button>
+                  ) : null}
                 </div>
               </article>
             )
