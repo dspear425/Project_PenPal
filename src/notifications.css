@@ -1,0 +1,26 @@
+.request-dashboard-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.request-dashboard-button.has-notification {
+  border-color: #a9634d;
+  box-shadow: 0 0 0 3px rgba(138, 78, 61, .08);
+}
+
+.request-notification-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: #8a4e3d;
+  color: #fff;
+  font-size: .74rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 2px 7px rgba(91, 47, 35, .22);
+}
