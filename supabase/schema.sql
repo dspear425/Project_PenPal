@@ -47,6 +47,17 @@ alter table public.profiles enable row level security;
 alter table public.interests enable row level security;
 alter table public.profile_interests enable row level security;
 
+-- Supabase projects created with automatic Data API exposure disabled require
+-- explicit table privileges in addition to RLS policies.
+grant usage on schema public to authenticated;
+grant select, insert, update on table public.profiles to authenticated;
+grant select on table public.interests to authenticated;
+grant select, insert, delete on table public.profile_interests to authenticated;
+
+grant select, insert, update, delete on table public.profiles to service_role;
+grant select, insert, update, delete on table public.interests to service_role;
+grant select, insert, update, delete on table public.profile_interests to service_role;
+
 -- Profiles: authenticated users can see their own profile and completed profiles
 -- that have chosen to appear in discovery.
 drop policy if exists "Profiles are visible to their owner and discovery" on public.profiles;
