@@ -4,9 +4,12 @@ import { supabase } from './lib/supabase'
 import AppV6 from './AppV6'
 import AdminPanel from './components/AdminPanel'
 import MemberNotices from './components/MemberNotices'
+import SupportCenter from './components/SupportCenter'
+import AdminQuickTools from './components/AdminQuickTools'
 import './admin.css'
 import './admin-shell.css'
 import './member-notices.css'
+import './support.css'
 
 type ModeratorRole = 'moderator' | 'admin'
 type AccountStatus = 'active' | 'suspended' | 'banned'
@@ -79,7 +82,6 @@ export default function AppRoot() {
 
   async function refreshSecurityState(userId: string) {
     try {
-      // This also clears a temporary suspension if its end time has passed.
       await supabase.rpc('refresh_my_account_status')
 
       const [profileResult, roleResult] = await Promise.all([
@@ -135,7 +137,12 @@ export default function AppRoot() {
   }
 
   if (route === '#admin' && session && role) {
-    return <AdminPanel userId={session.user.id} role={role} onBack={closeAdmin} onSignOut={() => void signOut()} />
+    return (
+      <>
+        <AdminPanel userId={session.user.id} role={role} onBack={closeAdmin} onSignOut={() => void signOut()} />
+        <AdminQuickTools userId={session.user.id} />
+      </>
+    )
   }
 
   if (route === '#admin' && session && !role) {
@@ -166,13 +173,14 @@ export default function AppRoot() {
             <h1 className="dashboard-title">{accountStatus === 'banned' ? 'This account has been banned.' : 'This account is temporarily suspended.'}</h1>
             <p className="hero-copy">
               {accountStatus === 'banned'
-                ? 'Normal Project PenPal features are unavailable for this account. Open Account Notices for the moderation notice associated with this action.'
-                : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information.`}
+                ? 'Normal Project PenPal features are unavailable for this account. Open Account Notices for the moderation notice associated with this action, or Help to contact the moderation team.'
+                : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information, or Help to contact the moderation team.`}
             </p>
             {role && <div className="actions"><button className="secondary" onClick={openAdmin}>Open moderation dashboard</button></div>}
           </section>
         </main>
         <MemberNotices userId={session.user.id} />
+        <SupportCenter userId={session.user.id} />
       </>
     )
   }
@@ -181,6 +189,7 @@ export default function AppRoot() {
     <>
       <AppV6 />
       {session && <MemberNotices userId={session.user.id} />}
+      {session && <SupportCenter userId={session.user.id} />}
       {session && role && (
         <button className="admin-launcher" type="button" onClick={openAdmin} title="Open Project PenPal moderation dashboard">
           Admin
