@@ -3,8 +3,10 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import AppV6 from './AppV6'
 import AdminPanel from './components/AdminPanel'
+import MemberNotices from './components/MemberNotices'
 import './admin.css'
 import './admin-shell.css'
+import './member-notices.css'
 
 type ModeratorRole = 'moderator' | 'admin'
 type AccountStatus = 'active' | 'suspended' | 'banned'
@@ -153,28 +155,32 @@ export default function AppRoot() {
   if (session && accountStatus !== 'active') {
     const until = formatDate(suspendedUntil)
     return (
-      <main className="page-shell">
-        <section className="hero-card dashboard-card account-restricted-card">
-          <div className="dashboard-topline">
-            <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
-            <button className="secondary" onClick={() => void signOut()}>Sign out</button>
-          </div>
-          <p className="eyebrow">Account status</p>
-          <h1 className="dashboard-title">{accountStatus === 'banned' ? 'This account has been banned.' : 'This account is temporarily suspended.'}</h1>
-          <p className="hero-copy">
-            {accountStatus === 'banned'
-              ? 'Normal Project PenPal features are unavailable for this account. If you believe this moderation decision was made in error, an appeal process will be added before public beta.'
-              : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place.`}
-          </p>
-          {role && <div className="actions"><button className="secondary" onClick={openAdmin}>Open moderation dashboard</button></div>}
-        </section>
-      </main>
+      <>
+        <main className="page-shell">
+          <section className="hero-card dashboard-card account-restricted-card">
+            <div className="dashboard-topline">
+              <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
+              <button className="secondary" onClick={() => void signOut()}>Sign out</button>
+            </div>
+            <p className="eyebrow">Account status</p>
+            <h1 className="dashboard-title">{accountStatus === 'banned' ? 'This account has been banned.' : 'This account is temporarily suspended.'}</h1>
+            <p className="hero-copy">
+              {accountStatus === 'banned'
+                ? 'Normal Project PenPal features are unavailable for this account. Open Account Notices for the moderation notice associated with this action.'
+                : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information.`}
+            </p>
+            {role && <div className="actions"><button className="secondary" onClick={openAdmin}>Open moderation dashboard</button></div>}
+          </section>
+        </main>
+        <MemberNotices userId={session.user.id} />
+      </>
     )
   }
 
   return (
     <>
       <AppV6 />
+      {session && <MemberNotices userId={session.user.id} />}
       {session && role && (
         <button className="admin-launcher" type="button" onClick={openAdmin} title="Open Project PenPal moderation dashboard">
           Admin
