@@ -59,8 +59,23 @@ revoke all on table public.staff_role_actions from anon, authenticated;
 grant select, insert, update, delete on table public.staff_role_actions to service_role;
 
 -- ---------------------------------------------------------------------------
--- Role helpers. A restricted staff account does not retain moderation powers.
+-- Role helpers
+-- has_staff_role() is membership-only and remains true even while restricted.
+-- staff_role()/is_moderator()/is_admin()/is_owner() represent CURRENT powers,
+-- so suspended or banned staff cannot continue using moderation functions.
 -- ---------------------------------------------------------------------------
+
+create or replace function public.has_staff_role(check_user uuid default auth.uid())
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.admin_users a where a.user_id = check_user
+  );
+$$;
 
 create or replace function public.staff_role(check_user uuid default auth.uid())
 returns text
@@ -110,10 +125,12 @@ as $$
   select coalesce(public.staff_role(check_user) = 'owner', false);
 $$;
 
+revoke all on function public.has_staff_role(uuid) from public;
 revoke all on function public.staff_role(uuid) from public;
 revoke all on function public.is_moderator(uuid) from public;
 revoke all on function public.is_admin(uuid) from public;
 revoke all on function public.is_owner(uuid) from public;
+grant execute on function public.has_staff_role(uuid) to authenticated;
 grant execute on function public.staff_role(uuid) to authenticated;
 grant execute on function public.is_moderator(uuid) to authenticated;
 grant execute on function public.is_admin(uuid) to authenticated;
@@ -256,7 +273,7 @@ begin
   where lower(coalesce(p.display_name, '')) like '%' || q || '%'
      or lower(coalesce(p.username, '')) like '%' || ltrim(q, '@') || '%'
      or lower(coalesce(u.email, '')) like '%' || q || '%'
-     or lower(coalesce(pai.member_code, '')) = upper(q)
+     or upper(coalesce(pai.member_code, '')) = upper(trim(search_term))
      or p.id::text = q
   order by case when lower(coalesce(u.email, '')) = q then 0 else 1 end,
            coalesce(p.display_name, p.username, u.email)
@@ -456,3 +473,40 @@ $$;
 
 revoke all on function public.moderation_take_action(uuid, uuid, text, text, integer) from public;
 grant execute on function public.moderation_take_action(uuid, uuid, text, text, integer) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Staff accounts cannot self-delete even while suspended/banned. This replaces
+-- the older deletion guard that checked only active moderator permission.
+-- ---------------------------------------------------------------------------
+
+create or replace function public.delete_my_account(confirmation text)
+returns void
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+declare
+  caller uuid := auth.uid();
+begin
+  if caller is null then
+    raise exception 'You must be signed in.' using errcode = 'P0001';
+  end if;
+
+  if confirmation <> 'DELETE MY ACCOUNT' then
+    raise exception 'Type DELETE MY ACCOUNT exactly to confirm.' using errcode = 'P0001';
+  end if;
+
+  if public.has_staff_role(caller) then
+    raise exception 'Staff accounts cannot be self-deleted. Remove the staff role first; the protected Owner role cannot be removed through normal administration.' using errcode = 'P0001';
+  end if;
+
+  delete from auth.users where id = caller;
+
+  if not found then
+    raise exception 'Account not found.' using errcode = 'P0001';
+  end if;
+end;
+$$;
+
+revoke all on function public.delete_my_account(text) from public;
+grant execute on function public.delete_my_account(text) to authenticated;
