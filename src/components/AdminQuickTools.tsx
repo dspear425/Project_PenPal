@@ -20,6 +20,48 @@ type UserContext = {
   support_threads: Array<Record<string, unknown>>
 }
 
+type UserRelationship = {
+  relationship_id: string
+  other_user_id: string
+  other_display_name: string | null
+  other_country: string | null
+  relationship_status: string
+  intro_message: string | null
+  created_at: string
+  responded_at: string | null
+  paused_at: string | null
+  ended_at: string | null
+  letter_count: number
+  last_letter_at: string | null
+}
+
+type ReviewedLetter = {
+  id: string
+  sender_id: string
+  recipient_id: string
+  subject: string | null
+  body: string
+  created_at: string
+  read_at: string | null
+}
+
+type ReviewedCorrespondence = {
+  relationship: {
+    id: string
+    status: string
+    created_at: string
+    responded_at: string | null
+    paused_at: string | null
+    ended_at: string | null
+    other_user_id: string
+    other_display_name: string | null
+    other_country: string | null
+  }
+  letters: ReviewedLetter[]
+  total_letters: number
+  returned_letters: number
+}
+
 type SupportThread = {
   id: string
   user_id: string
@@ -47,8 +89,14 @@ type ProfileLite = { id: string; display_name: string | null; country: string | 
 type Props = { userId: string }
 
 const categoryLabels: Record<string, string> = {
-  account_help: 'Account help', safety: 'Safety concern', technical: 'Technical problem', privacy: 'Privacy question',
-  feedback: 'Feedback', appeal: 'Moderation appeal', other: 'Other',
+  account_help: 'Account help',
+  safety: 'Safety concern',
+  technical: 'Technical problem',
+  privacy: 'Privacy question',
+  feedback: 'Feedback',
+  appeal: 'Moderation appeal',
+  other: 'Other',
+  moderator_outreach: 'Moderator outreach',
 }
 
 function errorMessage(error: unknown) {
@@ -62,7 +110,9 @@ function errorMessage(error: unknown) {
 
 function formatDate(value: string | null | undefined) {
   if (!value) return '—'
-  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(value))
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
+  }).format(new Date(value))
 }
 
 export default function AdminQuickTools({ userId }: Props) {
@@ -74,6 +124,14 @@ export default function AdminQuickTools({ userId }: Props) {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [selectedUser, setSelectedUser] = useState<SearchResult | null>(null)
   const [userContext, setUserContext] = useState<UserContext | null>(null)
+  const [userRelationships, setUserRelationships] = useState<UserRelationship[]>([])
+  const [caseTab, setCaseTab] = useState<'overview' | 'penpals' | 'support'>('overview')
+  const [selectedRelationshipId, setSelectedRelationshipId] = useState<string | null>(null)
+  const [accessReason, setAccessReason] = useState('')
+  const [reviewedCorrespondence, setReviewedCorrespondence] = useState<ReviewedCorrespondence | null>(null)
+  const [outreachOpen, setOutreachOpen] = useState(false)
+  const [outreachSubject, setOutreachSubject] = useState('')
+  const [outreachMessage, setOutreachMessage] = useState('')
 
   const [threads, setThreads] = useState<SupportThread[]>([])
   const [profiles, setProfiles] = useState<Map<string, ProfileLite>>(new Map())
@@ -89,28 +147,132 @@ export default function AdminQuickTools({ userId }: Props) {
     return () => window.clearInterval(timer)
   }, [userId])
 
-  const unreadSupport = useMemo(() => Array.from(unreadByThread.values()).reduce((a, b) => a + b, 0), [unreadByThread])
-  const filteredThreads = useMemo(() => threadFilter === 'all' ? threads : threads.filter((thread) => thread.status === threadFilter), [threads, threadFilter])
+  const unreadSupport = useMemo(
+    () => Array.from(unreadByThread.values()).reduce((a, b) => a + b, 0),
+    [unreadByThread],
+  )
+  const filteredThreads = useMemo(
+    () => threadFilter === 'all' ? threads : threads.filter((thread) => thread.status === threadFilter),
+    [threads, threadFilter],
+  )
   const selectedThread = threads.find((thread) => thread.id === selectedThreadId) ?? null
+  const selectedRelationship = userRelationships.find((item) => item.relationship_id === selectedRelationshipId) ?? null
 
   async function searchUsers(event: React.FormEvent) {
     event.preventDefault()
-    if (query.trim().length < 2) { setMessage('Enter at least 2 characters to search.'); return }
-    setWorking(true); setMessage(''); setSelectedUser(null); setUserContext(null)
+    if (query.trim().length < 2) {
+      setMessage('Enter at least 2 characters to search.')
+      return
+    }
+
+    setWorking(true)
+    setMessage('')
+    setSelectedUser(null)
+    setUserContext(null)
+    setUserRelationships([])
     try {
       const { data, error } = await supabase.rpc('moderator_search_users', { search_term: query })
       if (error) throw error
       setSearchResults((data ?? []) as SearchResult[])
-    } catch (error) { setMessage(errorMessage(error)) } finally { setWorking(false) }
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
   }
 
-  async function openUser(result: SearchResult) {
-    setSelectedUser(result); setWorking(true); setMessage('')
+  async function openUser(result: SearchResult, preserveTab = false) {
+    setSelectedUser(result)
+    setWorking(true)
+    setMessage('')
+    setSelectedRelationshipId(null)
+    setReviewedCorrespondence(null)
+    setAccessReason('')
+    setOutreachOpen(false)
+    if (!preserveTab) setCaseTab('overview')
+
     try {
-      const { data, error } = await supabase.rpc('moderator_user_context', { target_user: result.user_id })
+      const [contextResult, relationshipsResult] = await Promise.all([
+        supabase.rpc('moderator_user_context', { target_user: result.user_id }),
+        supabase.rpc('moderator_user_relationships', { target_user: result.user_id }),
+      ])
+
+      if (contextResult.error) throw contextResult.error
+      if (relationshipsResult.error) throw relationshipsResult.error
+
+      setUserContext((contextResult.data ?? null) as UserContext | null)
+      setUserRelationships((relationshipsResult.data ?? []) as UserRelationship[])
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
+  }
+
+  async function startModeratorOutreach(event: React.FormEvent) {
+    event.preventDefault()
+    if (!selectedUser) return
+
+    if (outreachSubject.trim().length < 3 || !outreachMessage.trim()) {
+      setMessage('Add a subject and message before contacting the member.')
+      return
+    }
+
+    setWorking(true)
+    setMessage('')
+    try {
+      const { error } = await supabase.rpc('moderator_start_support_thread', {
+        target_user: selectedUser.user_id,
+        ticket_subject: outreachSubject,
+        first_message: outreachMessage,
+      })
       if (error) throw error
-      setUserContext((data ?? null) as UserContext | null)
-    } catch (error) { setMessage(errorMessage(error)) } finally { setWorking(false) }
+
+      setOutreachSubject('')
+      setOutreachMessage('')
+      setOutreachOpen(false)
+      await loadSupportThreads()
+      await openUser(selectedUser, true)
+      setCaseTab('support')
+      setMessage(`Message sent to ${selectedUser.display_name || 'member'}. It is now in Member messages.`)
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
+  }
+
+  function chooseRelationship(relationship: UserRelationship) {
+    setSelectedRelationshipId(relationship.relationship_id)
+    setAccessReason('')
+    setReviewedCorrespondence(null)
+    setMessage('')
+  }
+
+  async function reviewRelationshipCorrespondence(event: React.FormEvent) {
+    event.preventDefault()
+    if (!selectedUser || !selectedRelationship) return
+
+    if (accessReason.trim().length < 5) {
+      setMessage('Enter a brief reason for reviewing this private correspondence.')
+      return
+    }
+
+    setWorking(true)
+    setMessage('')
+    try {
+      const { data, error } = await supabase.rpc('moderator_relationship_correspondence', {
+        target_user: selectedUser.user_id,
+        target_relationship: selectedRelationship.relationship_id,
+        access_reason: accessReason,
+      })
+      if (error) throw error
+      setReviewedCorrespondence((data ?? null) as ReviewedCorrespondence | null)
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
   }
 
   async function loadSupportThreads() {
@@ -125,65 +287,138 @@ export default function AdminQuickTools({ userId }: Props) {
 
       const ids = Array.from(new Set(rows.map((row) => row.user_id)))
       if (ids.length) {
-        const { data: profileRows } = await supabase.from('profiles').select('id, display_name, country').in('id', ids)
+        const { data: profileRows } = await supabase
+          .from('profiles')
+          .select('id, display_name, country')
+          .in('id', ids)
         const map = new Map<string, ProfileLite>()
         for (const row of profileRows ?? []) map.set(String(row.id), row as ProfileLite)
         setProfiles(map)
-      } else setProfiles(new Map())
+      } else {
+        setProfiles(new Map())
+      }
 
-      if (!rows.length) { setUnreadByThread(new Map()); return }
+      if (!rows.length) {
+        setUnreadByThread(new Map())
+        return
+      }
+
       const { data: memberMessages, error: messageError } = await supabase
         .from('support_messages')
         .select('thread_id, created_at, sender_role')
         .in('thread_id', rows.map((row) => row.id))
         .eq('sender_role', 'member')
       if (messageError) throw messageError
+
       const next = new Map<string, number>()
       for (const row of memberMessages ?? []) {
         const thread = rows.find((item) => item.id === String(row.thread_id))
         if (!thread) continue
         const lastRead = thread.moderator_last_read_at ? new Date(thread.moderator_last_read_at).getTime() : 0
         if (new Date(String(row.created_at)).getTime() > lastRead) {
-          const id = String(row.thread_id); next.set(id, (next.get(id) ?? 0) + 1)
+          const id = String(row.thread_id)
+          next.set(id, (next.get(id) ?? 0) + 1)
         }
       }
       setUnreadByThread(next)
-    } catch (error) { if (tool === 'support') setMessage(errorMessage(error)) }
+    } catch (error) {
+      if (tool === 'support') setMessage(errorMessage(error))
+    }
   }
 
   async function openSupportThread(thread: SupportThread) {
-    setSelectedThreadId(thread.id); setWorking(true); setMessage('')
+    setSelectedThreadId(thread.id)
+    setWorking(true)
+    setMessage('')
     try {
-      const { data, error } = await supabase.from('support_messages').select('id, thread_id, sender_id, sender_role, body, created_at').eq('thread_id', thread.id).order('created_at')
+      const { data, error } = await supabase
+        .from('support_messages')
+        .select('id, thread_id, sender_id, sender_role, body, created_at')
+        .eq('thread_id', thread.id)
+        .order('created_at')
       if (error) throw error
+
       setSupportMessages((data ?? []) as SupportMessage[])
       await supabase.rpc('mark_support_thread_read', { target_thread: thread.id })
       await loadSupportThreads()
-    } catch (error) { setMessage(errorMessage(error)) } finally { setWorking(false) }
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
+  }
+
+  async function openSupportFromCase(threadId: string) {
+    setWorking(true)
+    setMessage('')
+    try {
+      const { data, error } = await supabase
+        .from('support_threads')
+        .select('id, user_id, category, subject, status, assigned_to, created_at, updated_at, member_last_read_at, moderator_last_read_at')
+        .eq('id', threadId)
+        .single()
+      if (error) throw error
+      setTool('support')
+      await openSupportThread(data as SupportThread)
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
   }
 
   async function sendSupportReply(event: React.FormEvent) {
-    event.preventDefault(); if (!selectedThread || !supportReply.trim()) return
-    setWorking(true); setMessage('')
+    event.preventDefault()
+    if (!selectedThread || !supportReply.trim()) return
+
+    setWorking(true)
+    setMessage('')
     try {
-      const { error } = await supabase.rpc('reply_support_thread', { target_thread: selectedThread.id, message_body: supportReply })
+      const { error } = await supabase.rpc('reply_support_thread', {
+        target_thread: selectedThread.id,
+        message_body: supportReply,
+      })
       if (error) throw error
-      setSupportReply(''); await loadSupportThreads(); await openSupportThread(selectedThread)
-    } catch (error) { setMessage(errorMessage(error)) } finally { setWorking(false) }
+      setSupportReply('')
+      await loadSupportThreads()
+      await openSupportThread(selectedThread)
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
   }
 
   async function setSupportStatus(status: 'open' | 'reviewing' | 'resolved') {
     if (!selectedThread) return
-    setWorking(true); setMessage('')
+    setWorking(true)
+    setMessage('')
     try {
-      const { error } = await supabase.rpc('moderator_set_support_status', { target_thread: selectedThread.id, new_status: status })
+      const { error } = await supabase.rpc('moderator_set_support_status', {
+        target_thread: selectedThread.id,
+        new_status: status,
+      })
       if (error) throw error
       await loadSupportThreads()
       setMessage(`Support conversation marked ${status}.`)
-    } catch (error) { setMessage(errorMessage(error)) } finally { setWorking(false) }
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
   }
 
-  function close() { setTool(null); setMessage(''); setSelectedThreadId(null); setSelectedUser(null); setUserContext(null) }
+  function close() {
+    setTool(null)
+    setMessage('')
+    setSelectedThreadId(null)
+    setSelectedUser(null)
+    setUserContext(null)
+    setUserRelationships([])
+    setSelectedRelationshipId(null)
+    setReviewedCorrespondence(null)
+    setOutreachOpen(false)
+  }
 
   return (
     <>
@@ -197,19 +432,30 @@ export default function AdminQuickTools({ userId }: Props) {
       {tool && (
         <div className="admin-tool-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !working) close() }}>
           <section className="admin-tool-panel" role="dialog" aria-modal="true">
-            <header><div><p className="eyebrow">Moderator tools</p><h2>{tool === 'search' ? 'Find a member.' : 'Member messages.'}</h2></div><button className="admin-tool-close" onClick={close}>×</button></header>
+            <header>
+              <div><p className="eyebrow">Moderator tools</p><h2>{tool === 'search' ? 'Find a member.' : 'Member messages.'}</h2></div>
+              <button className="admin-tool-close" onClick={close}>×</button>
+            </header>
             {message && <p className="status-message admin-tool-status">{message}</p>}
 
             {tool === 'search' && (
               <div className="admin-user-search">
                 <form className="admin-search-form" onSubmit={searchUsers}>
-                  <label>Search by display name, email address, or user ID<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Alex, alex@example.com, or account UUID" /></label>
+                  <label>
+                    Search by display name, email address, or user ID
+                    <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Alex, alex@example.com, or account UUID" />
+                  </label>
                   <button className="primary" disabled={working}>{working ? 'Searching…' : 'Search users'}</button>
                 </form>
+
                 <div className="admin-search-layout">
                   <div className="admin-search-results">
                     {searchResults.map((result) => (
-                      <button key={result.user_id} className={`admin-user-result ${selectedUser?.user_id === result.user_id ? 'selected' : ''}`} onClick={() => void openUser(result)}>
+                      <button
+                        key={result.user_id}
+                        className={`admin-user-result ${selectedUser?.user_id === result.user_id ? 'selected' : ''}`}
+                        onClick={() => void openUser(result)}
+                      >
                         <div><strong>{result.display_name || 'Unnamed member'}</strong><span className={`account-status ${result.account_status}`}>{result.account_status}</span></div>
                         <span>{result.email || 'No email'}{result.country ? ` · ${result.country}` : ''}</span>
                         <small>{result.report_count} reports · {result.moderation_action_count} moderation actions</small>
@@ -217,14 +463,180 @@ export default function AdminQuickTools({ userId }: Props) {
                     ))}
                     {!working && query.trim().length >= 2 && searchResults.length === 0 && <p className="connection-empty">No matching members.</p>}
                   </div>
+
                   <div className="admin-user-context">
-                    {!selectedUser ? <div className="admin-tool-empty"><span>⌕</span><h3>Select a member.</h3><p>Their account and moderation history will appear here.</p></div> : working && !userContext ? <p className="connection-empty">Loading member…</p> : userContext && (
+                    {!selectedUser ? (
+                      <div className="admin-tool-empty"><span>⌕</span><h3>Select a member.</h3><p>Their account, relationships, support history, and moderation history will appear here.</p></div>
+                    ) : working && !userContext ? (
+                      <p className="connection-empty">Loading member…</p>
+                    ) : userContext && (
                       <>
-                        <div className="admin-user-heading"><div><h3>{String(userContext.profile.display_name || selectedUser.display_name || 'Member')}</h3><p>{String(userContext.profile.email || selectedUser.email || '')}</p></div><span className={`account-status ${String(userContext.profile.account_status || 'active')}`}>{String(userContext.profile.account_status || 'active')}</span></div>
-                        <div className="admin-user-facts"><span>User ID <code>{selectedUser.user_id}</code></span><span>Country <strong>{String(userContext.profile.country || 'Not listed')}</strong></span><span>Joined <strong>{formatDate(String(userContext.profile.created_at || selectedUser.joined_at))}</strong></span></div>
-                        <section><h4>Reports involving this member</h4><p>{userContext.reports.length} report{userContext.reports.length === 1 ? '' : 's'} as the reported member.</p></section>
-                        <section><h4>Moderation history</h4>{userContext.actions.length === 0 ? <p>No moderation actions.</p> : <div className="admin-mini-history">{userContext.actions.slice(0, 10).map((item) => <article key={String(item.id)}><strong>{String(item.action_type)}</strong><time>{formatDate(String(item.created_at))}</time>{item.reason ? <p>{String(item.reason)}</p> : null}</article>)}</div>}</section>
-                        <section><h4>Support conversations</h4><p>{userContext.support_threads.length} support conversation{userContext.support_threads.length === 1 ? '' : 's'}.</p></section>
+                        <div className="admin-user-heading admin-case-heading">
+                          <div>
+                            <h3>{String(userContext.profile.display_name || selectedUser.display_name || 'Member')}</h3>
+                            <p>{String(userContext.profile.email || selectedUser.email || '')}</p>
+                          </div>
+                          <div className="admin-case-heading-actions">
+                            <span className={`account-status ${String(userContext.profile.account_status || 'active')}`}>{String(userContext.profile.account_status || 'active')}</span>
+                            <button className="primary" type="button" onClick={() => setOutreachOpen((value) => !value)}>Message member</button>
+                          </div>
+                        </div>
+
+                        {outreachOpen && (
+                          <form className="admin-outreach-form" onSubmit={startModeratorOutreach}>
+                            <div>
+                              <strong>Start a moderator conversation</strong>
+                              <span>The member will receive this in Help and can reply directly.</span>
+                            </div>
+                            <label>Subject<input maxLength={120} value={outreachSubject} onChange={(event) => setOutreachSubject(event.target.value)} placeholder="A message from Project PenPal moderation" /></label>
+                            <label>Message<textarea rows={5} maxLength={6000} value={outreachMessage} onChange={(event) => setOutreachMessage(event.target.value)} placeholder="Write your message to the member…" /></label>
+                            <div className="admin-case-actions"><button className="primary" disabled={working || outreachSubject.trim().length < 3 || !outreachMessage.trim()}>{working ? 'Sending…' : 'Send message'}</button><button className="secondary" type="button" onClick={() => setOutreachOpen(false)}>Cancel</button></div>
+                          </form>
+                        )}
+
+                        <div className="admin-case-tabs" role="tablist" aria-label="Member case file">
+                          <button className={caseTab === 'overview' ? 'selected' : ''} onClick={() => setCaseTab('overview')}>Overview</button>
+                          <button className={caseTab === 'penpals' ? 'selected' : ''} onClick={() => setCaseTab('penpals')}>Pen-pal history <span>{userRelationships.length}</span></button>
+                          <button className={caseTab === 'support' ? 'selected' : ''} onClick={() => setCaseTab('support')}>Support <span>{userContext.support_threads.length}</span></button>
+                        </div>
+
+                        {caseTab === 'overview' && (
+                          <div className="admin-case-tab-content">
+                            <div className="admin-user-facts">
+                              <span>User ID <code>{selectedUser.user_id}</code></span>
+                              <span>Country <strong>{String(userContext.profile.country || 'Not listed')}</strong></span>
+                              <span>Joined <strong>{formatDate(String(userContext.profile.created_at || selectedUser.joined_at))}</strong></span>
+                              <span>Discoverable <strong>{userContext.profile.discoverable === false ? 'No' : 'Yes'}</strong></span>
+                            </div>
+
+                            <section>
+                              <h4>Reports involving this member</h4>
+                              {userContext.reports.length === 0 ? <p>No reports have been submitted against this member.</p> : (
+                                <div className="admin-mini-history">
+                                  {userContext.reports.slice(0, 8).map((item) => (
+                                    <article key={String(item.id)}>
+                                      <strong>{String(item.category || 'Report')}</strong>
+                                      <time>{formatDate(String(item.created_at || ''))}</time>
+                                      <p>Status: {String(item.status || 'open')}</p>
+                                      {item.details ? <p>{String(item.details)}</p> : null}
+                                    </article>
+                                  ))}
+                                </div>
+                              )}
+                            </section>
+
+                            <section>
+                              <h4>Moderation history</h4>
+                              {userContext.actions.length === 0 ? <p>No moderation actions.</p> : (
+                                <div className="admin-mini-history">
+                                  {userContext.actions.slice(0, 10).map((item) => (
+                                    <article key={String(item.id)}>
+                                      <strong>{String(item.action_type)}</strong>
+                                      <time>{formatDate(String(item.created_at))}</time>
+                                      {item.reason ? <p>{String(item.reason)}</p> : null}
+                                    </article>
+                                  ))}
+                                </div>
+                              )}
+                            </section>
+                          </div>
+                        )}
+
+                        {caseTab === 'penpals' && (
+                          <div className="admin-case-tab-content">
+                            <div className="admin-privacy-note">
+                              <strong>Private correspondence</strong>
+                              <span>Relationship metadata is available for moderation. Opening letter contents requires a reason and creates an audit log entry.</span>
+                            </div>
+
+                            {userRelationships.length === 0 ? (
+                              <div className="admin-tool-empty"><span>✉</span><h3>No pen-pal history.</h3><p>This member has no connection records yet.</p></div>
+                            ) : (
+                              <div className="admin-relationship-layout">
+                                <div className="admin-relationship-list">
+                                  {userRelationships.map((relationship) => (
+                                    <button
+                                      key={relationship.relationship_id}
+                                      className={`admin-relationship-card ${selectedRelationshipId === relationship.relationship_id ? 'selected' : ''}`}
+                                      onClick={() => chooseRelationship(relationship)}
+                                    >
+                                      <div><strong>{relationship.other_display_name || 'Member'}</strong><span className="support-status-pill reviewing">{relationship.relationship_status}</span></div>
+                                      <span>{relationship.other_country || 'Country not listed'}</span>
+                                      <small>{relationship.letter_count} {relationship.letter_count === 1 ? 'letter' : 'letters'} · last activity {formatDate(relationship.last_letter_at || relationship.ended_at || relationship.responded_at || relationship.created_at)}</small>
+                                    </button>
+                                  ))}
+                                </div>
+
+                                <div className="admin-relationship-detail">
+                                  {!selectedRelationship ? (
+                                    <div className="admin-tool-empty"><span>↗</span><h3>Select a relationship.</h3><p>Connection details and correspondence controls will appear here.</p></div>
+                                  ) : (
+                                    <>
+                                      <div className="admin-relationship-heading">
+                                        <div><h4>{selectedUser.display_name || 'Member'} ↔ {selectedRelationship.other_display_name || 'Member'}</h4><p>{selectedRelationship.relationship_status} · created {formatDate(selectedRelationship.created_at)}</p></div>
+                                        <strong>{selectedRelationship.letter_count} {selectedRelationship.letter_count === 1 ? 'letter' : 'letters'}</strong>
+                                      </div>
+                                      {selectedRelationship.intro_message && <div className="admin-relationship-intro"><strong>Connection introduction</strong><p>{selectedRelationship.intro_message}</p></div>}
+
+                                      {selectedRelationship.letter_count === 0 ? (
+                                        <p className="connection-empty">No letters were exchanged in this relationship.</p>
+                                      ) : !reviewedCorrespondence ? (
+                                        <form className="admin-correspondence-access" onSubmit={reviewRelationshipCorrespondence}>
+                                          <label>
+                                            Reason for reviewing private correspondence <span>required · logged</span>
+                                            <textarea rows={3} maxLength={500} value={accessReason} onChange={(event) => setAccessReason(event.target.value)} placeholder="Example: Reviewing a safety concern raised by the member." />
+                                          </label>
+                                          <button className="secondary" disabled={working || accessReason.trim().length < 5}>{working ? 'Opening…' : 'Review correspondence'}</button>
+                                        </form>
+                                      ) : (
+                                        <div className="admin-reviewed-correspondence">
+                                          <div className="admin-correspondence-summary">
+                                            <strong>Correspondence review</strong>
+                                            <span>Showing {reviewedCorrespondence.returned_letters} of {reviewedCorrespondence.total_letters} letters. This access has been logged.</span>
+                                          </div>
+                                          <div className="admin-correspondence-letters">
+                                            {reviewedCorrespondence.letters.map((letter) => {
+                                              const fromSelected = letter.sender_id === selectedUser.user_id
+                                              return (
+                                                <article key={letter.id}>
+                                                  <div><strong>{fromSelected ? selectedUser.display_name || 'Selected member' : selectedRelationship.other_display_name || 'Pen pal'}</strong><time>{formatDate(letter.created_at)}</time></div>
+                                                  {letter.subject && <h5>{letter.subject}</h5>}
+                                                  <p>{letter.body}</p>
+                                                </article>
+                                              )
+                                            })}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {caseTab === 'support' && (
+                          <div className="admin-case-tab-content">
+                            <div className="admin-case-section-heading">
+                              <div><h4>Support conversations</h4><p>Messages between this member and Project PenPal moderators.</p></div>
+                              <button className="primary" type="button" onClick={() => setOutreachOpen(true)}>Message member</button>
+                            </div>
+                            {userContext.support_threads.length === 0 ? (
+                              <div className="admin-tool-empty"><span>✉</span><h3>No support conversations.</h3><p>Use Message member to start one.</p></div>
+                            ) : (
+                              <div className="admin-case-support-list">
+                                {userContext.support_threads.map((item) => (
+                                  <button key={String(item.id)} onClick={() => void openSupportFromCase(String(item.id))}>
+                                    <div><strong>{String(item.subject || 'Support conversation')}</strong><span className={`support-status-pill ${String(item.status || 'open')}`}>{String(item.status || 'open')}</span></div>
+                                    <span>{categoryLabels[String(item.category)] || String(item.category || 'Support')}</span>
+                                    <small>Updated {formatDate(String(item.updated_at || item.created_at || ''))}</small>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -235,22 +647,51 @@ export default function AdminQuickTools({ userId }: Props) {
             {tool === 'support' && (
               <div className="admin-support-inbox">
                 <div className="admin-filter-row admin-support-filters">
-                  {(['open', 'reviewing', 'resolved', 'all'] as const).map((value) => <button key={value} className={`admin-filter ${threadFilter === value ? 'selected' : ''}`} onClick={() => setThreadFilter(value)}>{value[0].toUpperCase() + value.slice(1)}</button>)}
+                  {(['open', 'reviewing', 'resolved', 'all'] as const).map((value) => (
+                    <button key={value} className={`admin-filter ${threadFilter === value ? 'selected' : ''}`} onClick={() => setThreadFilter(value)}>{value[0].toUpperCase() + value.slice(1)}</button>
+                  ))}
                   <button className="secondary" onClick={() => void loadSupportThreads()}>Refresh</button>
                 </div>
+
                 <div className="admin-support-layout">
                   <div className="admin-support-list">
-                    {filteredThreads.length === 0 ? <div className="admin-tool-empty"><span>✓</span><h3>No messages here.</h3></div> : filteredThreads.map((thread) => {
-                      const member = profiles.get(thread.user_id); const unread = unreadByThread.get(thread.id) ?? 0
-                      return <button key={thread.id} className={`admin-support-card ${selectedThreadId === thread.id ? 'selected' : ''} ${unread ? 'unread' : ''}`} onClick={() => void openSupportThread(thread)}><div><span className={`support-status-pill ${thread.status}`}>{thread.status}</span><time>{formatDate(thread.updated_at)}</time></div><strong>{thread.subject}</strong><span>{member?.display_name || 'Member'}{member?.country ? ` · ${member.country}` : ''}</span><small>{categoryLabels[thread.category] || thread.category}</small>{unread > 0 && <em>{unread} new</em>}</button>
+                    {filteredThreads.length === 0 ? (
+                      <div className="admin-tool-empty"><span>✓</span><h3>No messages here.</h3></div>
+                    ) : filteredThreads.map((thread) => {
+                      const member = profiles.get(thread.user_id)
+                      const unread = unreadByThread.get(thread.id) ?? 0
+                      return (
+                        <button key={thread.id} className={`admin-support-card ${selectedThreadId === thread.id ? 'selected' : ''} ${unread ? 'unread' : ''}`} onClick={() => void openSupportThread(thread)}>
+                          <div><span className={`support-status-pill ${thread.status}`}>{thread.status}</span><time>{formatDate(thread.updated_at)}</time></div>
+                          <strong>{thread.subject}</strong>
+                          <span>{member?.display_name || 'Member'}{member?.country ? ` · ${member.country}` : ''}</span>
+                          <small>{categoryLabels[thread.category] || thread.category}</small>
+                          {unread > 0 && <em>{unread} new</em>}
+                        </button>
+                      )
                     })}
                   </div>
+
                   <div className="admin-support-conversation">
-                    {!selectedThread ? <div className="admin-tool-empty"><span>✉</span><h3>Select a conversation.</h3><p>Messages and reply controls will appear here.</p></div> : (
+                    {!selectedThread ? (
+                      <div className="admin-tool-empty"><span>✉</span><h3>Select a conversation.</h3><p>Messages and reply controls will appear here.</p></div>
+                    ) : (
                       <>
-                        <div className="admin-support-heading"><div><span className={`support-status-pill ${selectedThread.status}`}>{selectedThread.status}</span><h3>{selectedThread.subject}</h3><p>{profiles.get(selectedThread.user_id)?.display_name || 'Member'} · {categoryLabels[selectedThread.category] || selectedThread.category}</p></div></div>
-                        <div className="admin-support-messages">{supportMessages.map((item) => <article className={item.sender_role} key={item.id}><div><strong>{item.sender_role === 'moderator' ? 'Moderator' : profiles.get(selectedThread.user_id)?.display_name || 'Member'}</strong><time>{formatDate(item.created_at)}</time></div><p>{item.body}</p></article>)}</div>
-                        <form className="admin-support-reply" onSubmit={sendSupportReply}><label>Reply<textarea rows={5} maxLength={6000} value={supportReply} onChange={(event) => setSupportReply(event.target.value)} placeholder="Write a reply to the member…" /></label><div><button className="primary" disabled={working || !supportReply.trim()}>{working ? 'Sending…' : 'Send reply'}</button><button className="secondary" type="button" disabled={working} onClick={() => void setSupportStatus('reviewing')}>Mark reviewing</button><button className="secondary" type="button" disabled={working} onClick={() => void setSupportStatus('resolved')}>Resolve</button></div></form>
+                        <div className="admin-support-heading">
+                          <div><span className={`support-status-pill ${selectedThread.status}`}>{selectedThread.status}</span><h3>{selectedThread.subject}</h3><p>{profiles.get(selectedThread.user_id)?.display_name || 'Member'} · {categoryLabels[selectedThread.category] || selectedThread.category}</p></div>
+                        </div>
+                        <div className="admin-support-messages">
+                          {supportMessages.map((item) => (
+                            <article className={item.sender_role} key={item.id}>
+                              <div><strong>{item.sender_role === 'moderator' ? 'Moderator' : profiles.get(selectedThread.user_id)?.display_name || 'Member'}</strong><time>{formatDate(item.created_at)}</time></div>
+                              <p>{item.body}</p>
+                            </article>
+                          ))}
+                        </div>
+                        <form className="admin-support-reply" onSubmit={sendSupportReply}>
+                          <label>Reply<textarea rows={5} maxLength={6000} value={supportReply} onChange={(event) => setSupportReply(event.target.value)} placeholder="Write a reply to the member…" /></label>
+                          <div><button className="primary" disabled={working || !supportReply.trim()}>{working ? 'Sending…' : 'Send reply'}</button><button className="secondary" type="button" disabled={working} onClick={() => void setSupportStatus('reviewing')}>Mark reviewing</button><button className="secondary" type="button" disabled={working} onClick={() => void setSupportStatus('resolved')}>Resolve</button></div>
+                        </form>
                       </>
                     )}
                   </div>
