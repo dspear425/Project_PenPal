@@ -14,6 +14,16 @@ import './support.css'
 type ModeratorRole = 'moderator' | 'admin'
 type AccountStatus = 'active' | 'suspended' | 'banned'
 
+type AdminSupportThread = {
+  id: string
+  moderator_last_read_at: string | null
+}
+
+type AdminSupportMessage = {
+  thread_id: string
+  created_at: string
+}
+
 function formatDate(value: string | null) {
   if (!value) return null
   return new Intl.DateTimeFormat(undefined, {
@@ -28,6 +38,7 @@ export default function AppRoot() {
   const [suspendedUntil, setSuspendedUntil] = useState<string | null>(null)
   const [route, setRoute] = useState(window.location.hash)
   const [checking, setChecking] = useState(true)
+  const [adminMessageCount, setAdminMessageCount] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -52,6 +63,7 @@ export default function AppRoot() {
         setRole(null)
         setAccountStatus('active')
         setSuspendedUntil(null)
+        setAdminMessageCount(0)
         setChecking(false)
         if (window.location.hash === '#admin') window.location.hash = ''
       }
@@ -79,6 +91,57 @@ export default function AppRoot() {
       window.clearInterval(timer)
     }
   }, [])
+
+  useEffect(() => {
+    if (!session || !role) {
+      setAdminMessageCount(0)
+      return
+    }
+
+    const refresh = () => void loadAdminMessageCount()
+    refresh()
+    window.addEventListener('focus', refresh)
+    const timer = window.setInterval(refresh, 60000)
+
+    return () => {
+      window.removeEventListener('focus', refresh)
+      window.clearInterval(timer)
+    }
+  }, [session?.user.id, role])
+
+  async function loadAdminMessageCount() {
+    const { data: threadRows, error: threadError } = await supabase
+      .from('support_threads')
+      .select('id, moderator_last_read_at')
+
+    if (threadError || !threadRows?.length) {
+      setAdminMessageCount(0)
+      return
+    }
+
+    const threads = threadRows as AdminSupportThread[]
+    const { data: messageRows, error: messageError } = await supabase
+      .from('support_messages')
+      .select('thread_id, created_at')
+      .eq('sender_role', 'member')
+      .in('thread_id', threads.map((thread) => thread.id))
+
+    if (messageError) return
+
+    const lastReadByThread = new Map(
+      threads.map((thread) => [
+        thread.id,
+        thread.moderator_last_read_at ? new Date(thread.moderator_last_read_at).getTime() : 0,
+      ]),
+    )
+
+    const unread = ((messageRows ?? []) as AdminSupportMessage[]).reduce((count, message) => {
+      const lastRead = lastReadByThread.get(message.thread_id) ?? 0
+      return new Date(message.created_at).getTime() > lastRead ? count + 1 : count
+    }, 0)
+
+    setAdminMessageCount(unread)
+  }
 
   async function refreshSecurityState(userId: string) {
     try {
@@ -191,8 +254,15 @@ export default function AppRoot() {
       {session && <MemberNotices userId={session.user.id} />}
       {session && <SupportCenter userId={session.user.id} />}
       {session && role && (
-        <button className="admin-launcher" type="button" onClick={openAdmin} title="Open Project PenPal moderation dashboard">
-          Admin
+        <button
+          className={`admin-launcher ${adminMessageCount > 0 ? 'has-admin-message' : ''}`}
+          type="button"
+          onClick={openAdmin}
+          title={adminMessageCount > 0 ? `${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
+          aria-label={adminMessageCount > 0 ? `Admin, ${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
+        >
+          <span>Admin</span>
+          {adminMessageCount > 0 && <strong className="admin-message-badge">{adminMessageCount > 99 ? '99+' : adminMessageCount}</strong>}
         </button>
       )}
     </>
