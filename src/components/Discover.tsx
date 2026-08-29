@@ -11,7 +11,7 @@ type RequestRow = {
   id: string
   sender_id: string
   recipient_id: string
-  status: 'pending' | 'accepted'
+  status: 'pending' | 'accepted' | 'paused'
 }
 
 type Props = {
@@ -98,7 +98,7 @@ export default function Discover({
           .from('penpal_requests')
           .select('id, sender_id, recipient_id, status')
           .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
-          .in('status', ['pending', 'accepted']),
+          .in('status', ['pending', 'accepted', 'paused']),
       ])
 
       if (interestError) throw new Error(`Could not load member interests: ${errorMessage(interestError)}`)
@@ -161,7 +161,7 @@ export default function Discover({
 
       if (error) {
         if ('code' in error && error.code === '23505') {
-          throw new Error('A pending request or active pen-pal connection already exists with this member.')
+          throw new Error('A pending request or existing pen-pal connection already exists with this member.')
         }
         throw error
       }
@@ -233,6 +233,7 @@ export default function Discover({
             const isOutgoing = existingConnection?.status === 'pending' && existingConnection.sender_id === userId
             const isIncoming = existingConnection?.status === 'pending' && existingConnection.recipient_id === userId
             const isAccepted = existingConnection?.status === 'accepted'
+            const isPaused = existingConnection?.status === 'paused'
             const isComposing = composingFor === match.profile.id
 
             return (
@@ -289,7 +290,9 @@ export default function Discover({
 
                 <div className="match-actions">
                   {isAccepted ? (
-                    <><button className="primary" type="button" disabled>Already pen pals</button><span>Your connection is active.</span></>
+                    <><button className="primary" type="button" disabled>Already pen pals</button><button className="text-button inline-link" type="button" onClick={onConnections}>Open pen pals</button></>
+                  ) : isPaused ? (
+                    <><button className="primary" type="button" disabled>Connection paused</button><button className="text-button inline-link" type="button" onClick={onConnections}>Manage connection</button></>
                   ) : isOutgoing ? (
                     <><button className="primary" type="button" disabled>Request sent</button><button className="text-button inline-link" type="button" onClick={onConnections}>View requests</button></>
                   ) : isIncoming ? (
