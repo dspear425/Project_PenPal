@@ -34,6 +34,7 @@ const categoryLabels: Record<string, string> = {
   feedback: 'Feedback',
   appeal: 'Moderation appeal',
   other: 'Something else',
+  moderator_outreach: 'Message from moderation',
 }
 
 function errorMessage(error: unknown) {
@@ -253,7 +254,9 @@ export default function SupportCenter({ userId }: Props) {
                 <button className="back" type="button" onClick={() => setView('list')}>← Support conversations</button>
                 <label>What do you need help with?
                   <select value={category} onChange={(event) => setCategory(event.target.value)}>
-                    {Object.entries(categoryLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    {Object.entries(categoryLabels)
+                      .filter(([value]) => value !== 'moderator_outreach')
+                      .map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                   </select>
                 </label>
                 <label>Subject
