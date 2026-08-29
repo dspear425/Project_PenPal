@@ -12,6 +12,14 @@ type Letter = {
   read_at: string | null
 }
 
+type RelationshipPeriod = {
+  id: string
+  status: 'accepted' | 'paused' | 'ended'
+  created_at: string
+  responded_at: string | null
+  ended_at: string | null
+}
+
 type Props = {
   userId: string
   relationshipId: string
@@ -42,8 +50,34 @@ function formatDate(value: string) {
   }).format(new Date(value))
 }
 
+function formatShortDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value))
+}
+
 function draftKey(userId: string, relationshipId: string) {
   return `project-penpal:letter-draft:${userId}:${relationshipId}`
+}
+
+function LetterCard({ letter, userId, otherName }: { letter: Letter; userId: string; otherName: string }) {
+  const mine = letter.sender_id === userId
+
+  return (
+    <article className={`letter-paper ${mine ? 'sent-letter' : 'received-letter'}`}>
+      <div className="letter-meta">
+        <span>{mine ? 'You wrote' : `${otherName} wrote`}</span>
+        <time dateTime={letter.created_at}>{formatDate(letter.created_at)}</time>
+      </div>
+      {letter.subject && <h3>{letter.subject}</h3>}
+      <div className="letter-body">{letter.body}</div>
+      <div className="letter-footer">
+        {mine ? <span>{letter.read_at ? 'Read' : 'Sent'}</span> : <span>Received</span>}
+      </div>
+    </article>
+  )
 }
 
 export default function Correspondence({
@@ -57,6 +91,7 @@ export default function Correspondence({
   onSafety,
 }: Props) {
   const [letters, setLetters] = useState<Letter[]>([])
+  const [relationshipPeriods, setRelationshipPeriods] = useState<RelationshipPeriod[]>([])
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [loading, setLoading] = useState(true)
@@ -64,6 +99,23 @@ export default function Correspondence({
   const [message, setMessage] = useState('')
 
   const canWrite = relationshipStatus === 'accepted'
+
+  const currentLetters = useMemo(
+    () => letters.filter((letter) => letter.relationship_id === relationshipId),
+    [letters, relationshipId],
+  )
+
+  const previousPeriods = useMemo(
+    () => relationshipPeriods
+      .filter((period) => period.id !== relationshipId)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+    [relationshipPeriods, relationshipId],
+  )
+
+  const previousLetterCount = useMemo(
+    () => letters.filter((letter) => letter.relationship_id !== relationshipId).length,
+    [letters, relationshipId],
+  )
 
   const wordCount = useMemo(() => {
     const trimmed = body.trim()
@@ -82,7 +134,7 @@ export default function Correspondence({
       }
     }
     void loadLetters()
-  }, [relationshipId, userId])
+  }, [relationshipId, userId, otherUserId])
 
   useEffect(() => {
     if (!canWrite) return
@@ -106,10 +158,27 @@ export default function Correspondence({
     setMessage('')
 
     try {
+      const { data: periodsData, error: periodsError } = await supabase
+        .from('penpal_requests')
+        .select('id, status, created_at, responded_at, ended_at')
+        .or(
+          `and(sender_id.eq.${userId},recipient_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},recipient_id.eq.${userId})`,
+        )
+        .in('status', ['accepted', 'paused', 'ended'])
+        .order('created_at', { ascending: true })
+
+      if (periodsError) throw new Error(`Could not load correspondence periods: ${errorMessage(periodsError)}`)
+
+      const periods = (periodsData ?? []) as RelationshipPeriod[]
+      setRelationshipPeriods(periods)
+
+      const relationshipIds = periods.map((period) => period.id)
+      if (!relationshipIds.includes(relationshipId)) relationshipIds.push(relationshipId)
+
       const { data, error } = await supabase
         .from('letters')
         .select('id, relationship_id, sender_id, recipient_id, subject, body, created_at, read_at')
-        .eq('relationship_id', relationshipId)
+        .in('relationship_id', relationshipIds)
         .order('created_at', { ascending: true })
 
       if (error) throw new Error(`Could not load letters: ${errorMessage(error)}`)
@@ -117,11 +186,11 @@ export default function Correspondence({
       const rows = (data ?? []) as Letter[]
       setLetters(rows)
 
-      const hasUnread = rows.some(
-        (letter) => letter.recipient_id === userId && letter.read_at === null,
+      const hasUnreadCurrent = rows.some(
+        (letter) => letter.relationship_id === relationshipId && letter.recipient_id === userId && letter.read_at === null,
       )
 
-      if (hasUnread) {
+      if (hasUnreadCurrent) {
         const readAt = new Date().toISOString()
         const { error: readError } = await supabase
           .from('letters')
@@ -133,7 +202,7 @@ export default function Correspondence({
         if (!readError) {
           setLetters((previous) =>
             previous.map((letter) =>
-              letter.recipient_id === userId && letter.read_at === null
+              letter.relationship_id === relationshipId && letter.recipient_id === userId && letter.read_at === null
                 ? { ...letter, read_at: readAt }
                 : letter,
             ),
@@ -206,6 +275,16 @@ export default function Correspondence({
         </div>
       </div>
 
+      {previousPeriods.length > 0 && relationshipStatus === 'accepted' && (
+        <div className="reconnected-note">
+          <span aria-hidden="true">↻</span>
+          <div>
+            <strong>You and {otherName} have corresponded before.</strong>
+            <p>Your new connection starts fresh, while your earlier letters are preserved below as previous correspondence.</p>
+          </div>
+        </div>
+      )}
+
       {relationshipStatus === 'paused' && (
         <div className="correspondence-boundary-note">
           <strong>This pen-pal relationship is paused.</strong>
@@ -224,41 +303,73 @@ export default function Correspondence({
 
       <section className="letter-history" aria-live="polite">
         <div className="letter-section-heading">
-          <h2>Correspondence history</h2>
-          <span>{letters.length}</span>
+          <h2>{previousPeriods.length > 0 ? 'Current correspondence' : 'Correspondence history'}</h2>
+          <span>{currentLetters.length}</span>
         </div>
 
         {loading ? (
           <p className="connection-empty">Opening your letters…</p>
-        ) : letters.length === 0 ? (
+        ) : currentLetters.length === 0 ? (
           <div className="first-letter-note">
             <span aria-hidden="true">✉</span>
             <div>
-              <h3>No letters yet.</h3>
-              <p>{canWrite ? 'You can be the first to write. There’s no minimum length — just say something genuine.' : 'There were no letters exchanged before this relationship changed.'}</p>
+              <h3>{previousPeriods.length > 0 ? 'No new letters yet.' : 'No letters yet.'}</h3>
+              <p>{canWrite ? `This ${previousPeriods.length > 0 ? 'new chapter' : 'correspondence'} is ready whenever you are — write something genuine to ${otherName}.` : 'There were no letters exchanged before this relationship changed.'}</p>
             </div>
           </div>
         ) : (
           <div className="letter-stack">
-            {letters.map((letter) => {
-              const mine = letter.sender_id === userId
-              return (
-                <article className={`letter-paper ${mine ? 'sent-letter' : 'received-letter'}`} key={letter.id}>
-                  <div className="letter-meta">
-                    <span>{mine ? 'You wrote' : `${otherName} wrote`}</span>
-                    <time dateTime={letter.created_at}>{formatDate(letter.created_at)}</time>
-                  </div>
-                  {letter.subject && <h3>{letter.subject}</h3>}
-                  <div className="letter-body">{letter.body}</div>
-                  <div className="letter-footer">
-                    {mine ? <span>{letter.read_at ? 'Read' : 'Sent'}</span> : <span>Received</span>}
-                  </div>
-                </article>
-              )
-            })}
+            {currentLetters.map((letter) => (
+              <LetterCard key={letter.id} letter={letter} userId={userId} otherName={otherName} />
+            ))}
           </div>
         )}
       </section>
+
+      {!loading && previousPeriods.length > 0 && (
+        <section className="previous-correspondence-section">
+          <div className="letter-section-heading">
+            <h2>Previous correspondence</h2>
+            <span>{previousLetterCount}</span>
+          </div>
+          <p className="previous-correspondence-copy">
+            Earlier pen-pal periods are kept separate from your current connection so your history stays clear.
+          </p>
+
+          <div className="previous-periods">
+            {previousPeriods.map((period, index) => {
+              const periodLetters = letters.filter((letter) => letter.relationship_id === period.id)
+              const startDate = period.responded_at || period.created_at
+              const endDate = period.ended_at
+
+              return (
+                <section className="previous-period" key={period.id}>
+                  <div className="previous-period-heading">
+                    <div>
+                      <span className="person-kicker">Previous pen-pal period {previousPeriods.length - index}</span>
+                      <h3>
+                        {formatShortDate(startDate)}
+                        {endDate ? ` – ${formatShortDate(endDate)}` : ''}
+                      </h3>
+                    </div>
+                    <span className="previous-period-count">{periodLetters.length} {periodLetters.length === 1 ? 'letter' : 'letters'}</span>
+                  </div>
+
+                  {periodLetters.length === 0 ? (
+                    <p className="connection-empty">No letters were exchanged during this period.</p>
+                  ) : (
+                    <div className="letter-stack archived-letter-stack">
+                      {periodLetters.map((letter) => (
+                        <LetterCard key={letter.id} letter={letter} userId={userId} otherName={otherName} />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {canWrite ? (
         <section className="compose-letter-section">
