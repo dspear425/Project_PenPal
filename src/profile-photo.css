@@ -1,0 +1,63 @@
+.profile-photo-launcher {
+  position: fixed;
+  right: 24px;
+  bottom: 234px;
+  z-index: 42;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d2c4b6;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #fffdf9;
+  color: #4a4038;
+  box-shadow: 0 10px 28px rgba(69,52,39,.14);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.profile-photo-launcher > span:first-child { width:24px;height:24px;display:grid;place-items:center;border-radius:999px;background:#efe6dc;color:#845a48; }
+
+.profile-photo-overlay { position:fixed;inset:0;z-index:97;display:grid;place-items:center;padding:24px;background:rgba(38,31,26,.48);backdrop-filter:blur(4px); }
+.profile-photo-panel { width:min(980px,100%);max-height:90vh;overflow:auto;border-radius:26px;padding:clamp(24px,4vw,38px);background:#fffdf9;box-shadow:0 28px 80px rgba(38,29,22,.28); }
+.profile-photo-panel>header { display:flex;justify-content:space-between;gap:24px;align-items:flex-start; }
+.profile-photo-panel>header h2 { margin:4px 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.9rem,4vw,2.8rem); }
+.profile-photo-panel>header p:last-child { margin:0;max-width:700px;color:#756b62;line-height:1.55; }
+.profile-photo-status { margin-top:18px; }
+.profile-photo-layout { display:grid;grid-template-columns:minmax(260px,.72fr) minmax(0,1.28fr);gap:20px;margin-top:22px;align-items:start; }
+.profile-photo-preview-card,.profile-photo-privacy-card { border:1px solid #ddd2c6;border-radius:18px;padding:20px;background:white; }
+.profile-photo-preview-card { display:grid;place-items:center;text-align:center;gap:14px; }
+.profile-photo-preview-card>div:nth-of-type(2) { display:grid;gap:3px; }
+.profile-photo-preview-card span,.profile-photo-preview-card small { color:#7c7168;line-height:1.45; }
+.profile-photo-preview { width:156px;height:156px;border-radius:50%;overflow:hidden;border:5px solid #f4ede5;background:#eee6de; }
+.profile-photo-preview img { width:100%;height:100%;object-fit:cover;display:block; }
+.profile-photo-file-input { display:none; }
+.profile-photo-actions { display:flex;gap:8px;flex-wrap:wrap;justify-content:center; }
+
+.profile-photo-privacy-card { display:grid;gap:12px; }
+.profile-photo-privacy-card h3 { margin:0;font-family:Georgia,'Times New Roman',serif;font-size:1.35rem; }
+.profile-photo-privacy-card>div:first-child p { margin:5px 0 4px;color:#786e65;line-height:1.5; }
+.profile-photo-privacy-card>label { display:flex;gap:12px;align-items:flex-start;border:1px solid #dfd5cb;border-radius:14px;padding:14px;background:#fffdfa;cursor:pointer; }
+.profile-photo-privacy-card>label.selected { border-color:#a56853;background:#fff7f1;box-shadow:0 0 0 2px rgba(138,78,61,.06); }
+.profile-photo-privacy-card input[type='radio'] { margin-top:3px;width:18px;height:18px;accent-color:#8a4e3d; }
+.profile-photo-privacy-card label span { display:grid;gap:4px; }
+.profile-photo-privacy-card label small { color:#786e65;line-height:1.45; }
+.profile-photo-safety-note { margin-top:4px;border:1px solid #ddcfbe;border-radius:14px;padding:14px;background:#fbf5ed; }
+.profile-photo-safety-note strong { color:#7a4a39; }
+.profile-photo-safety-note p { margin:6px 0 0;color:#6f655d;line-height:1.5; }
+
+.profile-avatar { flex:0 0 auto;display:grid;place-items:center;border-radius:50%;overflow:hidden;border:2px solid #eadfd5;background:#f0e8df;color:#7a5142;font-weight:900;letter-spacing:.03em; }
+.profile-avatar img { width:100%;height:100%;object-fit:cover;display:block; }
+.profile-avatar-small { width:42px;height:42px;font-size:.78rem; }
+.profile-avatar-medium { width:68px;height:68px;font-size:1rem; }
+.profile-avatar-large { width:156px;height:156px;font-family:Georgia,'Times New Roman',serif;font-size:2.1rem;border-width:5px; }
+.match-profile-heading { display:flex;gap:14px;align-items:center;min-width:0; }
+.correspondence-person-heading { display:flex;gap:16px;align-items:center; }
+.correspondence-person-heading>div { min-width:0; }
+
+@media(max-width:800px){
+  .profile-photo-launcher{right:14px;bottom:234px}
+  .profile-photo-overlay{padding:10px;align-items:end}
+  .profile-photo-panel{max-height:94vh;border-radius:22px 22px 10px 10px}
+  .profile-photo-layout{grid-template-columns:1fr}
+}
