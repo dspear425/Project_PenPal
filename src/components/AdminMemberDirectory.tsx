@@ -197,6 +197,10 @@ export default function AdminMemberDirectory({ userId }: Props) {
 
   async function takeAction(action: 'warning' | 'suspend' | 'ban' | 'restore') {
     if (!selected) return
+    if ((action === 'suspend' || action === 'ban') && selected.user_id === userId) {
+      setMessage('You cannot suspend or ban your own moderator account. This protects administrator access.')
+      return
+    }
     if (action !== 'restore' && !actionReason.trim()) {
       setMessage('A reason is required for a warning, suspension, or ban.')
       return
@@ -251,6 +255,7 @@ export default function AdminMemberDirectory({ userId }: Props) {
   }
 
   const profile = context?.profile ?? {}
+  const selectedIsSelf = selected?.user_id === userId
 
   return (
     <>
@@ -306,7 +311,7 @@ export default function AdminMemberDirectory({ userId }: Props) {
                       <div className="admin-private-info-card"><div><span>Member code</span><strong>{String(profile.member_code || '—')}</strong></div><div><span>Private surname</span><strong>{String(profile.private_last_name || 'Not provided')}</strong></div><div><span>Email</span><strong>{String(profile.email || selected.email || '—')}</strong></div></div>
                       <div className="admin-user-facts"><span>User ID <code>{selected.user_id}</code></span><span>Birth year <strong>{String(profile.birth_year || 'Not listed')}</strong></span><span>Country <strong>{String(profile.country || 'Not listed')}</strong></span><span>Region <strong>{String(profile.region || 'Not listed')}</strong></span><span>Nearest city <strong>{String(profile.nearest_city || 'Not listed')}</strong></span><span>Joined <strong>{formatDate(String(profile.created_at || selected.joined_at))}</strong></span></div>
 
-                      <section className="admin-case-account-actions"><h4>Account action</h4><p>Reason is required for Warning, Suspend, or Ban. Actions are logged and delivered to the member through Account Notices.</p><textarea rows={3} maxLength={2000} value={actionReason} onChange={(event) => setActionReason(event.target.value)} placeholder="Reason for this moderation action…" /><label>Suspension length<select value={suspensionHours} onChange={(event) => setSuspensionHours(Number(event.target.value))}><option value={24}>24 hours</option><option value={72}>3 days</option><option value={168}>7 days</option><option value={336}>14 days</option><option value={720}>30 days</option><option value={2160}>90 days</option></select></label><div className="admin-case-actions"><button className="secondary" disabled={working || !actionReason.trim()} onClick={() => void takeAction('warning')}>Issue warning</button><button className="secondary" disabled={working || !actionReason.trim()} onClick={() => void takeAction('suspend')}>Suspend</button><button className="danger-button" disabled={working || !actionReason.trim()} onClick={() => void takeAction('ban')}>Ban account</button>{String(profile.account_status || selected.account_status) !== 'active' && <button className="primary" disabled={working} onClick={() => void takeAction('restore')}>Restore account</button>}</div></section>
+                      <section className="admin-case-account-actions"><h4>Account action</h4><p>{selectedIsSelf ? 'This is your moderator account. Self-suspension and self-ban are disabled to protect administrator access. Warnings can still be recorded.' : 'Reason is required for Warning, Suspend, or Ban. Actions are logged and delivered to the member through Account Notices.'}</p><textarea rows={3} maxLength={2000} value={actionReason} onChange={(event) => setActionReason(event.target.value)} placeholder="Reason for this moderation action…" /><label>Suspension length<select value={suspensionHours} onChange={(event) => setSuspensionHours(Number(event.target.value))}><option value={24}>24 hours</option><option value={72}>3 days</option><option value={168}>7 days</option><option value={336}>14 days</option><option value={720}>30 days</option><option value={2160}>90 days</option></select></label><div className="admin-case-actions"><button className="secondary" disabled={working || !actionReason.trim()} onClick={() => void takeAction('warning')}>Issue warning</button><button className="secondary" disabled={working || !actionReason.trim() || selectedIsSelf} onClick={() => void takeAction('suspend')} title={selectedIsSelf ? 'You cannot suspend your own moderator account.' : undefined}>Suspend</button><button className="danger-button" disabled={working || !actionReason.trim() || selectedIsSelf} onClick={() => void takeAction('ban')} title={selectedIsSelf ? 'You cannot ban your own moderator account.' : undefined}>Ban account</button>{String(profile.account_status || selected.account_status) !== 'active' && <button className="primary" disabled={working} onClick={() => void takeAction('restore')}>Restore account</button>}</div></section>
 
                       <section><h4>Reports involving this member</h4><p>{context.reports.length} report{context.reports.length === 1 ? '' : 's'} as the reported member.</p></section>
                       <section><h4>Moderation history</h4>{context.actions.length === 0 ? <p>No moderation actions.</p> : <div className="admin-mini-history">{context.actions.slice(0, 15).map((item) => <article key={String(item.id)}><strong>{String(item.action_type)}</strong><time>{formatDate(String(item.created_at || ''))}</time>{item.reason ? <p>{String(item.reason)}</p> : null}</article>)}</div>}</section>
