@@ -73,7 +73,7 @@ export default function Discover({
     try {
       const { data: profileRows, error: profileError } = await supabase
         .from('profiles')
-        .select('id, display_name, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals, max_penpals')
+        .select('id, display_name, username, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals, max_penpals')
         .neq('id', userId)
         .eq('account_status', 'active')
         .eq('onboarding_complete', true)
@@ -246,6 +246,7 @@ export default function Discover({
                       {personAge ? ` · Age ${personAge}` : ''}
                     </div>
                     <h2>{match.profile.display_name || 'New member'}</h2>
+                    {match.profile.username && <div className="person-username">@{match.profile.username}</div>}
                   </div>
                   <div className="match-score" aria-label={`${match.score}% compatibility`}>
                     <strong>{match.score}%</strong>
