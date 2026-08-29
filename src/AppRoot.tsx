@@ -37,11 +37,13 @@ export default function AppRoot() {
 
     void initialize()
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (!active) return
       setSession(nextSession)
-      if (nextSession) void refreshSecurityState(nextSession.user.id)
-      else {
+      if (nextSession) {
+        if (event === 'SIGNED_IN') setChecking(true)
+        void refreshSecurityState(nextSession.user.id)
+      } else {
         setRole(null)
         setAccountStatus('active')
         setSuspendedUntil(null)
@@ -74,8 +76,6 @@ export default function AppRoot() {
   }, [])
 
   async function refreshSecurityState(userId: string) {
-    setChecking(true)
-
     try {
       // This also clears a temporary suspension if its end time has passed.
       await supabase.rpc('refresh_my_account_status')
