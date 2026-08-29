@@ -7,6 +7,7 @@ import MemberNotices from './components/MemberNotices'
 import SupportCenter from './components/SupportCenter'
 import AdminQuickTools from './components/AdminQuickTools'
 import AdminMemberDirectory from './components/AdminMemberDirectory'
+import AdminActivity from './components/AdminActivity'
 import MemberIdentity from './components/MemberIdentity'
 import SettingsPrivacy from './components/SettingsPrivacy'
 import PasswordRecovery from './components/PasswordRecovery'
@@ -17,6 +18,7 @@ import './member-notices.css'
 import './support.css'
 import './member-identity.css'
 import './admin-directory.css'
+import './admin-activity.css'
 import './settings.css'
 
 type ModeratorRole = 'moderator' | 'admin'
@@ -232,6 +234,7 @@ export default function AppRoot() {
         <AdminPanel userId={session.user.id} role={role} onBack={closeAdmin} onSignOut={() => void signOut()} />
         <AdminQuickTools userId={session.user.id} />
         <AdminMemberDirectory userId={session.user.id} />
+        <AdminActivity />
       </>
     )
   }
