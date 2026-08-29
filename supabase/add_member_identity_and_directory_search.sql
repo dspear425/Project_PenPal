@@ -76,6 +76,8 @@ as $$
     || upper(substr(md5(user_id::text), 13, 4));
 $$;
 
+revoke all on function public.member_code_for(uuid) from public;
+
 insert into public.private_account_info (user_id, member_code)
 select p.id, public.member_code_for(p.id)
 from public.profiles p
@@ -94,7 +96,7 @@ begin
   insert into public.profiles (id, username, username_customized)
   values (new.id, generated_username, false)
   on conflict (id) do update
-    set username = coalesce(public.profiles.username, excluded.username);
+    set username = coalesce(profiles.username, excluded.username);
 
   insert into public.private_account_info (user_id, member_code)
   values (new.id, public.member_code_for(new.id))
@@ -160,7 +162,7 @@ begin
     raise exception 'You must be signed in.' using errcode = 'P0001';
   end if;
 
-  if clean_username !~ '^[a-z0-9][a-z0-9._-]{2,29}$' then
+  if clean_username is null or clean_username = '' or clean_username !~ '^[a-z0-9][a-z0-9._-]{2,29}$' then
     raise exception 'Username must be 3-30 characters and use only lowercase letters, numbers, periods, underscores, or hyphens.' using errcode = 'P0001';
   end if;
 
