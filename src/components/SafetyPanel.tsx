@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { signedProfilePhotoUrl } from '../lib/profilePhoto'
 
 type Props = {
   userId: string
@@ -56,6 +57,27 @@ export default function SafetyPanel({
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [reportedKind, setReportedKind] = useState<'member' | 'photo'>('member')
+  const [photoReportAvailable, setPhotoReportAvailable] = useState(canReportProfilePhoto)
+
+  useEffect(() => {
+    let active = true
+    setPhotoReportAvailable(canReportProfilePhoto)
+
+    if (canReportProfilePhoto) return () => { active = false }
+
+    void supabase
+      .from('profiles')
+      .select('avatar_path')
+      .eq('id', targetUserId)
+      .maybeSingle()
+      .then(async ({ data, error }) => {
+        if (!active || error || !data?.avatar_path) return
+        const url = await signedProfilePhotoUrl(String(data.avatar_path))
+        if (active && url) setPhotoReportAvailable(true)
+      })
+
+    return () => { active = false }
+  }, [targetUserId, canReportProfilePhoto])
 
   async function submitReport(event: React.FormEvent) {
     event.preventDefault()
@@ -143,7 +165,7 @@ export default function SafetyPanel({
                 <span className="safety-option-icon" aria-hidden="true">!</span>
                 <span><strong>Report {targetName}</strong><small>Tell us about harassment, scams, spam, abuse, or another safety concern.</small></span>
               </button>
-              {canReportProfilePhoto && (
+              {photoReportAvailable && (
                 <button className="safety-option" type="button" onClick={() => { setDetails(''); setView('photo-report') }}>
                   <span className="safety-option-icon" aria-hidden="true">▧</span>
                   <span><strong>Report profile photo</strong><small>Flag an inappropriate, misleading, graphic, or privacy-sensitive profile image for moderator review.</small></span>
