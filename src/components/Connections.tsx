@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Correspondence from './Correspondence'
 import SafetyPanel from './SafetyPanel'
+import BlockedMembers from './BlockedMembers'
 import '../letters.css'
 
 type RelationshipStatus = 'pending' | 'accepted' | 'declined' | 'cancelled' | 'paused' | 'ended'
@@ -68,6 +69,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
   const [unreadByRelationship, setUnreadByRelationship] = useState<Map<string, number>>(new Map())
   const [selectedCorrespondence, setSelectedCorrespondence] = useState<SelectedCorrespondence | null>(null)
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null)
+  const [managingBlocks, setManagingBlocks] = useState(false)
   const [loading, setLoading] = useState(true)
   const [workingId, setWorkingId] = useState<string | null>(null)
   const [message, setMessage] = useState('')
@@ -199,6 +201,48 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
     }
   }
 
+  async function reconnect(request: PenPalRequest) {
+    const otherUserId = request.sender_id === userId ? request.recipient_id : request.sender_id
+    const person = profiles.get(otherUserId)
+    const name = person?.display_name || 'this former pen pal'
+
+    const confirmed = window.confirm(
+      `Reconnect with ${name}? This will send a new pen-pal request. Your previous correspondence will remain preserved in your history.`,
+    )
+    if (!confirmed) return
+
+    setWorkingId(request.id)
+    setMessage('')
+
+    try {
+      const { error } = await supabase
+        .from('penpal_requests')
+        .insert({
+          sender_id: userId,
+          recipient_id: otherUserId,
+          intro_message: `I'd like to reconnect and become pen pals again.`,
+          status: 'pending',
+        })
+
+      if (error) {
+        if ('code' in error && error.code === '23505') {
+          throw new Error(`A new request or current connection with ${name} already exists.`)
+        }
+        if ('code' in error && (error.code === '42501' || error.code === 'P0001')) {
+          throw new Error(`${name} is not currently available for a reconnect request. They may not be accepting new pen pals or may have reached their capacity.`)
+        }
+        throw error
+      }
+
+      setMessage(`Reconnect request sent to ${name}.`)
+      await loadConnections()
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorkingId(null)
+    }
+  }
+
   const incoming = useMemo(
     () => requests.filter((request) => request.status === 'pending' && request.recipient_id === userId),
     [requests, userId],
@@ -229,25 +273,38 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
     return profiles.get(otherId)
   }
 
+  function otherUserId(request: PenPalRequest) {
+    return request.sender_id === userId ? request.recipient_id : request.sender_id
+  }
+
+  function currentOpenConnection(request: PenPalRequest) {
+    const targetId = otherUserId(request)
+    return requests.find((candidate) =>
+      candidate.id !== request.id
+      && ['pending', 'accepted', 'paused'].includes(candidate.status)
+      && otherUserId(candidate) === targetId,
+    )
+  }
+
   function openCorrespondence(request: PenPalRequest) {
     if (!['accepted', 'paused', 'ended'].includes(request.status)) return
-    const otherUserId = request.sender_id === userId ? request.recipient_id : request.sender_id
-    const person = profiles.get(otherUserId)
+    const targetUserId = otherUserId(request)
+    const person = profiles.get(targetUserId)
     setSelectedCorrespondence({
       relationshipId: request.id,
       relationshipStatus: request.status as 'accepted' | 'paused' | 'ended',
-      otherUserId,
+      otherUserId: targetUserId,
       otherName: person?.display_name || 'Pen pal',
       otherCountry: person?.country || null,
     })
   }
 
   function openSafety(request: PenPalRequest) {
-    const otherUserId = request.sender_id === userId ? request.recipient_id : request.sender_id
-    const person = profiles.get(otherUserId)
+    const targetUserId = otherUserId(request)
+    const person = profiles.get(targetUserId)
     setSafetyTarget({
       relationshipId: request.id,
-      otherUserId,
+      otherUserId: targetUserId,
       otherName: person?.display_name || 'this member',
     })
   }
@@ -267,6 +324,33 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
           void loadConnections()
         }}
       />
+    )
+  }
+
+  if (managingBlocks) {
+    return (
+      <main className="page-shell discover-shell">
+        <section className="discover-card connections-card">
+          <header className="discover-header">
+            <div className="brand-row compact-brand">
+              <div className="stamp" aria-hidden="true">✉</div>
+              <span className="brand-name">Project PenPal</span>
+            </div>
+            <nav className="discover-nav" aria-label="Account navigation">
+              <button className="text-button discover-link" onClick={onDiscover}>Discover</button>
+              <button className="text-button discover-link" onClick={onEditProfile}>Edit profile</button>
+              <button className="text-button discover-link" onClick={onSignOut}>Sign out</button>
+            </nav>
+          </header>
+          <BlockedMembers
+            onBack={() => {
+              setManagingBlocks(false)
+              void loadConnections()
+            }}
+            onUnblocked={() => void loadConnections()}
+          />
+        </section>
+      </main>
     )
   }
 
@@ -333,9 +417,12 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
               Review requests, continue your letters, and set clear boundaries when you need a break or a connection no longer feels right.
             </p>
           </div>
-          <button className="secondary refresh-button" onClick={() => void loadConnections()} disabled={loading}>
-            {loading ? 'Checking…' : 'Refresh'}
-          </button>
+          <div className="connection-toolbar">
+            <button className="secondary refresh-button" onClick={() => setManagingBlocks(true)}>Blocked members</button>
+            <button className="secondary refresh-button" onClick={() => void loadConnections()} disabled={loading}>
+              {loading ? 'Checking…' : 'Refresh'}
+            </button>
+          </div>
         </div>
 
         {unreadTotal > 0 && (
@@ -355,7 +442,10 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
             <div className="empty-envelope" aria-hidden="true">✉</div>
             <h2>No connections yet.</h2>
             <p>When you request a pen pal — or someone requests you — the connection will appear here.</p>
-            <button className="primary connections-discover-button" onClick={onDiscover}>Discover pen pals</button>
+            <div className="empty-state-actions">
+              <button className="primary connections-discover-button" onClick={onDiscover}>Discover pen pals</button>
+              <button className="secondary connections-discover-button" onClick={() => setManagingBlocks(true)}>Manage blocked members</button>
+            </div>
           </section>
         )}
 
@@ -470,6 +560,10 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
                 {ended.map((request) => {
                   const person = otherProfile(request)
                   const unread = unreadByRelationship.get(request.id) ?? 0
+                  const openConnection = currentOpenConnection(request)
+                  const reconnectPending = openConnection?.status === 'pending'
+                  const reconnected = openConnection?.status === 'accepted' || openConnection?.status === 'paused'
+
                   return (
                     <article className={`connection-item ended-connection ${unread > 0 ? 'connection-has-unread' : ''}`} key={request.id}>
                       <div>
@@ -480,6 +574,15 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
                       </div>
                       <div className="connection-actions">
                         <button className="secondary" onClick={() => openCorrespondence(request)}>View history</button>
+                        {reconnected ? (
+                          <span className="relationship-state-badge active">✓ Reconnected</span>
+                        ) : reconnectPending ? (
+                          <button className="primary" type="button" disabled>Reconnect request sent</button>
+                        ) : (
+                          <button className="primary" type="button" disabled={workingId === request.id} onClick={() => void reconnect(request)}>
+                            {workingId === request.id ? 'Sending…' : 'Reconnect'}
+                          </button>
+                        )}
                         <button className="relationship-control-link" type="button" onClick={() => openSafety(request)}>Safety</button>
                       </div>
                     </article>
