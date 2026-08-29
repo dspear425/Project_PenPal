@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import ProfileAvatar from './ProfileAvatar'
+import '../admin-profile-photo.css'
 
 type PhotoReport = {
   id: string
@@ -37,7 +38,7 @@ const violationOptions = [
   ['other', 'Other'],
 ] as const
 
-const violationLabels = Object.fromEntries(violationOptions)
+const violationLabels: Record<string, string> = Object.fromEntries(violationOptions)
 
 function errorMessage(error: unknown) {
   if (error instanceof Error) return error.message
