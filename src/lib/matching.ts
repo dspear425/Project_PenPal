@@ -2,6 +2,9 @@ export type MatchProfile = {
   id: string
   display_name: string | null
   username?: string | null
+  avatar_path?: string | null
+  avatar_visibility?: 'discover' | 'connections' | 'hidden' | null
+  avatar_updated_at?: string | null
   birth_year: number | null
   country: string | null
   about_me: string | null
