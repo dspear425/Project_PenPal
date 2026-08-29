@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { prepareProfilePhoto } from '../lib/profilePhoto'
+import { validateProfilePhotoFile } from '../lib/profilePhoto'
 import ProfileAvatar from './ProfileAvatar'
+import ProfilePhotoCropper from './ProfilePhotoCropper'
 
 type Visibility = 'discover' | 'connections' | 'hidden'
 
@@ -28,6 +29,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
   const [avatarPath, setAvatarPath] = useState<string | null>(null)
   const [visibility, setVisibility] = useState<Visibility>('discover')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [cropFile, setCropFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (open) void loadProfilePhoto()
@@ -57,19 +59,32 @@ export default function ProfilePhotoSettings({ userId }: Props) {
     }
   }
 
-  async function chooseFile(event: React.ChangeEvent<HTMLInputElement>) {
+  function closePanel() {
+    if (working) return
+    setCropFile(null)
+    setOpen(false)
+  }
+
+  function chooseFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
 
-    setWorking(true)
-    setMessage('Preparing photo…')
+    setMessage('')
     try {
-      const processed = await prepareProfilePhoto(file)
-      const localPreview = URL.createObjectURL(processed)
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
-      setPreviewUrl(localPreview)
+      validateProfilePhotoFile(file)
+      setCropFile(file)
+    } catch (error) {
+      setMessage(errorMessage(error))
+    }
+  }
 
+  async function saveCroppedPhoto(processed: Blob) {
+    setWorking(true)
+    setMessage('Saving your cropped photo…')
+    let localPreview: string | null = null
+
+    try {
       const path = `${userId}/avatar.jpg`
       const { error: uploadError } = await supabase.storage
         .from('profile-photos')
@@ -86,11 +101,18 @@ export default function ProfilePhotoSettings({ userId }: Props) {
       })
       if (saveError) throw saveError
 
+      localPreview = URL.createObjectURL(processed)
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(localPreview)
+
       const row = Array.isArray(data) ? data[0] : data
       setAvatarPath(row?.avatar_path ?? path)
-      setMessage('Profile photo saved. The uploaded image was resized to a square and its original metadata was removed.')
+      setCropFile(null)
+      setMessage('Profile photo saved. Only your selected crop was uploaded, resized to 512×512, and re-encoded without the original image metadata.')
     } catch (error) {
+      if (localPreview) URL.revokeObjectURL(localPreview)
       setMessage(errorMessage(error))
+      throw error
     } finally {
       setWorking(false)
     }
@@ -147,7 +169,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
       </button>
 
       {open && (
-        <div className="profile-photo-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !working) setOpen(false) }}>
+        <div className="profile-photo-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closePanel() }}>
           <section className="profile-photo-panel" role="dialog" aria-modal="true" aria-labelledby="profile-photo-title">
             <header>
               <div>
@@ -155,27 +177,38 @@ export default function ProfilePhotoSettings({ userId }: Props) {
                 <h2 id="profile-photo-title">Profile photo.</h2>
                 <p>Add one optional photo to make correspondence feel more personal without turning Project PenPal into a photo-first matching app.</p>
               </div>
-              <button className="settings-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
+              <button className="settings-close" type="button" onClick={closePanel} disabled={working}>×</button>
             </header>
 
             {message && <p className="status-message profile-photo-status">{message}</p>}
 
-            {loading ? <p className="connection-empty">Loading your photo settings…</p> : (
+            {loading ? <p className="connection-empty">Loading your photo settings…</p> : cropFile ? (
+              <ProfilePhotoCropper
+                file={cropFile}
+                working={working}
+                onCancel={() => {
+                  setCropFile(null)
+                  setMessage('')
+                  window.setTimeout(() => inputRef.current?.click(), 0)
+                }}
+                onConfirm={saveCroppedPhoto}
+              />
+            ) : (
               <div className="profile-photo-layout">
                 <section className="profile-photo-preview-card">
                   {previewUrl
-                    ? <div className="profile-photo-preview"><img src={previewUrl} alt="Your new profile photo preview" /></div>
+                    ? <div className="profile-photo-preview"><img src={previewUrl} alt="Your profile photo preview" /></div>
                     : <ProfileAvatar avatarPath={avatarPath} displayName={displayName} size="large" />}
                   <div>
                     <strong>{displayName || 'Your profile'}</strong>
                     <span>{avatarPath ? 'Profile photo added' : 'Using initials avatar'}</span>
                   </div>
-                  <input ref={inputRef} className="profile-photo-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void chooseFile(event)} />
+                  <input ref={inputRef} className="profile-photo-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={chooseFile} />
                   <div className="profile-photo-actions">
-                    <button className="primary" type="button" disabled={working} onClick={() => inputRef.current?.click()}>{working ? 'Working…' : avatarPath ? 'Replace photo' : 'Choose photo'}</button>
+                    <button className="primary" type="button" disabled={working} onClick={() => inputRef.current?.click()}>{avatarPath ? 'Replace photo' : 'Choose photo'}</button>
                     {avatarPath && <button className="secondary" type="button" disabled={working} onClick={() => void removePhoto()}>Remove</button>}
                   </div>
-                  <small>JPEG, PNG, or WebP · maximum 5 MB. Images are center-cropped to 512×512 and re-encoded before upload, removing embedded EXIF/GPS metadata.</small>
+                  <small>JPEG, PNG, or WebP · maximum 5 MB. After choosing a photo, you can drag and zoom to select the exact crop before anything is uploaded.</small>
                 </section>
 
                 <section className="profile-photo-privacy-card">
