@@ -4,19 +4,37 @@ const MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 const OUTPUT_SIZE = 512
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 
-export async function prepareProfilePhoto(file: File): Promise<Blob> {
+export type ProfilePhotoCrop = {
+  x: number
+  y: number
+  size: number
+}
+
+export function validateProfilePhotoFile(file: File) {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error('Choose a JPEG, PNG, or WebP image.')
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     throw new Error('Profile photos must be 5 MB or smaller.')
   }
+}
+
+export async function prepareProfilePhoto(file: File, crop?: ProfilePhotoCrop): Promise<Blob> {
+  validateProfilePhotoFile(file)
 
   const bitmap = await createImageBitmap(file)
   try {
-    const sourceSize = Math.min(bitmap.width, bitmap.height)
-    const sx = Math.max(0, Math.floor((bitmap.width - sourceSize) / 2))
-    const sy = Math.max(0, Math.floor((bitmap.height - sourceSize) / 2))
+    const defaultSize = Math.min(bitmap.width, bitmap.height)
+    const requestedSize = crop?.size ?? defaultSize
+    const sourceSize = Math.max(1, Math.min(requestedSize, bitmap.width, bitmap.height))
+    const maxX = Math.max(0, bitmap.width - sourceSize)
+    const maxY = Math.max(0, bitmap.height - sourceSize)
+    const sx = crop
+      ? Math.max(0, Math.min(crop.x, maxX))
+      : Math.max(0, (bitmap.width - sourceSize) / 2)
+    const sy = crop
+      ? Math.max(0, Math.min(crop.y, maxY))
+      : Math.max(0, (bitmap.height - sourceSize) / 2)
 
     const canvas = document.createElement('canvas')
     canvas.width = OUTPUT_SIZE
@@ -24,6 +42,8 @@ export async function prepareProfilePhoto(file: File): Promise<Blob> {
     const context = canvas.getContext('2d')
     if (!context) throw new Error('This browser could not prepare the image.')
 
+    context.imageSmoothingEnabled = true
+    context.imageSmoothingQuality = 'high'
     context.drawImage(
       bitmap,
       sx,
