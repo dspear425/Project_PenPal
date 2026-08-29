@@ -67,9 +67,9 @@ using (
   and (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- Signed URLs still require SELECT permission. This policy is the privacy gate:
--- owner/moderators can read, Discover photos follow normal discovery eligibility,
--- and Connections-only photos require an established relationship.
+-- Signed URLs still require SELECT permission. Owners can always read objects in
+-- their own folder, which also makes recovery from a partially completed upload
+-- possible. Everyone else must pass the saved-profile privacy rules below.
 drop policy if exists "Profile photo visibility follows member privacy" on storage.objects;
 create policy "Profile photo visibility follows member privacy"
 on storage.objects for select
@@ -80,19 +80,20 @@ using (
     select 1
     from public.profiles p
     where p.id::text = (storage.foldername(name))[1]
-      and p.avatar_path = name
       and (
         p.id = auth.uid()
         or public.is_moderator()
         or (
-          p.avatar_visibility = 'discover'
+          p.avatar_path = name
+          and p.avatar_visibility = 'discover'
           and p.account_status = 'active'
           and p.onboarding_complete = true
           and p.discoverable = true
           and not public.users_are_blocked(auth.uid(), p.id)
         )
         or (
-          p.avatar_visibility = 'connections'
+          p.avatar_path = name
+          and p.avatar_visibility = 'connections'
           and not public.users_are_blocked(auth.uid(), p.id)
           and exists (
             select 1
@@ -137,7 +138,7 @@ begin
   end if;
 
   if clean_path is not null then
-    if clean_path <> caller::text || '/avatar.jpg' then
+    if clean_path <> (caller::text || '/avatar.jpg') then
       raise exception 'Profile-photo path is invalid.' using errcode = 'P0001';
     end if;
 
