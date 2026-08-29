@@ -6,6 +6,18 @@
   margin-top: 24px;
 }
 
+.connection-toolbar,
+.empty-state-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.empty-state-actions {
+  justify-content: center;
+}
+
 .connection-sections {
   display: grid;
   gap: 30px;
@@ -167,6 +179,64 @@
   font-weight: 900;
 }
 
+.relationship-state-badge.active {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: #edf4eb;
+  color: #4f6849;
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.blocked-members-view {
+  margin-top: 34px;
+}
+
+.blocked-member-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.blocked-member-item {
+  background: #fffaf7;
+}
+
+.blocked-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 34px;
+  border: 1px solid #ddd1c4;
+  border-radius: 18px;
+  padding: 22px;
+  background: #fffdf9;
+}
+
+.blocked-empty-state > span {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf4eb;
+  color: #4f6849;
+  font-weight: 900;
+}
+
+.blocked-empty-state h2 {
+  margin: 0 0 5px;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.blocked-empty-state p {
+  margin: 0;
+  color: #756d65;
+}
+
 @media (max-width: 720px) {
   .connection-item {
     align-items: flex-start;
@@ -180,5 +250,9 @@
 
   .letter-alert {
     align-items: flex-start;
+  }
+
+  .connection-toolbar {
+    width: 100%;
   }
 }
