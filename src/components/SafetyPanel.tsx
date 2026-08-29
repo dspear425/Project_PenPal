@@ -58,12 +58,12 @@ export default function SafetyPanel({
   const [message, setMessage] = useState('')
   const [reportedKind, setReportedKind] = useState<'member' | 'photo'>('member')
   const [photoReportAvailable, setPhotoReportAvailable] = useState(canReportProfilePhoto)
+  const [photoEvidencePath, setPhotoEvidencePath] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
     setPhotoReportAvailable(canReportProfilePhoto)
-
-    if (canReportProfilePhoto) return () => { active = false }
+    setPhotoEvidencePath(null)
 
     void supabase
       .from('profiles')
@@ -71,9 +71,22 @@ export default function SafetyPanel({
       .eq('id', targetUserId)
       .maybeSingle()
       .then(async ({ data, error }) => {
-        if (!active || error || !data?.avatar_path) return
-        const url = await signedProfilePhotoUrl(String(data.avatar_path))
-        if (active && url) setPhotoReportAvailable(true)
+        if (!active) return
+        if (error || !data?.avatar_path) {
+          setPhotoReportAvailable(false)
+          return
+        }
+
+        const path = String(data.avatar_path)
+        const url = await signedProfilePhotoUrl(path)
+        if (!active) return
+        if (url) {
+          setPhotoEvidencePath(path)
+          setPhotoReportAvailable(true)
+        } else {
+          setPhotoEvidencePath(null)
+          setPhotoReportAvailable(false)
+        }
       })
 
     return () => { active = false }
@@ -109,8 +122,13 @@ export default function SafetyPanel({
     setMessage('')
 
     try {
+      if (!photoEvidencePath) {
+        throw new Error('The profile photo changed or is no longer available. Return to Safety and try again.')
+      }
+
       const { error } = await supabase.rpc('submit_profile_photo_report', {
         target_user: targetUserId,
+        expected_photo_path: photoEvidencePath,
         target_relationship: relationshipId || null,
         violation_category: photoCategory,
         report_details: details.trim() || null,
@@ -165,7 +183,7 @@ export default function SafetyPanel({
                 <span className="safety-option-icon" aria-hidden="true">!</span>
                 <span><strong>Report {targetName}</strong><small>Tell us about harassment, scams, spam, abuse, or another safety concern.</small></span>
               </button>
-              {photoReportAvailable && (
+              {photoReportAvailable && photoEvidencePath && (
                 <button className="safety-option" type="button" onClick={() => { setDetails(''); setView('photo-report') }}>
                   <span className="safety-option-icon" aria-hidden="true">▧</span>
                   <span><strong>Report profile photo</strong><small>Flag an inappropriate, misleading, graphic, or privacy-sensitive profile image for moderator review.</small></span>
@@ -217,7 +235,7 @@ export default function SafetyPanel({
             <button className="back safety-back" type="button" onClick={backToMenu}>← Safety options</button>
             <p className="eyebrow">Report profile photo</p>
             <h2 id="safety-title">What is wrong with {targetName}’s photo?</h2>
-            <p className="safety-copy">The exact photo version you are reporting is preserved privately for moderator review, even if the member changes it later.</p>
+            <p className="safety-copy">The exact photo version you are reporting is preserved for moderator review, even if the member changes it later.</p>
 
             <label className="safety-label">
               Photo concern
@@ -239,7 +257,7 @@ export default function SafetyPanel({
 
             {message && <p className="status-message">{message}</p>}
             <div className="safety-actions">
-              <button className="primary" type="submit" disabled={busy}>{busy ? 'Submitting…' : 'Report photo'}</button>
+              <button className="primary" type="submit" disabled={busy || !photoEvidencePath}>{busy ? 'Submitting…' : 'Report photo'}</button>
               <button className="secondary" type="button" onClick={onClose} disabled={busy}>Cancel</button>
             </div>
           </form>
