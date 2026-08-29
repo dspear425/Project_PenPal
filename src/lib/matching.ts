@@ -1,6 +1,7 @@
 export type MatchProfile = {
   id: string
   display_name: string | null
+  username?: string | null
   birth_year: number | null
   country: string | null
   about_me: string | null
