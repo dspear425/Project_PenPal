@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { calculateMatch, type CurrentProfile, type MatchProfile, type MatchResult } from '../lib/matching'
+import ProfileAvatar from './ProfileAvatar'
 
 type Interest = {
   id: number
@@ -73,7 +74,7 @@ export default function Discover({
     try {
       const { data: profileRows, error: profileError } = await supabase
         .from('profiles')
-        .select('id, display_name, username, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals, max_penpals')
+        .select('id, display_name, username, avatar_path, avatar_visibility, avatar_updated_at, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals, max_penpals')
         .neq('id', userId)
         .eq('account_status', 'active')
         .eq('onboarding_complete', true)
@@ -240,13 +241,20 @@ export default function Discover({
             return (
               <article className="match-card" key={match.profile.id}>
                 <div className="match-card-top">
-                  <div>
-                    <div className="person-kicker">
-                      {match.profile.country || 'Country not listed'}
-                      {personAge ? ` · Age ${personAge}` : ''}
+                  <div className="match-profile-heading">
+                    <ProfileAvatar
+                      avatarPath={match.profile.avatar_visibility === 'discover' ? match.profile.avatar_path : null}
+                      displayName={match.profile.display_name}
+                      size="medium"
+                    />
+                    <div>
+                      <div className="person-kicker">
+                        {match.profile.country || 'Country not listed'}
+                        {personAge ? ` · Age ${personAge}` : ''}
+                      </div>
+                      <h2>{match.profile.display_name || 'New member'}</h2>
+                      {match.profile.username && <div className="person-username">@{match.profile.username}</div>}
                     </div>
-                    <h2>{match.profile.display_name || 'New member'}</h2>
-                    {match.profile.username && <div className="person-username">@{match.profile.username}</div>}
                   </div>
                   <div className="match-score" aria-label={`${match.score}% compatibility`}>
                     <strong>{match.score}%</strong>
