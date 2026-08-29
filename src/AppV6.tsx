@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import Discover from './components/Discover'
 import Connections from './components/Connections'
+import ProfileAvatar from './components/ProfileAvatar'
 import './discover.css'
 import './connections.css'
 
@@ -93,6 +94,7 @@ export default function AppV6() {
   const [attentionCount, setAttentionCount] = useState(0)
   const [pendingRequestCount, setPendingRequestCount] = useState(0)
   const [unreadLetterCount, setUnreadLetterCount] = useState(0)
+  const [dashboardAvatarPath, setDashboardAvatarPath] = useState<string | null>(null)
   const loadedUserId = useRef<string | null>(null)
 
   const age = useMemo(
@@ -126,6 +128,7 @@ export default function AppV6() {
         setAttentionCount(0)
         setPendingRequestCount(0)
         setUnreadLetterCount(0)
+        setDashboardAvatarPath(null)
         return
       }
 
@@ -140,6 +143,15 @@ export default function AppV6() {
       active = false
       listener.subscription.unsubscribe()
     }
+  }, [])
+
+  useEffect(() => {
+    const onPhotoChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ avatarPath?: string | null }>).detail
+      setDashboardAvatarPath(detail?.avatarPath ?? null)
+    }
+    window.addEventListener('project-penpal:profile-photo-changed', onPhotoChange)
+    return () => window.removeEventListener('project-penpal:profile-photo-changed', onPhotoChange)
   }, [])
 
   useEffect(() => {
@@ -161,19 +173,31 @@ export default function AppV6() {
   useEffect(() => {
     if (!session || mode !== 'home') return
 
-    const refreshCount = () => void loadDashboardAttention(session.user.id)
-    refreshCount()
+    const refreshDashboard = () => {
+      void loadDashboardAttention(session.user.id)
+      void loadDashboardAvatar(session.user.id)
+    }
+    refreshDashboard()
 
-    // If a request or letter arrives while the member is already signed in,
-    // refresh when they return to the tab and periodically while on the dashboard.
-    window.addEventListener('focus', refreshCount)
-    const timer = window.setInterval(refreshCount, 60000)
+    // If a request, letter, or moderation/photo change happens while the member
+    // is signed in, refresh when they return to the tab and periodically.
+    window.addEventListener('focus', refreshDashboard)
+    const timer = window.setInterval(refreshDashboard, 60000)
 
     return () => {
-      window.removeEventListener('focus', refreshCount)
+      window.removeEventListener('focus', refreshDashboard)
       window.clearInterval(timer)
     }
   }, [session, mode])
+
+  async function loadDashboardAvatar(userId: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('avatar_path')
+      .eq('id', userId)
+      .maybeSingle()
+    if (!error) setDashboardAvatarPath(data?.avatar_path ?? null)
+  }
 
   async function loadDashboardAttention(userId: string) {
     const [requestResult, letterResult] = await Promise.all([
@@ -235,6 +259,8 @@ export default function AppV6() {
         if (createError) throw new Error(`Profile creation: ${errorMessage(createError)}`)
         profileData = createdProfile
       }
+
+      setDashboardAvatarPath(profileData.avatar_path ?? null)
 
       const loadedProfile: Profile = {
         display_name: profileData.display_name ?? '',
@@ -474,8 +500,13 @@ export default function AppV6() {
             </div>
             <button className="secondary" onClick={signOut}>Sign out</button>
           </div>
-          <p className="eyebrow">Your correspondence begins here</p>
-          <h1 className="dashboard-title">Welcome, {profile.display_name}.</h1>
+          <div className="dashboard-welcome-row">
+            <ProfileAvatar avatarPath={dashboardAvatarPath} displayName={profile.display_name} size="large" className="dashboard-welcome-avatar" />
+            <div>
+              <p className="eyebrow">Your correspondence begins here</p>
+              <h1 className="dashboard-title">Welcome, {profile.display_name}.</h1>
+            </div>
+          </div>
           <p className="hero-copy">
             Discover compatible people, manage your pen-pal requests, and build friendships one letter at a time.
           </p>
