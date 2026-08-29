@@ -11,6 +11,7 @@ import AdminActivity from './components/AdminActivity'
 import AdminTeam from './components/AdminTeam'
 import MemberIdentity from './components/MemberIdentity'
 import SettingsPrivacy from './components/SettingsPrivacy'
+import ProfilePhotoSettings from './components/ProfilePhotoSettings'
 import PasswordRecovery from './components/PasswordRecovery'
 import ForgotPassword from './components/ForgotPassword'
 import './admin.css'
@@ -22,6 +23,7 @@ import './admin-directory.css'
 import './admin-activity.css'
 import './admin-team.css'
 import './settings.css'
+import './profile-photo.css'
 
 type ModeratorRole = 'moderator' | 'admin' | 'owner'
 type AccountStatus = 'active' | 'suspended' | 'banned'
@@ -289,6 +291,7 @@ export default function AppRoot() {
       <AppV6 />
       {!session && <ForgotPassword />}
       {session && <MemberIdentity userId={session.user.id} requireSetup showLauncher={false} />}
+      {session && <ProfilePhotoSettings userId={session.user.id} />}
       {session && <SettingsPrivacy userId={session.user.id} isModerator={Boolean(role)} />}
       {session && <MemberNotices userId={session.user.id} />}
       {session && <SupportCenter userId={session.user.id} />}
