@@ -88,6 +88,8 @@ type ProfileLite = { id: string; display_name: string | null; country: string | 
 
 type Props = { userId: string }
 
+type CaseAction = 'warning' | 'suspend' | 'ban' | 'restore'
+
 const categoryLabels: Record<string, string> = {
   account_help: 'Account help',
   safety: 'Safety concern',
@@ -132,6 +134,8 @@ export default function AdminQuickTools({ userId }: Props) {
   const [outreachOpen, setOutreachOpen] = useState(false)
   const [outreachSubject, setOutreachSubject] = useState('')
   const [outreachMessage, setOutreachMessage] = useState('')
+  const [caseActionReason, setCaseActionReason] = useState('')
+  const [caseSuspensionHours, setCaseSuspensionHours] = useState(72)
 
   const [threads, setThreads] = useState<SupportThread[]>([])
   const [profiles, setProfiles] = useState<Map<string, ProfileLite>>(new Map())
@@ -181,6 +185,19 @@ export default function AdminQuickTools({ userId }: Props) {
     }
   }
 
+  async function loadCaseData(result: SearchResult) {
+    const [contextResult, relationshipsResult] = await Promise.all([
+      supabase.rpc('moderator_user_context', { target_user: result.user_id }),
+      supabase.rpc('moderator_user_relationships', { target_user: result.user_id }),
+    ])
+
+    if (contextResult.error) throw contextResult.error
+    if (relationshipsResult.error) throw relationshipsResult.error
+
+    setUserContext((contextResult.data ?? null) as UserContext | null)
+    setUserRelationships((relationshipsResult.data ?? []) as UserRelationship[])
+  }
+
   async function openUser(result: SearchResult, preserveTab = false) {
     setSelectedUser(result)
     setWorking(true)
@@ -189,24 +206,30 @@ export default function AdminQuickTools({ userId }: Props) {
     setReviewedCorrespondence(null)
     setAccessReason('')
     setOutreachOpen(false)
+    setCaseActionReason('')
     if (!preserveTab) setCaseTab('overview')
 
     try {
-      const [contextResult, relationshipsResult] = await Promise.all([
-        supabase.rpc('moderator_user_context', { target_user: result.user_id }),
-        supabase.rpc('moderator_user_relationships', { target_user: result.user_id }),
-      ])
-
-      if (contextResult.error) throw contextResult.error
-      if (relationshipsResult.error) throw relationshipsResult.error
-
-      setUserContext((contextResult.data ?? null) as UserContext | null)
-      setUserRelationships((relationshipsResult.data ?? []) as UserRelationship[])
+      await loadCaseData(result)
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
       setWorking(false)
     }
+  }
+
+  async function refreshSelectedCase() {
+    if (!selectedUser) return
+
+    const { data: searchData, error: searchError } = await supabase.rpc('moderator_search_users', {
+      search_term: selectedUser.user_id,
+    })
+    if (searchError) throw searchError
+
+    const fresh = ((searchData ?? []) as SearchResult[]).find((item) => item.user_id === selectedUser.user_id) ?? selectedUser
+    setSelectedUser(fresh)
+    setSearchResults((previous) => previous.map((item) => item.user_id === fresh.user_id ? fresh : item))
+    await loadCaseData(fresh)
   }
 
   async function startModeratorOutreach(event: React.FormEvent) {
@@ -232,9 +255,52 @@ export default function AdminQuickTools({ userId }: Props) {
       setOutreachMessage('')
       setOutreachOpen(false)
       await loadSupportThreads()
-      await openUser(selectedUser, true)
+      await refreshSelectedCase()
       setCaseTab('support')
       setMessage(`Message sent to ${selectedUser.display_name || 'member'}. It is now in Member messages.`)
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
+  }
+
+  async function takeCaseAction(action: CaseAction) {
+    if (!selectedUser) return
+
+    const requiresReason = action === 'warning' || action === 'suspend' || action === 'ban'
+    if (requiresReason && !caseActionReason.trim()) {
+      setMessage('Add a reason before issuing a warning, suspension, or ban.')
+      return
+    }
+
+    const targetName = selectedUser.display_name || 'this member'
+    if (action === 'ban' && !window.confirm(`Permanently ban ${targetName}? Normal Project PenPal access will remain unavailable until an administrator restores the account.`)) {
+      return
+    }
+
+    setWorking(true)
+    setMessage('')
+    try {
+      const { error } = await supabase.rpc('moderation_take_action', {
+        target_user: selectedUser.user_id,
+        target_report: null,
+        action,
+        reason: caseActionReason.trim() || null,
+        suspension_hours: action === 'suspend' ? caseSuspensionHours : null,
+      })
+      if (error) throw error
+
+      setCaseActionReason('')
+      await refreshSelectedCase()
+
+      const labels: Record<CaseAction, string> = {
+        warning: 'Warning issued',
+        suspend: 'Account suspended',
+        ban: 'Account banned',
+        restore: 'Account restored',
+      }
+      setMessage(`${labels[action]} for ${targetName}. The action was added to moderation history${action === 'restore' ? '' : ' and the member will receive an account notice'}.`)
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
@@ -418,6 +484,7 @@ export default function AdminQuickTools({ userId }: Props) {
     setSelectedRelationshipId(null)
     setReviewedCorrespondence(null)
     setOutreachOpen(false)
+    setCaseActionReason('')
   }
 
   return (
@@ -508,6 +575,39 @@ export default function AdminQuickTools({ userId }: Props) {
                               <span>Joined <strong>{formatDate(String(userContext.profile.created_at || selectedUser.joined_at))}</strong></span>
                               <span>Discoverable <strong>{userContext.profile.discoverable === false ? 'No' : 'Yes'}</strong></span>
                             </div>
+
+                            <section className="admin-case-account-actions">
+                              <div className="admin-case-section-heading admin-case-action-heading">
+                                <div>
+                                  <h4>Account action</h4>
+                                  <p>Take action directly from this case file. A submitted report is not required.</p>
+                                </div>
+                              </div>
+                              <p className="admin-case-action-note">Warning, suspension, and ban reasons are required. Every action is written to moderation history, and member-facing actions create an Account Notice automatically.</p>
+                              <label className="admin-case-action-label">
+                                Reason / internal record <span>required for Warning, Suspend, and Ban</span>
+                                <textarea rows={4} maxLength={2000} value={caseActionReason} onChange={(event) => setCaseActionReason(event.target.value)} placeholder="Explain why this moderation action is appropriate." />
+                              </label>
+                              <label className="admin-case-suspension-label">
+                                Suspension length
+                                <select value={caseSuspensionHours} onChange={(event) => setCaseSuspensionHours(Number(event.target.value))}>
+                                  <option value={24}>24 hours</option>
+                                  <option value={72}>3 days</option>
+                                  <option value={168}>7 days</option>
+                                  <option value={336}>14 days</option>
+                                  <option value={720}>30 days</option>
+                                  <option value={2160}>90 days</option>
+                                </select>
+                              </label>
+                              <div className="admin-case-action-buttons">
+                                <button className="secondary" type="button" disabled={working || !caseActionReason.trim()} onClick={() => void takeCaseAction('warning')}>Issue warning</button>
+                                <button className="secondary admin-suspend-button" type="button" disabled={working || !caseActionReason.trim() || String(userContext.profile.account_status || 'active') === 'banned'} onClick={() => void takeCaseAction('suspend')}>Suspend</button>
+                                <button className="danger-button" type="button" disabled={working || !caseActionReason.trim() || String(userContext.profile.account_status || 'active') === 'banned'} onClick={() => void takeCaseAction('ban')}>Ban account</button>
+                                {String(userContext.profile.account_status || 'active') !== 'active' && (
+                                  <button className="primary" type="button" disabled={working} onClick={() => void takeCaseAction('restore')}>Restore account</button>
+                                )}
+                              </div>
+                            </section>
 
                             <section>
                               <h4>Reports involving this member</h4>
