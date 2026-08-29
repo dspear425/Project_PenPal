@@ -67,7 +67,7 @@
 .profile-crop-viewport:active { cursor:grabbing; }
 .profile-crop-viewport.is-working { cursor:wait;opacity:.76; }
 .profile-crop-viewport img { position:absolute;left:50%;top:50%;max-width:none;max-height:none;display:block;pointer-events:none;user-select:none; }
-.profile-crop-circle { position:absolute;inset:9%;border:2px solid rgba(255,255,255,.95);border-radius:50%;box-shadow:0 0 0 999px rgba(24,19,16,.43);pointer-events:none; }
+.profile-crop-circle { position:absolute;inset:0;border:2px solid rgba(255,255,255,.95);border-radius:50%;box-shadow:0 0 0 999px rgba(24,19,16,.43);pointer-events:none; }
 .profile-crop-crosshair { position:absolute;inset:0;pointer-events:none;opacity:.42; }
 .profile-crop-crosshair span:first-child { position:absolute;left:50%;top:10%;bottom:10%;width:1px;background:rgba(255,255,255,.65); }
 .profile-crop-crosshair span:last-child { position:absolute;top:50%;left:10%;right:10%;height:1px;background:rgba(255,255,255,.65); }
