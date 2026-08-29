@@ -82,6 +82,7 @@
 .connection-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
   flex: 0 0 auto;
@@ -91,9 +92,22 @@
   background: #fffaf4;
 }
 
-.has-unread-letter {
+.has-unread-letter,
+.connection-has-unread {
   border-color: #b8755e;
   box-shadow: 0 0 0 2px rgba(138, 78, 61, .08);
+}
+
+.connection-letter-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 9px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #8a4e3d;
+  color: #fff;
+  font-size: .79rem;
+  font-weight: 850;
 }
 
 .letter-alert {
@@ -161,6 +175,7 @@
 
   .connection-actions {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .letter-alert {
