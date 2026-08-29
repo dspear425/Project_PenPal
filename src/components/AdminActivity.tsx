@@ -77,8 +77,15 @@ export default function AdminActivity() {
   const [selected, setSelected] = useState<ActivityRow | null>(null)
 
   useEffect(() => {
-    if (open) void loadActivity()
-  }, [open])
+    const refresh = () => void loadActivity(false)
+    refresh()
+    window.addEventListener('focus', refresh)
+    const timer = window.setInterval(refresh, 60000)
+    return () => {
+      window.removeEventListener('focus', refresh)
+      window.clearInterval(timer)
+    }
+  }, [])
 
   const visibleRows = useMemo(
     () => showAll ? rows : rows.filter((row) => Number(row.attention_score) > 0),
@@ -90,9 +97,8 @@ export default function AdminActivity() {
     [rows],
   )
 
-  async function loadActivity() {
-    setLoading(true)
-    setMessage('')
+  async function loadActivity(showLoading = true) {
+    if (showLoading) setLoading(true)
     try {
       const [activityResult, rulesResult] = await Promise.all([
         supabase.rpc('moderator_activity_overview', { window_hours: 24 }),
@@ -100,16 +106,14 @@ export default function AdminActivity() {
       ])
       if (activityResult.error) throw activityResult.error
       if (rulesResult.error) throw rulesResult.error
-      setRows((activityResult.data ?? []) as ActivityRow[])
+      const nextRows = (activityResult.data ?? []) as ActivityRow[]
+      setRows(nextRows)
       setRules((rulesResult.data ?? []) as RateLimitRule[])
-      if (selected) {
-        const refreshed = ((activityResult.data ?? []) as ActivityRow[]).find((row) => row.user_id === selected.user_id)
-        setSelected(refreshed ?? null)
-      }
+      setSelected((previous) => previous ? nextRows.find((row) => row.user_id === previous.user_id) ?? null : null)
     } catch (error) {
-      setMessage(errorMessage(error))
+      if (open || showLoading) setMessage(errorMessage(error))
     } finally {
-      setLoading(false)
+      if (showLoading) setLoading(false)
     }
   }
 
@@ -124,7 +128,7 @@ export default function AdminActivity() {
 
   return (
     <>
-      <button className={`admin-activity-launcher ${flaggedCount > 0 ? 'has-flags' : ''}`} type="button" onClick={() => { setOpen(true); setMessage('') }}>
+      <button className={`admin-activity-launcher ${flaggedCount > 0 ? 'has-flags' : ''}`} type="button" onClick={() => { setOpen(true); setMessage(''); void loadActivity() }}>
         <span>Activity</span>
         {flaggedCount > 0 && <strong>{flaggedCount > 99 ? '99+' : flaggedCount}</strong>}
       </button>
