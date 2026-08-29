@@ -96,7 +96,8 @@ grant update (
 -- ---------------------------------------------------------------------------
 -- Data export
 -- Returns only data the member is entitled to see about their own account.
--- It intentionally does not reveal who has blocked or reported the member.
+-- It intentionally does not reveal who has blocked or reported the member, and
+-- does not expose moderator identities, assignments, or internal moderator notes.
 -- ---------------------------------------------------------------------------
 
 create or replace function public.export_my_data()
@@ -123,12 +124,24 @@ begin
     ),
     'profile', to_jsonb(p),
     'private_account_info', (
-      select to_jsonb(pai)
+      select jsonb_build_object(
+        'private_last_name', pai.private_last_name,
+        'member_code', pai.member_code,
+        'created_at', pai.created_at,
+        'updated_at', pai.updated_at
+      )
       from public.private_account_info pai
       where pai.user_id = caller
     ),
     'notification_preferences', (
-      select to_jsonb(np)
+      select jsonb_build_object(
+        'email_penpal_requests', np.email_penpal_requests,
+        'email_request_accepted', np.email_request_accepted,
+        'email_new_letters', np.email_new_letters,
+        'email_support_replies', np.email_support_replies,
+        'product_updates', np.product_updates,
+        'updated_at', np.updated_at
+      )
       from public.notification_preferences np
       where np.user_id = caller
     ),
@@ -149,22 +162,48 @@ begin
       where l.sender_id = caller or l.recipient_id = caller
     ), '[]'::jsonb),
     'blocks_created_by_me', coalesce((
-      select jsonb_agg(to_jsonb(b) order by b.created_at)
+      select jsonb_agg(jsonb_build_object(
+        'blocked_user_id', b.blocked_id,
+        'created_at', b.created_at
+      ) order by b.created_at)
       from public.blocks b
       where b.blocker_id = caller
     ), '[]'::jsonb),
     'reports_submitted_by_me', coalesce((
-      select jsonb_agg(to_jsonb(r) order by r.created_at)
+      select jsonb_agg(jsonb_build_object(
+        'id', r.id,
+        'reported_user_id', r.reported_id,
+        'relationship_id', r.relationship_id,
+        'category', r.category,
+        'details', r.details,
+        'status', r.status,
+        'created_at', r.created_at,
+        'reviewed_at', r.reviewed_at
+      ) order by r.created_at)
       from public.reports r
       where r.reporter_id = caller
     ), '[]'::jsonb),
     'support_threads', coalesce((
-      select jsonb_agg(to_jsonb(st) order by st.created_at)
+      select jsonb_agg(jsonb_build_object(
+        'id', st.id,
+        'category', st.category,
+        'subject', st.subject,
+        'status', st.status,
+        'created_at', st.created_at,
+        'updated_at', st.updated_at,
+        'member_last_read_at', st.member_last_read_at
+      ) order by st.created_at)
       from public.support_threads st
       where st.user_id = caller
     ), '[]'::jsonb),
     'support_messages', coalesce((
-      select jsonb_agg(to_jsonb(sm) order by sm.created_at)
+      select jsonb_agg(jsonb_build_object(
+        'id', sm.id,
+        'thread_id', sm.thread_id,
+        'sender_role', sm.sender_role,
+        'body', sm.body,
+        'created_at', sm.created_at
+      ) order by sm.created_at)
       from public.support_messages sm
       where exists (
         select 1 from public.support_threads st
@@ -172,7 +211,14 @@ begin
       )
     ), '[]'::jsonb),
     'account_notices', coalesce((
-      select jsonb_agg(to_jsonb(mn) order by mn.created_at)
+      select jsonb_agg(jsonb_build_object(
+        'id', mn.id,
+        'notice_type', mn.notice_type,
+        'title', mn.title,
+        'message', mn.message,
+        'created_at', mn.created_at,
+        'acknowledged_at', mn.acknowledged_at
+      ) order by mn.created_at)
       from public.member_notices mn
       where mn.user_id = caller
     ), '[]'::jsonb)
