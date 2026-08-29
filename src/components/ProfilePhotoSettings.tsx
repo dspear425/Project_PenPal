@@ -19,6 +19,12 @@ function errorMessage(error: unknown) {
   return String(error || 'Unknown error')
 }
 
+function announcePhotoChange(avatarPath: string | null) {
+  window.dispatchEvent(new CustomEvent('project-penpal:profile-photo-changed', {
+    detail: { avatarPath },
+  }))
+}
+
 export default function ProfilePhotoSettings({ userId }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [open, setOpen] = useState(false)
@@ -85,11 +91,15 @@ export default function ProfilePhotoSettings({ userId }: Props) {
     let localPreview: string | null = null
 
     try {
-      const path = `${userId}/avatar.jpg`
+      const uniquePart = typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`
+      const path = `${userId}/avatar-${Date.now()}-${uniquePart}.jpg`
+
       const { error: uploadError } = await supabase.storage
         .from('profile-photos')
         .upload(path, processed, {
-          upsert: true,
+          upsert: false,
           contentType: 'image/jpeg',
           cacheControl: '3600',
         })
@@ -106,8 +116,10 @@ export default function ProfilePhotoSettings({ userId }: Props) {
       setPreviewUrl(localPreview)
 
       const row = Array.isArray(data) ? data[0] : data
-      setAvatarPath(row?.avatar_path ?? path)
+      const savedPath = row?.avatar_path ?? path
+      setAvatarPath(savedPath)
       setCropFile(null)
+      announcePhotoChange(savedPath)
       setMessage('Profile photo saved. Only your selected crop was uploaded, resized to 512×512, and re-encoded without the original image metadata.')
     } catch (error) {
       if (localPreview) URL.revokeObjectURL(localPreview)
@@ -147,14 +159,13 @@ export default function ProfilePhotoSettings({ userId }: Props) {
     setWorking(true)
     setMessage('')
     try {
-      const { error: storageError } = await supabase.storage.from('profile-photos').remove([avatarPath])
-      if (storageError) throw storageError
       const { error } = await supabase.rpc('remove_my_profile_photo')
       if (error) throw error
       setAvatarPath(null)
       if (previewUrl) URL.revokeObjectURL(previewUrl)
       setPreviewUrl(null)
-      setMessage('Profile photo removed. Your initials will be shown instead.')
+      announcePhotoChange(null)
+      setMessage('Profile photo removed from your profile. Your initials will be shown instead.')
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
