@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { calculateMatch, type CurrentProfile, type MatchProfile, type MatchResult } from '../lib/matching'
 import ProfileAvatar from './ProfileAvatar'
+import SafetyPanel from './SafetyPanel'
 
 type Interest = {
   id: number
@@ -57,6 +58,7 @@ export default function Discover({
   const [composingFor, setComposingFor] = useState<string | null>(null)
   const [introMessage, setIntroMessage] = useState('')
   const [requestingId, setRequestingId] = useState<string | null>(null)
+  const [safetyTarget, setSafetyTarget] = useState<MatchProfile | null>(null)
 
   const interestNameById = useMemo(
     () => new Map(interestCatalog.map((interest) => [interest.id, interest.name])),
@@ -312,12 +314,28 @@ export default function Discover({
                       Request pen pal
                     </button>
                   ) : null}
+                  <button className="text-button inline-link" type="button" onClick={() => setSafetyTarget(match.profile)}>Safety</button>
                 </div>
               </article>
             )
           })}
         </section>
       </section>
+
+      {safetyTarget && (
+        <SafetyPanel
+          userId={userId}
+          targetUserId={safetyTarget.id}
+          targetName={safetyTarget.display_name || 'this member'}
+          relationshipId={connectionsByMember.get(safetyTarget.id)?.id ?? null}
+          canReportProfilePhoto={Boolean(safetyTarget.avatar_path) && safetyTarget.avatar_visibility === 'discover'}
+          onClose={() => setSafetyTarget(null)}
+          onBlocked={() => {
+            setSafetyTarget(null)
+            void loadMatches()
+          }}
+        />
+      )}
     </main>
   )
 }
