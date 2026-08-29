@@ -1,0 +1,43 @@
+.person-username {
+  margin-top: 2px;
+  color: #8a6f62;
+  font-size: .82rem;
+  font-weight: 750;
+}
+
+.support-member-code {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-top: 22px;
+  border: 1px solid #dccdbf;
+  border-radius: 15px;
+  padding: 15px;
+  background: #fbf5ee;
+}
+
+.support-member-code > div {
+  display: grid;
+  gap: 4px;
+}
+
+.support-member-code span {
+  color: #7c7067;
+  font-size: .73rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.support-member-code strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #49382f;
+  letter-spacing: .05em;
+}
+
+.support-member-code small { color: #7a7067; }
+
+@media(max-width:640px){
+  .support-member-code { align-items:flex-start; flex-direction:column; }
+}
