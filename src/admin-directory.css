@@ -2,7 +2,7 @@
 
 .admin-directory-launcher {
   position: fixed;
-  right: 205px;
+  right: 220px;
   bottom: 24px;
   z-index: 51;
   border: 1px solid #c9bbae;
@@ -176,7 +176,7 @@
 }
 
 @media(max-width:680px){
-  .admin-directory-launcher{right:156px;bottom:12px}
+  .admin-directory-launcher{right:12px;bottom:66px}
   .admin-directory-overlay{padding:10px;align-items:end}
   .admin-directory-panel{max-height:94vh;border-radius:22px 22px 10px 10px}
   .admin-directory-filters{grid-template-columns:1fr}
