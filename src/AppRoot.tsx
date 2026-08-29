@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase'
 import AppV6 from './AppV6'
 import AdminPanel from './components/AdminPanel'
 import './admin.css'
+import './admin-shell.css'
 
 type ModeratorRole = 'moderator' | 'admin'
 type AccountStatus = 'active' | 'suspended' | 'banned'
@@ -51,7 +52,9 @@ export default function AppRoot() {
 
     const onHashChange = () => setRoute(window.location.hash)
     const onFocus = () => {
-      if (session) void refreshSecurityState(session.user.id)
+      void supabase.auth.getSession().then(({ data }) => {
+        if (data.session) void refreshSecurityState(data.session.user.id)
+      })
     }
     window.addEventListener('hashchange', onHashChange)
     window.addEventListener('focus', onFocus)
