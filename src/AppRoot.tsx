@@ -107,7 +107,7 @@ export default function AppRoot() {
       window.removeEventListener('focus', refresh)
       window.clearInterval(timer)
     }
-  }, [session?.user.id, role])
+  }, [session?.user.id, role, route])
 
   async function loadAdminMessageCount() {
     const { data: threadRows, error: threadError } = await supabase
