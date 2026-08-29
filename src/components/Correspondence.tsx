@@ -15,10 +15,12 @@ type Letter = {
 type Props = {
   userId: string
   relationshipId: string
+  relationshipStatus: 'accepted' | 'paused' | 'ended'
   otherUserId: string
   otherName: string
   otherCountry?: string | null
   onBack: () => void
+  onSafety: () => void
 }
 
 function errorMessage(error: unknown) {
@@ -47,10 +49,12 @@ function draftKey(userId: string, relationshipId: string) {
 export default function Correspondence({
   userId,
   relationshipId,
+  relationshipStatus,
   otherUserId,
   otherName,
   otherCountry,
   onBack,
+  onSafety,
 }: Props) {
   const [letters, setLetters] = useState<Letter[]>([])
   const [subject, setSubject] = useState('')
@@ -58,6 +62,8 @@ export default function Correspondence({
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState('')
+
+  const canWrite = relationshipStatus === 'accepted'
 
   const wordCount = useMemo(() => {
     const trimmed = body.trim()
@@ -79,6 +85,8 @@ export default function Correspondence({
   }, [relationshipId, userId])
 
   useEffect(() => {
+    if (!canWrite) return
+
     const timer = window.setTimeout(() => {
       if (subject.trim() || body.trim()) {
         localStorage.setItem(
@@ -91,7 +99,7 @@ export default function Correspondence({
     }, 300)
 
     return () => window.clearTimeout(timer)
-  }, [subject, body, userId, relationshipId])
+  }, [subject, body, userId, relationshipId, canWrite])
 
   async function loadLetters() {
     setLoading(true)
@@ -114,9 +122,10 @@ export default function Correspondence({
       )
 
       if (hasUnread) {
+        const readAt = new Date().toISOString()
         const { error: readError } = await supabase
           .from('letters')
-          .update({ read_at: new Date().toISOString() })
+          .update({ read_at: readAt })
           .eq('relationship_id', relationshipId)
           .eq('recipient_id', userId)
           .is('read_at', null)
@@ -125,7 +134,7 @@ export default function Correspondence({
           setLetters((previous) =>
             previous.map((letter) =>
               letter.recipient_id === userId && letter.read_at === null
-                ? { ...letter, read_at: new Date().toISOString() }
+                ? { ...letter, read_at: readAt }
                 : letter,
             ),
           )
@@ -140,6 +149,11 @@ export default function Correspondence({
 
   async function sendLetter(event: React.FormEvent) {
     event.preventDefault()
+
+    if (!canWrite) {
+      setMessage('This relationship is not currently open for new letters.')
+      return
+    }
 
     const cleanBody = body.trim()
     const cleanSubject = subject.trim()
@@ -186,8 +200,25 @@ export default function Correspondence({
           <p className="hero-copy correspondence-copy">
             {otherCountry ? `${otherName} · ${otherCountry}` : otherName}. Take your time — this space is built for letters, not instant messaging.
           </p>
+          <div className="correspondence-heading-actions">
+            <button className="secondary" type="button" onClick={onSafety}>Safety & boundaries</button>
+          </div>
         </div>
       </div>
+
+      {relationshipStatus === 'paused' && (
+        <div className="correspondence-boundary-note">
+          <strong>This pen-pal relationship is paused.</strong>
+          You can read your existing letters, but neither person can send a new letter until the relationship is resumed.
+        </div>
+      )}
+
+      {relationshipStatus === 'ended' && (
+        <div className="correspondence-boundary-note">
+          <strong>This pen-pal relationship has ended.</strong>
+          Your shared correspondence is preserved here as read-only history.
+        </div>
+      )}
 
       {message && <p className="status-message correspondence-status">{message}</p>}
 
@@ -204,7 +235,7 @@ export default function Correspondence({
             <span aria-hidden="true">✉</span>
             <div>
               <h3>No letters yet.</h3>
-              <p>You can be the first to write. There’s no minimum length — just say something genuine.</p>
+              <p>{canWrite ? 'You can be the first to write. There’s no minimum length — just say something genuine.' : 'There were no letters exchanged before this relationship changed.'}</p>
             </div>
           </div>
         ) : (
@@ -220,11 +251,7 @@ export default function Correspondence({
                   {letter.subject && <h3>{letter.subject}</h3>}
                   <div className="letter-body">{letter.body}</div>
                   <div className="letter-footer">
-                    {mine ? (
-                      <span>{letter.read_at ? 'Read' : 'Sent'}</span>
-                    ) : (
-                      <span>Received</span>
-                    )}
+                    {mine ? <span>{letter.read_at ? 'Read' : 'Sent'}</span> : <span>Received</span>}
                   </div>
                 </article>
               )
@@ -233,44 +260,49 @@ export default function Correspondence({
         )}
       </section>
 
-      <section className="compose-letter-section">
-        <div className="letter-section-heading">
-          <h2>Write to {otherName}</h2>
-        </div>
+      {canWrite ? (
+        <section className="compose-letter-section">
+          <div className="letter-section-heading"><h2>Write to {otherName}</h2></div>
 
-        <form className="letter-form" onSubmit={sendLetter}>
-          <label>
-            Subject <span className="optional">optional</span>
-            <input
-              value={subject}
-              maxLength={120}
-              onChange={(event) => setSubject(event.target.value)}
-              placeholder="A little hello from my corner of the world"
-            />
-          </label>
+          <form className="letter-form" onSubmit={sendLetter}>
+            <label>
+              Subject <span className="optional">optional</span>
+              <input
+                value={subject}
+                maxLength={120}
+                onChange={(event) => setSubject(event.target.value)}
+                placeholder="A little hello from my corner of the world"
+              />
+            </label>
 
-          <label>
-            Your letter
-            <textarea
-              value={body}
-              maxLength={12000}
-              rows={14}
-              onChange={(event) => setBody(event.target.value)}
-              placeholder={`Dear ${otherName},\n\n`}
-            />
-          </label>
+            <label>
+              Your letter
+              <textarea
+                value={body}
+                maxLength={12000}
+                rows={14}
+                onChange={(event) => setBody(event.target.value)}
+                placeholder={`Dear ${otherName},\n\n`}
+              />
+            </label>
 
-          <div className="letter-compose-footer">
-            <div className="letter-draft-info">
-              <strong>{wordCount}</strong> {wordCount === 1 ? 'word' : 'words'}
-              <span>Draft saved automatically on this device.</span>
+            <div className="letter-compose-footer">
+              <div className="letter-draft-info">
+                <strong>{wordCount}</strong> {wordCount === 1 ? 'word' : 'words'}
+                <span>Draft saved automatically on this device.</span>
+              </div>
+              <button className="primary" type="submit" disabled={sending || !body.trim()}>
+                {sending ? 'Sending…' : 'Send letter'}
+              </button>
             </div>
-            <button className="primary" type="submit" disabled={sending || !body.trim()}>
-              {sending ? 'Sending…' : 'Send letter'}
-            </button>
-          </div>
-        </form>
-      </section>
+          </form>
+        </section>
+      ) : (
+        <section className="compose-letter-section">
+          <div className="letter-section-heading"><h2>New letters are unavailable</h2></div>
+          <p className="connection-empty">Return to Pen pals & requests to manage this relationship.</p>
+        </section>
+      )}
     </section>
   )
 }
