@@ -1,0 +1,179 @@
+.admin-profile-photo-card {
+  margin-top: 20px;
+  border: 1px solid #dac9ba;
+  border-radius: 16px;
+  padding: 18px;
+  background: #fffaf6;
+}
+
+.admin-profile-photo-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.admin-profile-photo-heading h4 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+}
+
+.admin-profile-photo-heading p {
+  margin: 5px 0 0;
+  color: #766c64;
+  line-height: 1.5;
+}
+
+.admin-photo-report-count {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #f2dfd6;
+  color: #874b39;
+  font-size: .75rem;
+  font-weight: 900;
+}
+
+.admin-profile-photo-status { margin: 14px 0 0; }
+
+.admin-profile-photo-current {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 17px;
+  padding: 16px;
+  border: 1px solid #e1d6cb;
+  border-radius: 14px;
+  background: white;
+}
+
+.admin-profile-photo-current .profile-avatar-large {
+  width: 124px;
+  height: 124px;
+  border-width: 4px;
+  font-size: 1.7rem;
+}
+
+.admin-profile-photo-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+}
+
+.admin-profile-photo-facts span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  color: #6e645c;
+  font-size: .88rem;
+}
+
+.admin-profile-photo-facts strong { color: #443b34; }
+.admin-profile-photo-facts code { overflow-wrap: anywhere; font-size: .76rem; }
+
+.admin-photo-moderation-controls {
+  display: grid;
+  gap: 13px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e4d9cf;
+}
+
+.admin-photo-moderation-controls > div:first-child strong {
+  color: #5b463d;
+}
+
+.admin-photo-moderation-controls > div:first-child p {
+  margin: 5px 0 0;
+  color: #786e65;
+  line-height: 1.5;
+  font-size: .86rem;
+}
+
+.admin-photo-moderation-controls label {
+  display: grid;
+  gap: 7px;
+  color: #443d36;
+  font-weight: 780;
+}
+
+.admin-photo-moderation-controls label > span {
+  color: #8a4e3d;
+  font-size: .78rem;
+}
+
+.admin-photo-moderation-controls select,
+.admin-photo-moderation-controls textarea {
+  width: 100%;
+  border: 1px solid #cfc4b8;
+  border-radius: 12px;
+  padding: 11px 13px;
+  background: white;
+  color: #302a25;
+  font: inherit;
+  outline: none;
+}
+
+.admin-photo-moderation-controls select:focus,
+.admin-photo-moderation-controls textarea:focus {
+  border-color: #8a4e3d;
+  box-shadow: 0 0 0 3px rgba(138, 78, 61, .09);
+}
+
+.admin-photo-action-row {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.admin-photo-self-note {
+  margin-top: 15px;
+  border: 1px solid #ddcfbe;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fbf5ed;
+  color: #6f655d;
+}
+
+.admin-profile-photo-reports {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e4d9cf;
+}
+
+.admin-profile-photo-reports h5 {
+  margin: 0 0 2px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+}
+
+.admin-profile-photo-reports article {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e1d7cd;
+  border-radius: 12px;
+  padding: 12px;
+  background: white;
+}
+
+.admin-profile-photo-reports article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-profile-photo-reports small { color: #82776e; }
+.admin-profile-photo-reports p { margin: 0; color: #5e554d; line-height: 1.5; }
+.admin-profile-photo-reports em { color: #8a4e3d; font-size: .8rem; font-style: normal; font-weight: 800; }
+
+@media (max-width: 680px) {
+  .admin-profile-photo-heading { flex-direction: column; }
+  .admin-profile-photo-current { grid-template-columns: 1fr; justify-items: start; }
+  .admin-profile-photo-current .profile-avatar-large { width: 98px; height: 98px; }
+  .admin-profile-photo-facts { grid-template-columns: 1fr; }
+}
