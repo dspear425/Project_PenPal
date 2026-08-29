@@ -3,6 +3,9 @@
   right: 22px;
   bottom: 22px;
   z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   border: 1px solid #704233;
   border-radius: 999px;
   padding: 10px 15px;
@@ -16,6 +19,25 @@
 
 .admin-launcher:hover {
   transform: translateY(-1px);
+}
+
+.admin-launcher.has-admin-message {
+  border-color: #b56b50;
+  box-shadow: 0 0 0 3px rgba(181, 107, 80, .14), 0 10px 28px rgba(46, 36, 29, .24);
+}
+
+.admin-message-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #c85f42;
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 950;
+  line-height: 1;
 }
 
 .account-restricted-card {
