@@ -10,6 +10,7 @@ import AdminMemberDirectory from './components/AdminMemberDirectory'
 import MemberIdentity from './components/MemberIdentity'
 import SettingsPrivacy from './components/SettingsPrivacy'
 import PasswordRecovery from './components/PasswordRecovery'
+import ForgotPassword from './components/ForgotPassword'
 import './admin.css'
 import './admin-shell.css'
 import './member-notices.css'
@@ -88,14 +89,14 @@ export default function AppRoot() {
     const onHashChange = () => setRoute(window.location.hash)
     const onFocus = () => {
       void supabase.auth.getSession().then(({ data }) => {
-        if (data.session && !passwordRecovery) void refreshSecurityState(data.session.user.id)
+        if (data.session) void refreshSecurityState(data.session.user.id)
       })
     }
     window.addEventListener('hashchange', onHashChange)
     window.addEventListener('focus', onFocus)
     const timer = window.setInterval(() => {
       void supabase.auth.getSession().then(({ data }) => {
-        if (data.session && !passwordRecovery) void refreshSecurityState(data.session.user.id)
+        if (data.session) void refreshSecurityState(data.session.user.id)
       })
     }, 60000)
 
@@ -106,7 +107,7 @@ export default function AppRoot() {
       window.removeEventListener('focus', onFocus)
       window.clearInterval(timer)
     }
-  }, [passwordRecovery])
+  }, [])
 
   useEffect(() => {
     if (!session || !role) {
@@ -278,6 +279,7 @@ export default function AppRoot() {
   return (
     <>
       <AppV6 />
+      {!session && <ForgotPassword />}
       {session && <MemberIdentity userId={session.user.id} requireSetup showLauncher={false} />}
       {session && <SettingsPrivacy userId={session.user.id} isModerator={Boolean(role)} />}
       {session && <MemberNotices userId={session.user.id} />}
