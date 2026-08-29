@@ -49,7 +49,8 @@ on conflict (user_id) do nothing;
 -- ---------------------------------------------------------------------------
 -- Harden profile writes.
 -- Moderation-only fields such as account_status and suspended_until must never
--- be writable by a normal authenticated client.
+-- be writable by a normal authenticated client. Username/nearest-city changes
+-- are also intentionally omitted here and go through save_my_identity().
 -- ---------------------------------------------------------------------------
 
 revoke insert, update on table public.profiles from authenticated;
@@ -60,7 +61,6 @@ grant insert (
   birth_year,
   country,
   region,
-  nearest_city,
   about_me,
   languages,
   friendship_goals,
@@ -69,9 +69,7 @@ grant insert (
   accepting_new_penpals,
   max_penpals,
   onboarding_complete,
-  discoverable,
-  username,
-  username_customized
+  discoverable
 ) on public.profiles to authenticated;
 
 grant update (
@@ -79,7 +77,6 @@ grant update (
   birth_year,
   country,
   region,
-  nearest_city,
   about_me,
   languages,
   friendship_goals,
@@ -88,9 +85,7 @@ grant update (
   accepting_new_penpals,
   max_penpals,
   onboarding_complete,
-  discoverable,
-  username,
-  username_customized
+  discoverable
 ) on public.profiles to authenticated;
 
 -- ---------------------------------------------------------------------------
