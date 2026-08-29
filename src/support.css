@@ -128,6 +128,18 @@
 .admin-case-support-list { display:grid;gap:9px;margin-top:16px; }
 .admin-case-support-list button:hover { border-color:#a56853;background:#fffaf6; }
 
+/* Direct moderation actions inside a member case file. */
+.admin-case-account-actions { border:1px solid #ddc9bd !important;border-radius:16px;padding:17px !important;background:#fff9f5; }
+.admin-case-action-heading { margin-top:0; }
+.admin-case-action-note { margin:8px 0 14px;color:#756a61;line-height:1.5;font-size:.84rem; }
+.admin-case-action-label { display:grid;gap:7px;font-weight:780;color:#443d36; }
+.admin-case-action-label>span { color:#8a4e3d;font-size:.78rem;font-weight:850; }
+.admin-case-action-label textarea,.admin-case-suspension-label select { width:100%;border:1px solid #cfc4b8;border-radius:12px;padding:12px 14px;background:white;color:#302a25;outline:none; }
+.admin-case-action-label textarea:focus,.admin-case-suspension-label select:focus { border-color:#8a4e3d;box-shadow:0 0 0 3px rgba(138,78,61,.09); }
+.admin-case-suspension-label { display:grid;gap:7px;max-width:280px;margin-top:12px;font-weight:780;color:#443d36; }
+.admin-case-action-buttons { display:flex;gap:9px;flex-wrap:wrap;margin-top:14px; }
+.admin-case-action-buttons button:disabled { opacity:.5;cursor:not-allowed; }
+
 /* Make the admin action requirement visible before a moderator clicks an action. */
 .moderation-control-section + .moderation-control-section .admin-label:first-of-type::after {
   content:'Required for Issue warning, Suspend, or Ban account.';
