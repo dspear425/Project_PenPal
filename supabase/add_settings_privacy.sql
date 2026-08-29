@@ -173,7 +173,7 @@ begin
     ), '[]'::jsonb),
     'account_notices', coalesce((
       select jsonb_agg(to_jsonb(mn) order by mn.created_at)
-      from public.moderation_notices mn
+      from public.member_notices mn
       where mn.user_id = caller
     ), '[]'::jsonb)
   ) into result
