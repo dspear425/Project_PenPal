@@ -75,6 +75,7 @@ export default function Discover({
         .from('profiles')
         .select('id, display_name, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals, max_penpals')
         .neq('id', userId)
+        .eq('account_status', 'active')
         .eq('onboarding_complete', true)
         .eq('discoverable', true)
         .eq('accepting_new_penpals', true)
