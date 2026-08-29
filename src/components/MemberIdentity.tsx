@@ -12,6 +12,7 @@ type Identity = {
 type Props = {
   userId: string
   requireSetup?: boolean
+  showLauncher?: boolean
 }
 
 function errorMessage(error: unknown) {
@@ -23,7 +24,7 @@ function errorMessage(error: unknown) {
   return String(error || 'Unknown error')
 }
 
-export default function MemberIdentity({ userId, requireSetup = true }: Props) {
+export default function MemberIdentity({ userId, requireSetup = true, showLauncher = true }: Props) {
   const [identity, setIdentity] = useState<Identity | null>(null)
   const [open, setOpen] = useState(false)
   const [username, setUsername] = useState('')
@@ -48,8 +49,6 @@ export default function MemberIdentity({ userId, requireSetup = true }: Props) {
       setNearestCity(next?.nearest_city ?? '')
       if (requireSetup && next && !next.username_customized) setOpen(true)
     } catch (error) {
-      // The identity migration may not have been run yet. Do not block the rest
-      // of the app; the normal migration instructions will resolve it.
       console.warn('Could not load member identity', error)
     }
   }
@@ -101,7 +100,7 @@ export default function MemberIdentity({ userId, requireSetup = true }: Props) {
 
   return (
     <>
-      {identity?.username_customized && (
+      {showLauncher && identity?.username_customized && (
         <button className="identity-launcher" type="button" onClick={() => { setOpen(true); setMessage('') }} title="Account identity and member code">
           <span aria-hidden="true">@</span><span className="identity-launcher-text">Account</span>
         </button>
