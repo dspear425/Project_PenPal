@@ -1,0 +1,30 @@
+.admin-launcher {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 40;
+  border: 1px solid #704233;
+  border-radius: 999px;
+  padding: 10px 15px;
+  background: #2f2924;
+  color: #fff;
+  font-weight: 850;
+  letter-spacing: .03em;
+  box-shadow: 0 10px 28px rgba(46, 36, 29, .24);
+  cursor: pointer;
+}
+
+.admin-launcher:hover {
+  transform: translateY(-1px);
+}
+
+.account-restricted-card {
+  border: 1px solid #d4b6aa;
+}
+
+@media (max-width: 640px) {
+  .admin-launcher {
+    right: 14px;
+    bottom: 14px;
+  }
+}
