@@ -46,6 +46,25 @@ insert into public.notification_preferences (user_id)
 select id from public.profiles
 on conflict (user_id) do nothing;
 
+create or replace function public.ensure_notification_preferences()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.notification_preferences (user_id)
+  values (new.id)
+  on conflict (user_id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_notification_preferences on public.profiles;
+create trigger profiles_notification_preferences
+after insert on public.profiles
+for each row execute procedure public.ensure_notification_preferences();
+
 -- ---------------------------------------------------------------------------
 -- Harden profile writes.
 -- Moderation-only fields such as account_status and suspended_until must never
