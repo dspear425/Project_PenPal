@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import AdminPhotoReportEvidence from './AdminPhotoReportEvidence'
 import '../admin.css'
 
 type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
@@ -16,6 +17,9 @@ type ReportRow = {
   reviewed_at: string | null
   moderator_notes: string | null
   assigned_to: string | null
+  photo_evidence_path: string | null
+  photo_visibility_at_report: string | null
+  photo_violation_category: string | null
 }
 
 type ProfileSummary = {
@@ -24,6 +28,7 @@ type ProfileSummary = {
   country: string | null
   account_status: 'active' | 'suspended' | 'banned'
   suspended_until: string | null
+  avatar_path: string | null
 }
 
 type LetterEvidence = {
@@ -39,7 +44,7 @@ type LetterEvidence = {
 type ModerationAction = {
   id: string
   moderator_id: string
-  action_type: 'warning' | 'suspend' | 'ban' | 'restore' | 'note'
+  action_type: 'warning' | 'suspend' | 'ban' | 'restore' | 'note' | 'photo_remove'
   reason: string | null
   suspension_until: string | null
   created_at: string
@@ -66,6 +71,7 @@ const categoryLabels: Record<string, string> = {
   hate_abuse: 'Hate / threats / abuse',
   impersonation: 'Impersonation / false identity',
   spam: 'Spam / mass messaging',
+  profile_photo: 'Profile photo',
   other: 'Other concern',
 }
 
@@ -134,7 +140,7 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
     try {
       const { data, error } = await supabase
         .from('reports')
-        .select('id, reporter_id, reported_id, relationship_id, category, details, status, created_at, reviewed_at, moderator_notes, assigned_to')
+        .select('id, reporter_id, reported_id, relationship_id, category, details, status, created_at, reviewed_at, moderator_notes, assigned_to, photo_evidence_path, photo_visibility_at_report, photo_violation_category')
         .order('created_at', { ascending: false })
 
       if (error) throw new Error(`Could not load reports: ${errorMessage(error)}`)
@@ -146,7 +152,7 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
       if (ids.length) {
         const { data: profileRows, error: profileError } = await supabase
           .from('profiles')
-          .select('id, display_name, country, account_status, suspended_until')
+          .select('id, display_name, country, account_status, suspended_until, avatar_path')
           .in('id', ids)
 
         if (profileError) throw new Error(`Could not load report profiles: ${errorMessage(profileError)}`)
@@ -204,8 +210,7 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
       })
       if (error) throw error
       await loadReports()
-      const updated = reports.find((report) => report.id === selectedReport.id)
-      if (updated) await openReport({ ...updated, status, moderator_notes: moderatorNotes.trim() || updated.moderator_notes })
+      await openReport({ ...selectedReport, status, moderator_notes: moderatorNotes.trim() || selectedReport.moderator_notes })
       setMessage(`Report marked ${status}.`)
     } catch (error) {
       setMessage(errorMessage(error))
@@ -360,6 +365,18 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
                   <h3>Report details</h3>
                   <div className="admin-report-text">{selectedReport.details || 'No additional details were provided.'}</div>
                 </section>
+
+                {selectedReport.category === 'profile_photo' && selectedReport.photo_evidence_path && (
+                  <AdminPhotoReportEvidence
+                    targetUserId={selectedReport.reported_id}
+                    targetName={selectedTarget?.display_name || 'this member'}
+                    evidencePath={selectedReport.photo_evidence_path}
+                    currentAvatarPath={selectedTarget?.avatar_path ?? null}
+                    visibilityAtReport={selectedReport.photo_visibility_at_report}
+                    violationCategory={selectedReport.photo_violation_category}
+                    onChanged={() => loadReports()}
+                  />
+                )}
 
                 {context?.relationship && (
                   <section className="admin-detail-section">
