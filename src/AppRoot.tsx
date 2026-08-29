@@ -8,6 +8,7 @@ import SupportCenter from './components/SupportCenter'
 import AdminQuickTools from './components/AdminQuickTools'
 import AdminMemberDirectory from './components/AdminMemberDirectory'
 import AdminActivity from './components/AdminActivity'
+import AdminTeam from './components/AdminTeam'
 import MemberIdentity from './components/MemberIdentity'
 import SettingsPrivacy from './components/SettingsPrivacy'
 import PasswordRecovery from './components/PasswordRecovery'
@@ -19,9 +20,10 @@ import './support.css'
 import './member-identity.css'
 import './admin-directory.css'
 import './admin-activity.css'
+import './admin-team.css'
 import './settings.css'
 
-type ModeratorRole = 'moderator' | 'admin'
+type ModeratorRole = 'moderator' | 'admin' | 'owner'
 type AccountStatus = 'active' | 'suspended' | 'banned'
 
 type AdminSupportThread = {
@@ -112,7 +114,7 @@ export default function AppRoot() {
   }, [])
 
   useEffect(() => {
-    if (!session || !role) {
+    if (!session || !role || accountStatus !== 'active') {
       setAdminMessageCount(0)
       return
     }
@@ -126,7 +128,7 @@ export default function AppRoot() {
       window.removeEventListener('focus', refresh)
       window.clearInterval(timer)
     }
-  }, [session?.user.id, role, route])
+  }, [session?.user.id, role, route, accountStatus])
 
   async function loadAdminMessageCount() {
     const { data: threadRows, error: threadError } = await supabase
@@ -228,14 +230,17 @@ export default function AppRoot() {
     )
   }
 
-  if (route === '#admin' && session && role) {
+  if (route === '#admin' && session && role && accountStatus === 'active') {
     return (
-      <>
-        <AdminPanel userId={session.user.id} role={role} onBack={closeAdmin} onSignOut={() => void signOut()} />
-        <AdminQuickTools userId={session.user.id} />
-        <AdminMemberDirectory userId={session.user.id} />
-        <AdminActivity />
-      </>
+      <div className={`admin-route staff-role-${role}`}>
+        <AdminPanel userId={session.user.id} role={role === 'owner' ? 'admin' : role} onBack={closeAdmin} onSignOut={() => void signOut()} />
+        <div className="admin-floating-toolbar">
+          <AdminActivity />
+          <AdminMemberDirectory userId={session.user.id} />
+          <AdminQuickTools userId={session.user.id} />
+          <AdminTeam currentUserId={session.user.id} role={role} />
+        </div>
+      </div>
     )
   }
 
@@ -270,7 +275,7 @@ export default function AppRoot() {
                 ? 'Normal Project PenPal features are unavailable for this account. Open Account Notices for the moderation notice associated with this action, or Help to contact the moderation team.'
                 : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information, or Help to contact the moderation team.`}
             </p>
-            {role && <div className="actions"><button className="secondary" onClick={openAdmin}>Open moderation dashboard</button></div>}
+            {role && <p className="hero-copy compact">Staff moderation privileges are unavailable while this account is restricted.</p>}
           </section>
         </main>
         <MemberNotices userId={session.user.id} />
@@ -287,7 +292,7 @@ export default function AppRoot() {
       {session && <SettingsPrivacy userId={session.user.id} isModerator={Boolean(role)} />}
       {session && <MemberNotices userId={session.user.id} />}
       {session && <SupportCenter userId={session.user.id} />}
-      {session && role && (
+      {session && role && accountStatus === 'active' && (
         <button
           className={`admin-launcher ${adminMessageCount > 0 ? 'has-admin-message' : ''}`}
           type="button"
@@ -295,7 +300,7 @@ export default function AppRoot() {
           title={adminMessageCount > 0 ? `${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
           aria-label={adminMessageCount > 0 ? `Admin, ${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
         >
-          <span>Admin</span>
+          <span>{role === 'owner' ? 'Owner' : role === 'admin' ? 'Admin' : 'Moderator'}</span>
           {adminMessageCount > 0 && <strong className="admin-message-badge">{adminMessageCount > 99 ? '99+' : adminMessageCount}</strong>}
         </button>
       )}
