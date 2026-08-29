@@ -51,7 +51,8 @@ create index if not exists reports_photo_evidence_idx
   where photo_evidence_path is not null;
 
 -- Ordinary member inserts cannot forge photo evidence. Profile-photo reports go
--- through submit_profile_photo_report(), which captures the current object path.
+-- through submit_profile_photo_report(), which captures and validates the exact
+-- current object path server-side.
 drop policy if exists "Members can submit reports" on public.reports;
 create policy "Members can submit reports"
 on public.reports for insert
@@ -188,7 +189,7 @@ end;
 $$;
 
 -- Removing a photo removes it from the profile immediately. The immutable object
--- is retained privately so a report that already references it cannot lose evidence.
+-- is retained so a report that already references it cannot lose evidence.
 create or replace function public.remove_my_profile_photo()
 returns void
 language plpgsql
@@ -213,12 +214,18 @@ grant execute on function public.save_my_profile_photo(text, text) to authentica
 grant execute on function public.remove_my_profile_photo() to authenticated;
 
 -- ---------------------------------------------------------------------------
--- Member profile-photo reporting. This is the only member path that can create
--- a profile_photo report, and the evidence path is captured server-side.
+-- Member profile-photo reporting. The browser supplies the exact object path it
+-- displayed. The server verifies it is still current before creating the report,
+-- preventing a replacement race from attaching the wrong image.
 -- ---------------------------------------------------------------------------
+
+-- Remove the earlier draft signature if this migration is rerun after a partial
+-- development execution.
+drop function if exists public.submit_profile_photo_report(uuid, uuid, text, text);
 
 create or replace function public.submit_profile_photo_report(
   target_user uuid,
+  expected_photo_path text,
   target_relationship uuid default null,
   violation_category text default 'other',
   report_details text default null
@@ -231,6 +238,7 @@ as $$
 declare
   caller uuid := auth.uid();
   target_profile public.profiles%rowtype;
+  clean_expected_path text := nullif(trim(expected_photo_path), '');
   clean_category text := lower(trim(violation_category));
   clean_details text := nullif(trim(report_details), '');
   relationship_access boolean := false;
@@ -245,7 +253,11 @@ begin
     raise exception 'You cannot report your own profile photo.' using errcode = 'P0001';
   end if;
 
-  if clean_category not in (
+  if clean_expected_path is null then
+    raise exception 'The profile photo could not be identified. Reopen Safety and try again.' using errcode = 'P0001';
+  end if;
+
+  if clean_category is null or clean_category not in (
     'nudity_sexual', 'hate_extremism', 'graphic_content', 'impersonation',
     'spam_advertising', 'privacy_concern', 'other'
   ) then
@@ -266,6 +278,10 @@ begin
 
   if target_profile.avatar_path is null or target_profile.avatar_visibility = 'hidden' then
     raise exception 'There is no visible profile photo to report.' using errcode = 'P0001';
+  end if;
+
+  if target_profile.avatar_path <> clean_expected_path then
+    raise exception 'This member changed their profile photo before the report was submitted. Reopen Safety to review the current photo.' using errcode = 'P0001';
   end if;
 
   if public.users_are_blocked(caller, target_user) then
@@ -328,8 +344,8 @@ begin
 end;
 $$;
 
-revoke all on function public.submit_profile_photo_report(uuid, uuid, text, text) from public;
-grant execute on function public.submit_profile_photo_report(uuid, uuid, text, text) to authenticated;
+revoke all on function public.submit_profile_photo_report(uuid, text, uuid, text, text) from public;
+grant execute on function public.submit_profile_photo_report(uuid, text, uuid, text, text) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Staff photo context and moderation action.
@@ -405,6 +421,7 @@ declare
   actor_role text := public.staff_role(auth.uid());
   target_role text;
   current_path text;
+  clean_expected_path text := nullif(trim(expected_photo_path), '');
   clean_category text := lower(trim(violation_category));
   clean_reason text := nullif(trim(action_reason), '');
   action_id uuid;
@@ -413,7 +430,11 @@ begin
     raise exception 'Moderator access required.' using errcode = 'P0001';
   end if;
 
-  if clean_category not in (
+  if clean_expected_path is null then
+    raise exception 'The current profile photo could not be identified. Refresh the member before taking action.' using errcode = 'P0001';
+  end if;
+
+  if clean_category is null or clean_category not in (
     'nudity_sexual', 'hate_extremism', 'graphic_content', 'impersonation',
     'spam_advertising', 'privacy_concern', 'other'
   ) then
@@ -459,7 +480,7 @@ begin
     raise exception 'This member does not currently have a profile photo.' using errcode = 'P0001';
   end if;
 
-  if expected_photo_path is not null and current_path <> expected_photo_path then
+  if current_path <> clean_expected_path then
     raise exception 'The member has changed their profile photo since this view was loaded. Refresh before taking action.' using errcode = 'P0001';
   end if;
 
@@ -477,7 +498,7 @@ begin
     auth.uid(),
     target_user,
     'photo_remove',
-    '[' || clean_category || '] ' || clean_reason
+    left('[' || clean_category || '] ' || clean_reason, 2000)
   ) returning id into action_id;
 
   if notify_member then
