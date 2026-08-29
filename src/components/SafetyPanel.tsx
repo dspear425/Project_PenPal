@@ -6,6 +6,7 @@ type Props = {
   targetUserId: string
   targetName: string
   relationshipId?: string | null
+  canReportProfilePhoto?: boolean
   onClose: () => void
   onBlocked: () => void
 }
@@ -17,6 +18,16 @@ const reportCategories = [
   ['hate_abuse', 'Hate, threats, or abusive behavior'],
   ['impersonation', 'Impersonation or false identity'],
   ['spam', 'Spam or mass messaging'],
+  ['other', 'Something else'],
+] as const
+
+const photoCategories = [
+  ['nudity_sexual', 'Nudity or sexual imagery'],
+  ['hate_extremism', 'Hate or extremist imagery'],
+  ['graphic_content', 'Graphic or disturbing content'],
+  ['impersonation', 'Impersonation / not the account holder'],
+  ['spam_advertising', 'Advertising, spam, or promotional image'],
+  ['privacy_concern', 'Privacy or personal-information concern'],
   ['other', 'Something else'],
 ] as const
 
@@ -34,14 +45,17 @@ export default function SafetyPanel({
   targetUserId,
   targetName,
   relationshipId,
+  canReportProfilePhoto = false,
   onClose,
   onBlocked,
 }: Props) {
-  const [view, setView] = useState<'menu' | 'report' | 'block' | 'reported'>('menu')
+  const [view, setView] = useState<'menu' | 'report' | 'photo-report' | 'block' | 'reported'>('menu')
   const [category, setCategory] = useState('harassment')
+  const [photoCategory, setPhotoCategory] = useState('other')
   const [details, setDetails] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [reportedKind, setReportedKind] = useState<'member' | 'photo'>('member')
 
   async function submitReport(event: React.FormEvent) {
     event.preventDefault()
@@ -58,6 +72,29 @@ export default function SafetyPanel({
       })
 
       if (error) throw error
+      setReportedKind('member')
+      setView('reported')
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function submitPhotoReport(event: React.FormEvent) {
+    event.preventDefault()
+    setBusy(true)
+    setMessage('')
+
+    try {
+      const { error } = await supabase.rpc('submit_profile_photo_report', {
+        target_user: targetUserId,
+        target_relationship: relationshipId || null,
+        violation_category: photoCategory,
+        report_details: details.trim() || null,
+      })
+      if (error) throw error
+      setReportedKind('photo')
       setView('reported')
     } catch (error) {
       setMessage(errorMessage(error))
@@ -80,6 +117,12 @@ export default function SafetyPanel({
     }
   }
 
+  function backToMenu() {
+    setView('menu')
+    setMessage('')
+    setDetails('')
+  }
+
   return (
     <div className="safety-overlay" role="presentation" onMouseDown={(event) => {
       if (event.target === event.currentTarget && !busy) onClose()
@@ -100,6 +143,12 @@ export default function SafetyPanel({
                 <span className="safety-option-icon" aria-hidden="true">!</span>
                 <span><strong>Report {targetName}</strong><small>Tell us about harassment, scams, spam, abuse, or another safety concern.</small></span>
               </button>
+              {canReportProfilePhoto && (
+                <button className="safety-option" type="button" onClick={() => { setDetails(''); setView('photo-report') }}>
+                  <span className="safety-option-icon" aria-hidden="true">▧</span>
+                  <span><strong>Report profile photo</strong><small>Flag an inappropriate, misleading, graphic, or privacy-sensitive profile image for moderator review.</small></span>
+                </button>
+              )}
               <button className="safety-option danger-option" type="button" onClick={() => setView('block')}>
                 <span className="safety-option-icon" aria-hidden="true">×</span>
                 <span><strong>Block {targetName}</strong><small>End the connection and prevent both accounts from contacting or discovering one another.</small></span>
@@ -110,7 +159,7 @@ export default function SafetyPanel({
 
         {view === 'report' && (
           <form onSubmit={submitReport}>
-            <button className="back safety-back" type="button" onClick={() => { setView('menu'); setMessage('') }}>← Safety options</button>
+            <button className="back safety-back" type="button" onClick={backToMenu}>← Safety options</button>
             <p className="eyebrow">Report a concern</p>
             <h2 id="safety-title">What happened with {targetName}?</h2>
             <p className="safety-copy">Your report is not shown to the person you report.</p>
@@ -141,12 +190,49 @@ export default function SafetyPanel({
           </form>
         )}
 
+        {view === 'photo-report' && (
+          <form onSubmit={submitPhotoReport}>
+            <button className="back safety-back" type="button" onClick={backToMenu}>← Safety options</button>
+            <p className="eyebrow">Report profile photo</p>
+            <h2 id="safety-title">What is wrong with {targetName}’s photo?</h2>
+            <p className="safety-copy">The exact photo version you are reporting is preserved privately for moderator review, even if the member changes it later.</p>
+
+            <label className="safety-label">
+              Photo concern
+              <select value={photoCategory} onChange={(event) => setPhotoCategory(event.target.value)}>
+                {photoCategories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </label>
+
+            <label className="safety-label">
+              Details <span className="optional">optional · {details.length}/2000</span>
+              <textarea
+                rows={7}
+                maxLength={2000}
+                value={details}
+                onChange={(event) => setDetails(event.target.value)}
+                placeholder="Tell moderators what they should look for in the photo."
+              />
+            </label>
+
+            {message && <p className="status-message">{message}</p>}
+            <div className="safety-actions">
+              <button className="primary" type="submit" disabled={busy}>{busy ? 'Submitting…' : 'Report photo'}</button>
+              <button className="secondary" type="button" onClick={onClose} disabled={busy}>Cancel</button>
+            </div>
+          </form>
+        )}
+
         {view === 'reported' && (
           <>
             <div className="safety-success-icon" aria-hidden="true">✓</div>
             <p className="eyebrow">Report received</p>
             <h2 id="safety-title">Thanks for letting us know.</h2>
-            <p className="safety-copy">The report has been saved for moderation review. Reporting does not automatically block {targetName}.</p>
+            <p className="safety-copy">
+              {reportedKind === 'photo'
+                ? 'The reported photo version has been attached to the moderation record for private review.'
+                : `The report has been saved for moderation review. Reporting does not automatically block ${targetName}.`}
+            </p>
             <div className="safety-actions">
               <button className="secondary" type="button" onClick={() => setView('block')}>Block {targetName} too</button>
               <button className="primary" type="button" onClick={onClose}>Done</button>
@@ -156,7 +242,7 @@ export default function SafetyPanel({
 
         {view === 'block' && (
           <>
-            <button className="back safety-back" type="button" onClick={() => { setView('menu'); setMessage('') }} disabled={busy}>← Safety options</button>
+            <button className="back safety-back" type="button" onClick={backToMenu} disabled={busy}>← Safety options</button>
             <p className="eyebrow danger-eyebrow">Block member</p>
             <h2 id="safety-title">Block {targetName}?</h2>
             <p className="safety-copy">
