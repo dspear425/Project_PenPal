@@ -66,9 +66,12 @@ export default function SupportCenter({ userId }: Props) {
   const [working, setWorking] = useState(false)
   const [message, setMessage] = useState('')
   const [unreadByThread, setUnreadByThread] = useState<Map<string, number>>(new Map())
+  const [memberCode, setMemberCode] = useState<string | null>(null)
+  const [codeCopied, setCodeCopied] = useState(false)
 
   useEffect(() => {
     void loadThreads()
+    void loadMemberCode()
     const onFocus = () => void loadThreads()
     window.addEventListener('focus', onFocus)
     const timer = window.setInterval(() => void loadThreads(), 60000)
@@ -84,6 +87,24 @@ export default function SupportCenter({ userId }: Props) {
   )
 
   const selectedThread = threads.find((thread) => thread.id === selectedId) ?? null
+
+  async function loadMemberCode() {
+    const { data, error } = await supabase.rpc('get_my_identity')
+    if (!error && data && typeof data === 'object' && 'member_code' in data) {
+      setMemberCode(String((data as { member_code?: unknown }).member_code || '') || null)
+    }
+  }
+
+  async function copyMemberCode() {
+    if (!memberCode) return
+    try {
+      await navigator.clipboard.writeText(memberCode)
+      setCodeCopied(true)
+      window.setTimeout(() => setCodeCopied(false), 1400)
+    } catch {
+      setMessage(`Your member code is ${memberCode}.`)
+    }
+  }
 
   async function loadThreads() {
     try {
@@ -202,6 +223,7 @@ export default function SupportCenter({ userId }: Props) {
     setSelectedId(null)
     setMessage('')
     void loadThreads()
+    void loadMemberCode()
   }
 
   return (
@@ -227,6 +249,12 @@ export default function SupportCenter({ userId }: Props) {
 
             {view === 'list' && (
               <>
+                {memberCode && (
+                  <div className="support-member-code">
+                    <div><span>Your member code</span><strong>{memberCode}</strong><small>Support may ask for this code to locate your account quickly.</small></div>
+                    <button className="secondary" type="button" onClick={() => void copyMemberCode()}>{codeCopied ? 'Copied!' : 'Copy code'}</button>
+                  </div>
+                )}
                 <div className="support-toolbar">
                   <button className="primary" type="button" onClick={() => { setView('new'); setMessage('') }}>New message</button>
                   <button className="secondary" type="button" onClick={() => void loadThreads()}>Refresh</button>
