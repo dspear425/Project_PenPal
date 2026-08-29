@@ -28,6 +28,7 @@
 }
 
 .letter-history,
+.previous-correspondence-section,
 .compose-letter-section {
   border-top: 1px solid #ddd2c6;
   padding-top: 28px;
@@ -57,6 +58,41 @@
   color: #7e4939;
   font-size: .83rem;
   font-weight: 800;
+}
+
+.reconnected-note {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid #d8c6b7;
+  border-radius: 18px;
+  padding: 17px 19px;
+  background: #fbf6ef;
+  color: #54483f;
+}
+
+.reconnected-note > span {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #f0e2d6;
+  color: #8a4e3d;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.reconnected-note strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.reconnected-note p {
+  margin: 0;
+  color: #756a60;
+  line-height: 1.55;
 }
 
 .first-letter-note {
@@ -152,6 +188,53 @@
   font-size: .8rem;
 }
 
+.previous-correspondence-copy {
+  margin: -5px 0 20px;
+  color: #786d63;
+  line-height: 1.6;
+}
+
+.previous-periods {
+  display: grid;
+  gap: 22px;
+}
+
+.previous-period {
+  border: 1px solid #d8cec2;
+  border-radius: 20px;
+  padding: clamp(20px, 4vw, 28px);
+  background: #faf6f0;
+}
+
+.previous-period-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.previous-period-heading h3 {
+  margin: 5px 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.35rem;
+}
+
+.previous-period-count {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #eee2d7;
+  color: #755244;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.archived-letter-stack .letter-paper {
+  box-shadow: none;
+  background: #fffdf9;
+}
+
 .letter-form {
   display: grid;
   gap: 18px;
@@ -220,7 +303,8 @@
 }
 
 @media (max-width: 640px) {
-  .correspondence-heading-row {
+  .correspondence-heading-row,
+  .previous-period-heading {
     align-items: flex-start;
     flex-direction: column;
   }
