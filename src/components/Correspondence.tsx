@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import ProfileAvatar from './ProfileAvatar'
 
 type Letter = {
   id: string
@@ -92,6 +93,7 @@ export default function Correspondence({
 }: Props) {
   const [letters, setLetters] = useState<Letter[]>([])
   const [relationshipPeriods, setRelationshipPeriods] = useState<RelationshipPeriod[]>([])
+  const [avatarPath, setAvatarPath] = useState<string | null>(null)
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [loading, setLoading] = useState(true)
@@ -134,6 +136,7 @@ export default function Correspondence({
       }
     }
     void loadLetters()
+    void loadPenPalAvatar()
   }, [relationshipId, userId, otherUserId])
 
   useEffect(() => {
@@ -152,6 +155,15 @@ export default function Correspondence({
 
     return () => window.clearTimeout(timer)
   }, [subject, body, userId, relationshipId, canWrite])
+
+  async function loadPenPalAvatar() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('avatar_path')
+      .eq('id', otherUserId)
+      .maybeSingle()
+    if (!error) setAvatarPath(data?.avatar_path ?? null)
+  }
 
   async function loadLetters() {
     setLoading(true)
@@ -263,14 +275,17 @@ export default function Correspondence({
       <button className="back correspondence-back" onClick={onBack}>← Pen pals & requests</button>
 
       <div className="correspondence-heading-row">
-        <div>
-          <p className="eyebrow">Your correspondence</p>
-          <h1 className="correspondence-title">Letters with {otherName}.</h1>
-          <p className="hero-copy correspondence-copy">
-            {otherCountry ? `${otherName} · ${otherCountry}` : otherName}. Take your time — this space is built for letters, not instant messaging.
-          </p>
-          <div className="correspondence-heading-actions">
-            <button className="secondary" type="button" onClick={onSafety}>Safety & boundaries</button>
+        <div className="correspondence-person-heading">
+          <ProfileAvatar avatarPath={avatarPath} displayName={otherName} size="medium" />
+          <div>
+            <p className="eyebrow">Your correspondence</p>
+            <h1 className="correspondence-title">Letters with {otherName}.</h1>
+            <p className="hero-copy correspondence-copy">
+              {otherCountry ? `${otherName} · ${otherCountry}` : otherName}. Take your time — this space is built for letters, not instant messaging.
+            </p>
+            <div className="correspondence-heading-actions">
+              <button className="secondary" type="button" onClick={onSafety}>Safety & boundaries</button>
+            </div>
           </div>
         </div>
       </div>
