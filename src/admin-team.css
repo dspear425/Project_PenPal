@@ -117,6 +117,11 @@
 }
 .admin-floating-toolbar .admin-quick-launchers { display:flex;gap:8px;max-width:none; }
 
+/* AdminPanel predates the Owner role and receives owner as admin for TS
+   compatibility. Present the correct role label visually on the Owner route. */
+.admin-route.staff-role-owner .admin-role-badge { font-size:0; }
+.admin-route.staff-role-owner .admin-role-badge::after { content:'Owner';font-size:.78rem; }
+
 /* Role-aware controls: backend enforcement remains authoritative. */
 .admin-route.staff-role-moderator .admin-case-account-actions .danger-button,
 .admin-route.staff-role-moderator .admin-case-account-actions .primary,
