@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabase'
 import Correspondence from './Correspondence'
 import SafetyPanel from './SafetyPanel'
 import BlockedMembers from './BlockedMembers'
+import ProfileAvatar from './ProfileAvatar'
+import ConnectionProfileModal from './ConnectionProfileModal'
 import '../letters.css'
 
 type RelationshipStatus = 'pending' | 'accepted' | 'declined' | 'cancelled' | 'paused' | 'ended'
@@ -24,6 +26,9 @@ export type PenPalRequest = {
 type MemberProfile = {
   id: string
   display_name: string | null
+  username: string | null
+  avatar_path: string | null
+  avatar_visibility: 'discover' | 'connections' | 'hidden' | null
   country: string | null
   about_me: string | null
 }
@@ -38,6 +43,13 @@ type SelectedCorrespondence = {
 
 type SafetyTarget = {
   relationshipId: string | null
+  otherUserId: string
+  otherName: string
+}
+
+type ProfileTarget = {
+  relationshipId: string
+  relationshipStatus: 'pending' | 'accepted' | 'paused' | 'ended'
   otherUserId: string
   otherName: string
 }
@@ -69,6 +81,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
   const [unreadByRelationship, setUnreadByRelationship] = useState<Map<string, number>>(new Map())
   const [selectedCorrespondence, setSelectedCorrespondence] = useState<SelectedCorrespondence | null>(null)
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null)
+  const [profileTarget, setProfileTarget] = useState<ProfileTarget | null>(null)
   const [managingBlocks, setManagingBlocks] = useState(false)
   const [loading, setLoading] = useState(true)
   const [workingId, setWorkingId] = useState<string | null>(null)
@@ -102,7 +115,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
       if (otherIds.length) {
         const { data: profileRows, error: profileError } = await supabase
           .from('profiles')
-          .select('id, display_name, country, about_me')
+          .select('id, display_name, username, avatar_path, avatar_visibility, country, about_me')
           .in('id', otherIds)
 
         if (profileError) throw new Error(`Could not load member profiles: ${errorMessage(profileError)}`)
@@ -158,6 +171,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
         .eq('id', request.id)
 
       if (error) throw error
+      setProfileTarget(null)
       await loadConnections()
     } catch (error) {
       setMessage(errorMessage(error))
@@ -193,6 +207,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
       if (selectedCorrespondence?.relationshipId === request.id) {
         setSelectedCorrespondence(null)
       }
+      setProfileTarget(null)
       await loadConnections()
     } catch (error) {
       setMessage(errorMessage(error))
@@ -226,7 +241,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
 
       if (error) {
         if ('code' in error && error.code === '23505') {
-          throw new Error(`A new request or current connection with ${name} already exists.`)
+          throw new Error('A pending request or existing pen-pal connection already exists with this member.')
         }
         if ('code' in error && (error.code === '42501' || error.code === 'P0001')) {
           throw new Error(`${name} is not currently available for a reconnect request. They may not be accepting new pen pals or may have reached their capacity.`)
@@ -286,6 +301,43 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
     )
   }
 
+  function visibleAvatarPath(request: PenPalRequest, person: MemberProfile | undefined) {
+    if (!person?.avatar_path || person.avatar_visibility === 'hidden') return null
+    if (person.avatar_visibility === 'discover') return person.avatar_path
+    if (person.avatar_visibility === 'connections' && ['accepted', 'paused', 'ended'].includes(request.status)) return person.avatar_path
+    return null
+  }
+
+  function openProfile(request: PenPalRequest) {
+    if (!['pending', 'accepted', 'paused', 'ended'].includes(request.status)) return
+    const targetUserId = otherUserId(request)
+    const person = profiles.get(targetUserId)
+    setProfileTarget({
+      relationshipId: request.id,
+      relationshipStatus: request.status as 'pending' | 'accepted' | 'paused' | 'ended',
+      otherUserId: targetUserId,
+      otherName: person?.display_name || 'this member',
+    })
+  }
+
+  function memberIdentity(request: PenPalRequest, kicker: string, includeCountryInName = false) {
+    const person = otherProfile(request)
+    const name = person?.display_name || (request.status === 'ended' ? 'Former pen pal' : 'Pen pal')
+    const nameWithCountry = includeCountryInName && person?.country ? `${name} · ${person.country}` : name
+    return (
+      <div className="connection-member-identity">
+        <ProfileAvatar avatarPath={visibleAvatarPath(request, person)} displayName={name} size="medium" />
+        <div className="connection-member-identity-copy">
+          <span className="person-kicker">{kicker}</span>
+          <button className="connection-profile-link" type="button" onClick={() => openProfile(request)}>
+            <strong>{nameWithCountry}</strong>
+            <span>{person?.username ? `@${person.username} · ` : ''}View profile</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   function openCorrespondence(request: PenPalRequest) {
     if (!['accepted', 'paused', 'ended'].includes(request.status)) return
     const targetUserId = otherUserId(request)
@@ -320,8 +372,29 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
         onClose={() => setSafetyTarget(null)}
         onBlocked={() => {
           setSafetyTarget(null)
+          setProfileTarget(null)
           setSelectedCorrespondence(null)
           void loadConnections()
+        }}
+      />
+    )
+  }
+
+  function profileModal() {
+    if (!profileTarget) return null
+    const currentTarget = profileTarget
+    return (
+      <ConnectionProfileModal
+        targetUserId={currentTarget.otherUserId}
+        relationshipStatus={currentTarget.relationshipStatus}
+        onClose={() => setProfileTarget(null)}
+        onSafety={() => {
+          setProfileTarget(null)
+          setSafetyTarget({
+            relationshipId: currentTarget.relationshipId,
+            otherUserId: currentTarget.otherUserId,
+            otherName: currentTarget.otherName,
+          })
         }}
       />
     )
@@ -459,9 +532,8 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
                 const person = otherProfile(request)
                 return (
                   <article className="connection-item" key={request.id}>
-                    <div>
-                      <span className="person-kicker">{person?.country || 'Location not listed'} · {formatDate(request.created_at)}</span>
-                      <h3>{person?.display_name || 'Pen pal'}</h3>
+                    <div className="connection-member-content">
+                      {memberIdentity(request, `${person?.country || 'Location not listed'} · ${formatDate(request.created_at)}`)}
                       {request.intro_message && <p className="request-intro">“{request.intro_message}”</p>}
                     </div>
                     <div className="connection-actions">
@@ -478,22 +550,18 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
               <div className="connection-heading"><h2>Sent requests</h2><span>{outgoing.length}</span></div>
               {outgoing.length === 0 ? (
                 <p className="connection-empty">You don’t have any requests waiting for a reply.</p>
-              ) : outgoing.map((request) => {
-                const person = otherProfile(request)
-                return (
-                  <article className="connection-item" key={request.id}>
-                    <div>
-                      <span className="person-kicker">Waiting since {formatDate(request.created_at)}</span>
-                      <h3>{person?.display_name || 'Pen pal'}</h3>
-                      <p className="request-state">Your request is waiting for their response.</p>
-                    </div>
-                    <div className="connection-actions">
-                      <button className="secondary" disabled={workingId === request.id} onClick={() => void respond(request, 'cancelled')}>Cancel request</button>
-                      <button className="relationship-control-link" type="button" onClick={() => openSafety(request)}>Safety</button>
-                    </div>
-                  </article>
-                )
-              })}
+              ) : outgoing.map((request) => (
+                <article className="connection-item" key={request.id}>
+                  <div className="connection-member-content">
+                    {memberIdentity(request, `Waiting since ${formatDate(request.created_at)}`)}
+                    <p className="request-state">Your request is waiting for their response.</p>
+                  </div>
+                  <div className="connection-actions">
+                    <button className="secondary" disabled={workingId === request.id} onClick={() => void respond(request, 'cancelled')}>Cancel request</button>
+                    <button className="relationship-control-link" type="button" onClick={() => openSafety(request)}>Safety</button>
+                  </div>
+                </article>
+              ))}
             </section>
 
             <section className="connection-section active-penpals-section">
@@ -505,9 +573,8 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
                 const unread = unreadByRelationship.get(request.id) ?? 0
                 return (
                   <article className={`connection-item active-connection ${unread > 0 ? 'connection-has-unread' : ''}`} key={request.id}>
-                    <div>
-                      <span className="person-kicker">Pen pals since {formatDate(request.responded_at || request.created_at)}</span>
-                      <h3>{person?.display_name || 'Pen pal'}{person?.country ? ` · ${person.country}` : ''}</h3>
+                    <div className="connection-member-content">
+                      {memberIdentity(request, `Pen pals since ${formatDate(request.responded_at || request.created_at)}`, true)}
                       {unread > 0 && <span className="connection-letter-badge">✉ {unread} new {unread === 1 ? 'letter' : 'letters'}</span>}
                       {person?.about_me && <p className="request-state">{person.about_me}</p>}
                     </div>
@@ -533,9 +600,8 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
                   const unread = unreadByRelationship.get(request.id) ?? 0
                   return (
                     <article className={`connection-item paused-connection ${unread > 0 ? 'connection-has-unread' : ''}`} key={request.id}>
-                      <div>
-                        <span className="person-kicker">Paused {request.paused_at ? formatDate(request.paused_at) : ''}</span>
-                        <h3>{person?.display_name || 'Pen pal'}{person?.country ? ` · ${person.country}` : ''}</h3>
+                      <div className="connection-member-content">
+                        {memberIdentity(request, `Paused ${request.paused_at ? formatDate(request.paused_at) : ''}`, true)}
                         <span className="relationship-state-badge paused">⏸ {pausedByMe ? 'Paused by you' : `Paused by ${person?.display_name || 'your pen pal'}`}</span>
                         {unread > 0 && <span className="connection-letter-badge">✉ {unread} unread</span>}
                         <p className="request-state">Existing letters remain available, but new letters cannot be sent while the relationship is paused.</p>
@@ -558,7 +624,6 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
               <section className="connection-section">
                 <div className="connection-heading"><h2>Past pen pals</h2><span>{ended.length}</span></div>
                 {ended.map((request) => {
-                  const person = otherProfile(request)
                   const unread = unreadByRelationship.get(request.id) ?? 0
                   const openConnection = currentOpenConnection(request)
                   const reconnectPending = openConnection?.status === 'pending'
@@ -566,9 +631,8 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
 
                   return (
                     <article className={`connection-item ended-connection ${unread > 0 ? 'connection-has-unread' : ''}`} key={request.id}>
-                      <div>
-                        <span className="person-kicker">Ended {request.ended_at ? formatDate(request.ended_at) : ''}</span>
-                        <h3>{person?.display_name || 'Former pen pal'}{person?.country ? ` · ${person.country}` : ''}</h3>
+                      <div className="connection-member-content">
+                        {memberIdentity(request, `Ended ${request.ended_at ? formatDate(request.ended_at) : ''}`, true)}
                         {unread > 0 && <span className="connection-letter-badge">✉ {unread} unread from before the connection ended</span>}
                         <p className="request-state">Your existing correspondence is preserved as read-only history.</p>
                       </div>
@@ -593,6 +657,7 @@ export default function Connections({ userId, onBack, onDiscover, onEditProfile,
           </div>
         )}
       </section>
+      {profileModal()}
       {safetyPanel()}
     </main>
   )
