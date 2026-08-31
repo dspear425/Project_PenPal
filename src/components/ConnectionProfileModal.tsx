@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import ProfileAvatar from './ProfileAvatar'
+import '../connection-profile.css'
 
 type RelationshipStatus = 'pending' | 'accepted' | 'paused' | 'ended'
 
@@ -104,8 +105,7 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
       if (profileError) throw profileError
       if (!profileData) throw new Error('This member profile is no longer available.')
 
-      const nextProfile = profileData as Profile
-      setProfile(nextProfile)
+      setProfile(profileData as Profile)
 
       const { data: selectedInterests, error: selectedError } = await supabase
         .from('profile_interests')
