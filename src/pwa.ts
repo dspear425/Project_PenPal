@@ -13,7 +13,10 @@ function isStandalone() {
 }
 
 function isIos() {
-  return /iphone|ipad|ipod/i.test(window.navigator.userAgent)
+  const ua = window.navigator.userAgent
+  const classicIos = /iphone|ipad|ipod/i.test(ua)
+  const desktopClassIpad = /macintosh/i.test(ua) && window.navigator.maxTouchPoints > 1
+  return classicIos || desktopClassIpad
 }
 
 export function getPwaInstallMode(): InstallMode {
