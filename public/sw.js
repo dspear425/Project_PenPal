@@ -1,7 +1,15 @@
 const CACHE_PREFIX = 'project-penpal-shell-'
-const CACHE_VERSION = 'v1'
+const CACHE_VERSION = 'v2'
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/app-icon.svg']
+const APP_SHELL = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/app-icon.svg',
+  '/icon-180.png',
+  '/icon-192.png',
+  '/icon-512.png',
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
