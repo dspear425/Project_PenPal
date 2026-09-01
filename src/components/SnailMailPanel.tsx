@@ -244,7 +244,14 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
     return (
       <section className="snail-mail-panel snail-mail-closed">
         <div className="snail-mail-heading"><div><p className="eyebrow">Physical correspondence</p><h2>Snail mail</h2></div><span className="snail-mail-stamp" aria-hidden="true">📪</span></div>
+        {message && <p className="status-message snail-mail-status">{message}</p>}
         <p>This pen-pal relationship has ended, so any in-app mailing-address access from this relationship has been revoked.</p>
+        {state.my_address && (
+          <div className="snail-mail-actions snail-ended-actions">
+            <button className="secondary" type="button" disabled={working} onClick={() => void deleteAddress()}>Delete my saved mailing address</button>
+            <small>Your private address vault is account-wide. Deleting it also revokes any active shares you created with other pen pals.</small>
+          </div>
+        )}
       </section>
     )
   }
@@ -252,6 +259,8 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
   const pendingIncoming = state.exchange_status === 'pending' && state.exchange_requested_by !== userId
   const pendingOutgoing = state.exchange_status === 'pending' && state.exchange_requested_by === userId
   const exchangeAccepted = state.exchange_status === 'accepted'
+  const myRequestWasDeclined = state.exchange_status === 'declined' && state.exchange_requested_by === userId
+  const iPreviouslyDeclined = state.exchange_status === 'declined' && state.exchange_requested_by !== userId
   const crossBorder = countriesDiffer(state.my_country, state.other_country)
   const bothOpen = state.my_preference !== 'digital' && state.other_preference !== 'digital'
   const internationalCompatible = !crossBorder || (state.my_international && state.other_international)
@@ -291,9 +300,21 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
         </div>
       )}
 
-      {!exchangeAccepted && !pendingIncoming && !pendingOutgoing && canRequest && (
+      {myRequestWasDeclined && !exchangeAccepted && (
+        <div className="snail-mail-info">
+          <strong>{otherName} declined the address exchange.</strong>
+          <p>You won’t be prompted to ask again. If {otherName} changes their mind later, they can initiate a new request themselves.</p>
+        </div>
+      )}
+
+      {!exchangeAccepted && !pendingIncoming && !pendingOutgoing && !myRequestWasDeclined && canRequest && (
         <div className="snail-exchange-request">
-          <div><strong>Ready to write on paper?</strong><p>Request permission to exchange mailing addresses. Accepting the request shares no address by itself.</p></div>
+          <div>
+            <strong>{iPreviouslyDeclined ? 'Changed your mind?' : 'Ready to write on paper?'}</strong>
+            <p>{iPreviouslyDeclined
+              ? `You previously declined ${otherName}'s request. You can start a new exchange now if you are comfortable.`
+              : 'Request permission to exchange mailing addresses. Accepting the request shares no address by itself.'}</p>
+          </div>
           <button className="primary" type="button" disabled={working} onClick={() => void requestExchange()}>Request address exchange</button>
         </div>
       )}
