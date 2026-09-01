@@ -19,6 +19,8 @@ type Profile = {
   friendship_goals: string[] | null
   communication_style: string | null
   correspondence_frequency: string | null
+  correspondence_method: 'digital' | 'both' | 'snail_mail' | null
+  international_snail_mail: boolean | null
   accepting_new_penpals: boolean | null
 }
 
@@ -57,6 +59,12 @@ const frequencyLabels: Record<string, string> = {
   biweekly: 'Every couple of weeks',
   monthly: 'About monthly',
   flexible: 'Flexible',
+}
+
+const correspondenceLabels: Record<string, string> = {
+  digital: 'Digital letters only',
+  both: 'Digital + snail mail',
+  snail_mail: 'Snail mail preferred',
 }
 
 function errorMessage(error: unknown) {
@@ -98,14 +106,15 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, display_name, username, avatar_path, avatar_visibility, birth_year, country, region, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals')
+        .select('id, display_name, username, avatar_path, avatar_visibility, birth_year, country, region, about_me, languages, friendship_goals, communication_style, correspondence_frequency, correspondence_method, international_snail_mail, accepting_new_penpals')
         .eq('id', targetUserId)
         .maybeSingle()
 
       if (profileError) throw profileError
       if (!profileData) throw new Error('This member profile is no longer available.')
 
-      setProfile(profileData as Profile)
+      const nextProfile = profileData as Profile
+      setProfile(nextProfile)
 
       const { data: selectedInterests, error: selectedError } = await supabase
         .from('profile_interests')
@@ -144,6 +153,7 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
   const location = [profile?.region, profile?.country].filter(Boolean).join(', ') || 'Location not listed'
   const goals = profile?.friendship_goals ?? []
   const languages = profile?.languages ?? []
+  const correspondenceMethod = profile?.correspondence_method ?? 'digital'
 
   return (
     <div className="connection-profile-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
@@ -169,6 +179,9 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
                 <p className="connection-profile-location">
                   {location}{age ? ` · Age ${age}` : ''}
                 </p>
+                {correspondenceMethod !== 'digital' && (
+                  <span className="snail-mail-profile-badge">📬 {correspondenceLabels[correspondenceMethod]}{profile.international_snail_mail ? ' · international okay' : ''}</span>
+                )}
                 {relationshipStatus === 'pending' && profile.avatar_path && profile.avatar_visibility === 'connections' && (
                   <span className="connection-profile-photo-note">Photo shared after you become pen pals</span>
                 )}
@@ -206,6 +219,7 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
                 <div className="connection-profile-facts">
                   <article><span>Letter style</span><strong>{styleLabels[profile.communication_style || ''] || 'Not specified'}</strong></article>
                   <article><span>Preferred rhythm</span><strong>{frequencyLabels[profile.correspondence_frequency || ''] || 'Not specified'}</strong></article>
+                  <article><span>Format</span><strong>{correspondenceLabels[correspondenceMethod]}</strong>{correspondenceMethod !== 'digital' && <small>{profile.international_snail_mail ? 'International physical mail okay' : 'Domestic physical mail only'}</small>}</article>
                   <article><span>Languages</span><strong>{languages.length ? languages.join(', ') : 'Not specified'}</strong></article>
                 </div>
               </section>
