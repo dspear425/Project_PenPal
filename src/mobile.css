@@ -1,0 +1,495 @@
+/* Project PenPal mobile/PWA usability layer.
+   Imported last so these rules can normalize the many feature-specific layouts
+   without duplicating each component's desktop styling. */
+
+:root {
+  --pp-safe-top: env(safe-area-inset-top, 0px);
+  --pp-safe-right: env(safe-area-inset-right, 0px);
+  --pp-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --pp-safe-left: env(safe-area-inset-left, 0px);
+  --pp-mobile-menu-space: 78px;
+}
+
+html { min-height: 100%; }
+body {
+  min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+/* Connection state --------------------------------------------------------- */
+.connectivity-banner {
+  position: fixed;
+  z-index: 180;
+  left: max(12px, var(--pp-safe-left));
+  right: max(12px, var(--pp-safe-right));
+  top: max(12px, var(--pp-safe-top));
+  width: min(720px, calc(100% - 24px));
+  margin-inline: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid #c88d72;
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: #fff8f1;
+  color: #57463d;
+  box-shadow: 0 12px 34px rgba(55, 42, 33, .18);
+}
+.connectivity-banner > span {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f1ddd2;
+  color: #8a4e3d;
+  font-weight: 950;
+}
+.connectivity-banner > div { display: grid; gap: 2px; }
+.connectivity-banner strong { font-size: .92rem; }
+.connectivity-banner div > span { color: #75665e; font-size: .8rem; line-height: 1.4; }
+
+/* Mobile quick-action menu ------------------------------------------------- */
+.mobile-action-menu,
+.mobile-install-overlay { display: none; }
+
+@media (max-width: 800px) {
+  /* Replace the independent desktop bubbles with one predictable mobile menu. */
+  .profile-photo-launcher,
+  .settings-launcher,
+  .support-launcher,
+  .member-notice-launcher,
+  .admin-launcher {
+    display: none !important;
+  }
+
+  .mobile-action-menu { display: block; }
+  .mobile-menu-trigger {
+    position: fixed;
+    z-index: 126;
+    right: max(12px, calc(var(--pp-safe-right) + 8px));
+    bottom: max(12px, calc(var(--pp-safe-bottom) + 8px));
+    min-width: 92px;
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #704233;
+    border-radius: 999px;
+    padding: 10px 17px;
+    background: #2f2924;
+    color: white;
+    box-shadow: 0 12px 32px rgba(46,36,29,.28);
+    font: inherit;
+    cursor: pointer;
+  }
+  .mobile-menu-trigger > span { font-size: 1.05rem; line-height: 1; }
+  .mobile-menu-trigger > strong { font-size: .9rem; }
+  .mobile-menu-trigger > i {
+    position: absolute;
+    right: 4px;
+    top: 3px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid #2f2924;
+    border-radius: 50%;
+    background: #d86c4b;
+  }
+
+  .mobile-menu-backdrop {
+    position: fixed;
+    z-index: 123;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: rgba(38,31,26,.42);
+    backdrop-filter: blur(3px);
+  }
+  .mobile-menu-sheet {
+    position: fixed;
+    z-index: 125;
+    left: max(10px, var(--pp-safe-left));
+    right: max(10px, var(--pp-safe-right));
+    bottom: calc(76px + var(--pp-safe-bottom));
+    display: grid;
+    gap: 7px;
+    max-height: min(70dvh, 620px);
+    overflow: auto;
+    border: 1px solid #d6c8bb;
+    border-radius: 22px;
+    padding: 12px;
+    background: #fffdf9;
+    box-shadow: 0 24px 64px rgba(43,33,26,.3);
+  }
+  .mobile-menu-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 5px 5px 10px;
+    border-bottom: 1px solid #eadfd5;
+  }
+  .mobile-menu-heading > div { display: grid; gap: 2px; }
+  .mobile-menu-heading span { color: #8a4e3d; font-size: .7rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+  .mobile-menu-heading strong { font-family: Georgia,'Times New Roman',serif; font-size: 1.25rem; }
+  .mobile-menu-heading > button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d8ccc0;
+    border-radius: 50%;
+    background: white;
+    color: #5c5148;
+    font-size: 1.3rem;
+  }
+  .mobile-menu-sheet > button[role='menuitem'] {
+    width: 100%;
+    min-height: 62px;
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #e1d6cb;
+    border-radius: 15px;
+    padding: 10px 12px;
+    background: #fffdfa;
+    color: #413831;
+    text-align: left;
+  }
+  .mobile-menu-sheet > button[role='menuitem'] > span {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #f2e9df;
+    color: #7c4a3b;
+    font-size: 1.05rem;
+    font-weight: 900;
+  }
+  .mobile-menu-sheet > button[role='menuitem'] > div { display: grid; gap: 2px; min-width: 0; }
+  .mobile-menu-sheet > button[role='menuitem'] strong { font-size: .92rem; }
+  .mobile-menu-sheet > button[role='menuitem'] small { color: #7b7168; line-height: 1.35; }
+  .mobile-menu-sheet em {
+    display: inline-flex;
+    margin-left: 5px;
+    border-radius: 999px;
+    padding: 2px 6px;
+    background: #a5513c;
+    color: white;
+    font-size: .62rem;
+    font-style: normal;
+    vertical-align: middle;
+  }
+
+  .mobile-install-overlay {
+    position: fixed;
+    z-index: 170;
+    inset: 0;
+    display: grid;
+    align-items: end;
+    padding: 10px max(10px, var(--pp-safe-right)) max(10px, var(--pp-safe-bottom)) max(10px, var(--pp-safe-left));
+    background: rgba(38,31,26,.48);
+    backdrop-filter: blur(4px);
+  }
+  .mobile-install-card {
+    position: relative;
+    width: 100%;
+    max-height: 86dvh;
+    overflow: auto;
+    border-radius: 24px 24px 12px 12px;
+    padding: 28px 24px 24px;
+    background: #fffdf9;
+    box-shadow: 0 28px 80px rgba(38,29,22,.3);
+  }
+  .mobile-install-card h2 { margin: 3px 0 12px; font-family: Georgia,'Times New Roman',serif; font-size: 2rem; }
+  .mobile-install-card > p:not(.eyebrow) { color: #665b52; line-height: 1.65; }
+  .mobile-install-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 16px; border: 1px dashed #a66a55; border-radius: 13px; color: #8a4e3d; font-size: 1.4rem; }
+  .mobile-install-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 1px solid #d8ccc0; border-radius: 50%; background: white; color: #62564e; font-size: 1.3rem; }
+
+  /* Global touch and viewport normalization. */
+  .page-shell {
+    min-height: 100dvh;
+    padding: max(10px, var(--pp-safe-top)) max(10px, var(--pp-safe-right)) calc(var(--pp-mobile-menu-space) + var(--pp-safe-bottom)) max(10px, var(--pp-safe-left));
+  }
+  .onboarding-shell,
+  .discover-shell { padding-top: max(10px, var(--pp-safe-top)); padding-bottom: calc(var(--pp-mobile-menu-space) + var(--pp-safe-bottom)); }
+
+  .hero-card,
+  .discover-card,
+  .connections-card {
+    border-radius: 18px;
+    padding: clamp(20px, 5vw, 32px);
+  }
+
+  button,
+  [role='button'],
+  select,
+  input[type='checkbox'],
+  input[type='radio'] { touch-action: manipulation; }
+
+  .primary,
+  .secondary { min-height: 46px; }
+
+  .back,
+  .text-button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  textarea { max-width: 100%; }
+  h1 { overflow-wrap: anywhere; }
+
+  /* App/dashboard/onboarding. */
+  .dashboard-topline,
+  .discover-header {
+    gap: 14px;
+    margin-bottom: 34px;
+  }
+  .dashboard-title,
+  .onboarding-title { font-size: clamp(2.2rem, 10vw, 3.7rem); }
+  .dashboard-actions { gap: 9px; }
+  .profile-summary { gap: 10px; }
+  .form-section { padding-top: 26px; }
+  .section-heading { gap: 12px; }
+  .choice-grid,
+  .interest-grid { gap: 8px; }
+  .choice { min-height: 42px; padding-inline: 13px; }
+  .save-row { align-items: stretch; flex-direction: column; }
+  .save-row .primary { width: 100%; }
+
+  /* Discover. */
+  .discover-title { font-size: clamp(2.35rem, 11vw, 3.8rem); }
+  .discover-title-row { gap: 18px; }
+  .discover-nav { gap: 8px; }
+  .match-grid { gap: 14px; margin-top: 30px; }
+  .match-card { min-height: 0; padding: 18px; border-radius: 18px; }
+  .match-card-top { gap: 12px; }
+  .match-profile-heading { align-items: flex-start; }
+  .match-score { width: 64px; height: 64px; }
+  .match-bio { margin-top: 16px; }
+  .match-actions { gap: 8px; padding-top: 20px; }
+
+  /* Connections and profile review. */
+  .connection-sections { gap: 24px; margin-top: 32px; }
+  .connection-item { padding: 17px; border-radius: 17px; gap: 18px; }
+  .connection-actions { gap: 8px; }
+  .connection-actions .primary,
+  .connection-actions .secondary { flex: 1 1 auto; }
+  .connection-member-identity { width: 100%; }
+  .connection-profile-overlay,
+  .member-notice-overlay,
+  .settings-overlay,
+  .profile-photo-overlay,
+  .support-overlay,
+  .help-center-overlay,
+  .admin-tool-overlay,
+  .admin-directory-overlay,
+  .admin-activity-overlay,
+  .admin-team-overlay {
+    min-height: 100dvh;
+    padding: max(8px, var(--pp-safe-top)) max(8px, var(--pp-safe-right)) max(8px, var(--pp-safe-bottom)) max(8px, var(--pp-safe-left));
+    align-items: end;
+  }
+  .connection-profile-modal,
+  .member-notice-panel,
+  .settings-panel,
+  .profile-photo-panel,
+  .support-panel,
+  .help-center-panel,
+  .admin-tool-panel,
+  .admin-directory-panel,
+  .admin-activity-panel,
+  .admin-team-panel {
+    width: 100%;
+    max-height: calc(100dvh - var(--pp-safe-top) - var(--pp-safe-bottom) - 12px);
+    border-radius: 22px 22px 10px 10px;
+    padding: 20px;
+    overscroll-behavior: contain;
+  }
+
+  /* Correspondence: prioritize actual writing space on phones. */
+  .correspondence-view { gap: 26px; }
+  .correspondence-title { font-size: clamp(2.3rem, 11vw, 3.8rem); }
+  .letter-paper { padding: 19px; border-radius: 16px; }
+  .letter-body { font-size: 1rem; line-height: 1.75; }
+  .letter-form { padding: 17px; border-radius: 18px; gap: 14px; }
+  .letter-form textarea {
+    min-height: 42dvh;
+    max-height: 68dvh;
+    resize: vertical;
+  }
+  .letter-compose-footer {
+    position: sticky;
+    bottom: calc(var(--pp-mobile-menu-space) + var(--pp-safe-bottom));
+    z-index: 8;
+    margin-inline: -8px;
+    padding: 10px 8px;
+    border-top: 1px solid #e3d8cc;
+    background: rgba(255,253,249,.96);
+    backdrop-filter: blur(8px);
+  }
+  .letter-compose-footer .primary { width: 100%; }
+  .correspondence-person-heading { align-items: flex-start; }
+
+  /* Snail mail. */
+  .snail-mail-panel { margin-top: 26px; }
+  .snail-exchange-request .primary,
+  .snail-exchange-request .secondary { width: 100%; }
+  .snail-address-block { user-select: text; }
+
+  /* Settings/help/profile-photo sheets. */
+  .settings-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: -4px;
+    padding-inline: 4px;
+  }
+  .settings-tabs::-webkit-scrollbar { display: none; }
+  .settings-tabs button { white-space: nowrap; flex: 0 0 auto; }
+  .settings-card { padding: 16px; }
+  .help-home { gap: 24px; }
+  .help-search-wrap { grid-template-columns: auto minmax(0,1fr) auto; }
+  .profile-crop-viewport { width: min(300px, 82vw); }
+
+  /* Admin: turn the many staff bubbles into one horizontal dock above Menu. */
+  .admin-route { padding-bottom: calc(152px + var(--pp-safe-bottom)); }
+  .admin-floating-toolbar {
+    position: fixed;
+    z-index: 72;
+    left: max(8px, var(--pp-safe-left));
+    right: max(8px, var(--pp-safe-right));
+    bottom: calc(74px + var(--pp-safe-bottom));
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 8px;
+    border: 1px solid rgba(207,194,179,.9);
+    border-radius: 18px;
+    background: rgba(255,253,249,.94);
+    box-shadow: 0 10px 28px rgba(46,36,29,.18);
+    backdrop-filter: blur(10px);
+    scrollbar-width: none;
+  }
+  .admin-floating-toolbar::-webkit-scrollbar { display: none; }
+  .admin-floating-toolbar .admin-activity-launcher,
+  .admin-floating-toolbar .admin-directory-launcher,
+  .admin-floating-toolbar .admin-quick-launchers {
+    position: static !important;
+    inset: auto !important;
+  }
+  .admin-floating-toolbar .admin-activity-launcher,
+  .admin-floating-toolbar .admin-directory-launcher,
+  .admin-floating-toolbar .admin-team-launcher,
+  .admin-floating-toolbar .admin-quick-launchers button {
+    min-height: 44px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    box-shadow: none;
+  }
+  .admin-floating-toolbar .admin-quick-launchers {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 7px;
+    max-width: none;
+  }
+  .admin-search-layout,
+  .admin-support-layout,
+  .admin-relationship-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-search-form { grid-template-columns: 1fr; }
+  .admin-search-form button { width: 100%; }
+  .admin-user-context,
+  .admin-support-conversation { min-height: 0; }
+  .admin-case-heading,
+  .admin-user-heading,
+  .admin-relationship-heading { flex-direction: column; }
+  .admin-case-heading-actions { justify-content: flex-start; }
+  .admin-correspondence-letters,
+  .admin-support-messages { max-height: none; }
+}
+
+@media (max-width: 520px) {
+  .hero-card,
+  .discover-card,
+  .connections-card { padding: 18px; }
+
+  .dashboard-topline,
+  .discover-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .dashboard-topline .secondary { align-self: flex-end; }
+  .discover-nav {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .discover-nav .text-button { margin: 0; }
+  .dashboard-welcome-row { flex-direction: row; align-items: center; }
+  .dashboard-welcome-avatar { width: 68px; height: 68px; flex: 0 0 68px; }
+  .dashboard-welcome-row .dashboard-title { font-size: clamp(2rem, 10vw, 3rem); }
+
+  .match-card-top { align-items: flex-start; }
+  .match-score { width: 58px; height: 58px; }
+  .match-actions,
+  .connection-actions,
+  .request-composer-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .match-actions .primary,
+  .match-actions .secondary,
+  .connection-actions .primary,
+  .connection-actions .secondary,
+  .request-composer-actions button { width: 100%; }
+
+  .first-letter-note,
+  .letter-alert,
+  .reconnected-note { gap: 12px; padding: 15px; }
+  .letter-paper { padding: 16px; }
+  .letter-form { padding: 14px; }
+
+  .connection-profile-modal,
+  .member-notice-panel,
+  .settings-panel,
+  .profile-photo-panel,
+  .support-panel,
+  .help-center-panel,
+  .admin-tool-panel,
+  .admin-directory-panel,
+  .admin-activity-panel,
+  .admin-team-panel { padding: 17px; }
+
+  .connection-profile-header { gap: 14px; }
+  .connection-profile-header .profile-avatar-large { width: 78px; height: 78px; }
+  .member-notice-card { padding: 16px; }
+  .settings-code-card .secondary { width: 100%; }
+
+  .snail-mail-heading { align-items: flex-start; }
+  .snail-mail-stamp { width: 40px; height: 40px; }
+
+  .mobile-menu-sheet { left: max(7px, var(--pp-safe-left)); right: max(7px, var(--pp-safe-right)); }
+}
+
+/* Installed standalone window: use the full safe area cleanly. */
+@media (display-mode: standalone) {
+  body { background: #efe8dc; }
+  .page-shell { padding-top: max(16px, calc(var(--pp-safe-top) + 6px)); }
+}
