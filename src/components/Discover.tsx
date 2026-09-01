@@ -41,6 +41,12 @@ function ageFromBirthYear(birthYear: number | null) {
   return new Date().getFullYear() - birthYear
 }
 
+function snailMailLabel(profile: MatchProfile) {
+  if (profile.correspondence_method === 'snail_mail') return 'Snail mail preferred'
+  if (profile.correspondence_method === 'both') return 'Open to snail mail'
+  return null
+}
+
 export default function Discover({
   userId,
   currentProfile,
@@ -76,7 +82,7 @@ export default function Discover({
     try {
       const { data: profileRows, error: profileError } = await supabase
         .from('profiles')
-        .select('id, display_name, username, avatar_path, avatar_visibility, avatar_updated_at, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, accepting_new_penpals, max_penpals')
+        .select('id, display_name, username, avatar_path, avatar_visibility, avatar_updated_at, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, correspondence_method, international_snail_mail, accepting_new_penpals, max_penpals')
         .neq('id', userId)
         .eq('account_status', 'active')
         .eq('onboarding_complete', true)
@@ -206,7 +212,7 @@ export default function Discover({
             <h1 className="discover-title">People worth writing to.</h1>
             <p className="hero-copy discover-copy">
               Matches are ranked by shared interests, friendship goals, writing style,
-              reply rhythm, location preference, and language compatibility.
+              reply rhythm, location preference, and language compatibility. Snail-mail preference is shown as an additional compatibility signal without changing the established score weighting.
             </p>
           </div>
           <button className="secondary refresh-button" onClick={() => void loadMatches()} disabled={loading}>
@@ -239,6 +245,7 @@ export default function Discover({
             const isAccepted = existingConnection?.status === 'accepted'
             const isPaused = existingConnection?.status === 'paused'
             const isComposing = composingFor === match.profile.id
+            const snailLabel = snailMailLabel(match.profile)
 
             return (
               <article className="match-card" key={match.profile.id}>
@@ -256,6 +263,9 @@ export default function Discover({
                       </div>
                       <h2>{match.profile.display_name || 'New member'}</h2>
                       {match.profile.username && <div className="person-username">@{match.profile.username}</div>}
+                      {snailLabel && (
+                        <div className="snail-mail-profile-badge">📬 {snailLabel}{match.profile.international_snail_mail ? ' · international okay' : ''}</div>
+                      )}
                     </div>
                   </div>
                   <div className="match-score" aria-label={`${match.score}% compatibility`}>
