@@ -542,7 +542,7 @@ export default function AppV6() {
           <div className="profile-summary">
             <article><strong>{profile.country}</strong><span>{profile.region || 'Region kept private'}</span></article>
             <article><strong>{selectedInterests.length}</strong><span>interests selected</span></article>
-            <article><strong>{profile.max_penpals}</strong><span>{correspondenceMethodLabel(profile.correspondence_method)}</span></article>
+            <article><strong>{profile.max_penpals}</strong><span>pen-pal capacity · {correspondenceMethodLabel(profile.correspondence_method)}</span></article>
           </div>
           <div className="actions dashboard-actions">
             <button className="primary" onClick={() => setMode('discover')}>Discover matches</button>
