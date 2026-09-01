@@ -133,7 +133,7 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
     }
   }
 
-  async function runAction(fn: () => Promise<{ error: unknown }>, success: string) {
+  async function runAction(fn: () => PromiseLike<{ error: unknown }>, success: string) {
     setWorking(true)
     setMessage('')
     try {
