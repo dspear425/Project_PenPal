@@ -4,7 +4,7 @@ import { supabase } from './lib/supabase'
 import AppV6 from './AppV6'
 import AdminPanel from './components/AdminPanel'
 import MemberNotices from './components/MemberNotices'
-import SupportCenter from './components/SupportCenter'
+import HelpCenter from './components/HelpCenter'
 import AdminQuickTools from './components/AdminQuickTools'
 import AdminMemberDirectory from './components/AdminMemberDirectory'
 import AdminActivity from './components/AdminActivity'
@@ -18,6 +18,7 @@ import './admin.css'
 import './admin-shell.css'
 import './member-notices.css'
 import './support.css'
+import './help-center.css'
 import './member-identity.css'
 import './admin-directory.css'
 import './admin-activity.css'
@@ -242,6 +243,7 @@ export default function AppRoot() {
           <AdminQuickTools userId={session.user.id} />
           <AdminTeam currentUserId={session.user.id} role={role} />
         </div>
+        <HelpCenter userId={session.user.id} initialContext="admin" />
       </div>
     )
   }
@@ -281,7 +283,7 @@ export default function AppRoot() {
           </section>
         </main>
         <MemberNotices userId={session.user.id} />
-        <SupportCenter userId={session.user.id} />
+        <HelpCenter userId={session.user.id} initialContext="restricted" />
       </>
     )
   }
@@ -294,7 +296,7 @@ export default function AppRoot() {
       {session && <ProfilePhotoSettings userId={session.user.id} />}
       {session && <SettingsPrivacy userId={session.user.id} isModerator={Boolean(role)} />}
       {session && <MemberNotices userId={session.user.id} />}
-      {session && <SupportCenter userId={session.user.id} />}
+      {session && <HelpCenter userId={session.user.id} />}
       {session && role && accountStatus === 'active' && (
         <button
           className={`admin-launcher ${adminMessageCount > 0 ? 'has-admin-message' : ''}`}
