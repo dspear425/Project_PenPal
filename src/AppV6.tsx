@@ -8,6 +8,7 @@ import './discover.css'
 import './connections.css'
 
 type Mode = 'welcome' | 'signup' | 'signin' | 'onboarding' | 'home' | 'discover' | 'connections'
+type CorrespondenceMethod = 'digital' | 'both' | 'snail_mail'
 
 type Interest = {
   id: number
@@ -25,6 +26,8 @@ type Profile = {
   friendship_goals: string[]
   communication_style: string | null
   correspondence_frequency: string | null
+  correspondence_method: CorrespondenceMethod
+  international_snail_mail: boolean
   accepting_new_penpals: boolean
   max_penpals: number
   onboarding_complete: boolean
@@ -58,6 +61,8 @@ const emptyProfile: Profile = {
   friendship_goals: ['long-term', 'international'],
   communication_style: 'long',
   correspondence_frequency: 'weekly',
+  correspondence_method: 'digital',
+  international_snail_mail: false,
   accepting_new_penpals: true,
   max_penpals: 3,
   onboarding_complete: false,
@@ -78,6 +83,12 @@ function draftKey(userId: string) {
 
 function editModeKey(userId: string) {
   return `project-penpal:editing-profile:${userId}`
+}
+
+function correspondenceMethodLabel(value: CorrespondenceMethod) {
+  if (value === 'both') return 'Digital + snail mail'
+  if (value === 'snail_mail') return 'Snail mail preferred'
+  return 'Digital letters'
 }
 
 export default function AppV6() {
@@ -274,6 +285,8 @@ export default function AppV6() {
           : ['long-term', 'international'],
         communication_style: profileData.communication_style ?? 'long',
         correspondence_frequency: profileData.correspondence_frequency ?? 'weekly',
+        correspondence_method: (profileData.correspondence_method ?? 'digital') as CorrespondenceMethod,
+        international_snail_mail: profileData.international_snail_mail ?? false,
         accepting_new_penpals: profileData.accepting_new_penpals ?? true,
         max_penpals: profileData.max_penpals ?? 3,
         onboarding_complete: profileData.onboarding_complete ?? false,
@@ -367,12 +380,18 @@ export default function AppV6() {
   }
 
   function toggleGoal(goal: string) {
-    setProfile((previous) => ({
-      ...previous,
-      friendship_goals: previous.friendship_goals.includes(goal)
-        ? previous.friendship_goals.filter((item) => item !== goal)
-        : [...previous.friendship_goals, goal],
-    }))
+    setProfile((previous) => {
+      const adding = !previous.friendship_goals.includes(goal)
+      return {
+        ...previous,
+        friendship_goals: adding
+          ? [...previous.friendship_goals, goal]
+          : previous.friendship_goals.filter((item) => item !== goal),
+        correspondence_method: goal === 'snail-mail' && adding && previous.correspondence_method === 'digital'
+          ? 'both'
+          : previous.correspondence_method,
+      }
+    })
   }
 
   function toggleInterest(id: number) {
@@ -425,6 +444,12 @@ export default function AppV6() {
 
       if (profileError) throw new Error(`Profile save: ${errorMessage(profileError)}`)
 
+      const { error: snailMailError } = await supabase.rpc('save_snail_mail_preferences', {
+        preference: profile.correspondence_method,
+        international_ok: profile.correspondence_method === 'digital' ? false : profile.international_snail_mail,
+      })
+      if (snailMailError) throw new Error(`Snail-mail preference: ${errorMessage(snailMailError)}`)
+
       const { error: deleteError } = await supabase
         .from('profile_interests')
         .delete()
@@ -443,7 +468,11 @@ export default function AppV6() {
 
       localStorage.removeItem(draftKey(session.user.id))
       sessionStorage.removeItem(editModeKey(session.user.id))
-      setProfile((previous) => ({ ...previous, onboarding_complete: true }))
+      setProfile((previous) => ({
+        ...previous,
+        international_snail_mail: previous.correspondence_method === 'digital' ? false : previous.international_snail_mail,
+        onboarding_complete: true,
+      }))
       setMode('home')
     } catch (error) {
       setMessage(errorMessage(error))
@@ -513,7 +542,7 @@ export default function AppV6() {
           <div className="profile-summary">
             <article><strong>{profile.country}</strong><span>{profile.region || 'Region kept private'}</span></article>
             <article><strong>{selectedInterests.length}</strong><span>interests selected</span></article>
-            <article><strong>{profile.max_penpals}</strong><span>pen-pal capacity</span></article>
+            <article><strong>{profile.max_penpals}</strong><span>{correspondenceMethodLabel(profile.correspondence_method)}</span></article>
           </div>
           <div className="actions dashboard-actions">
             <button className="primary" onClick={() => setMode('discover')}>Discover matches</button>
@@ -593,15 +622,22 @@ export default function AppV6() {
               <div className="two-column">
                 <label>Letter style<select value={profile.communication_style ?? 'long'} onChange={(event) => setProfile({ ...profile, communication_style: event.target.value })}><option value="short">Short messages</option><option value="medium">Medium-length messages</option><option value="long">Long letters</option><option value="any">Anything</option></select></label>
                 <label>Preferred frequency<select value={profile.correspondence_frequency ?? 'weekly'} onChange={(event) => setProfile({ ...profile, correspondence_frequency: event.target.value })}><option value="several_week">Several times a week</option><option value="weekly">About weekly</option><option value="biweekly">Every couple of weeks</option><option value="monthly">About monthly</option><option value="flexible">Flexible</option></select></label>
+                <label>Correspondence format<select value={profile.correspondence_method} onChange={(event) => {
+                  const next = event.target.value as CorrespondenceMethod
+                  setProfile({ ...profile, correspondence_method: next, international_snail_mail: next === 'digital' ? false : profile.international_snail_mail })
+                }}><option value="digital">Digital letters only</option><option value="both">Digital + snail mail</option><option value="snail_mail">Snail mail preferred</option></select><span className="field-help">Mailing addresses are never public and are shared only after mutual consent with an established pen pal.</span></label>
                 <label>Pen-pal capacity<select value={profile.max_penpals} onChange={(event) => setProfile({ ...profile, max_penpals: Number(event.target.value) })}>{[1,2,3,4,5,6,7,8,9,10].map((number) => <option key={number} value={number}>{number}</option>)}</select></label>
                 <label>Language(s)<input value={profile.languages.join(', ')} onChange={(event) => setProfile({ ...profile, languages: event.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} placeholder="English, Spanish" /></label>
               </div>
+              {profile.correspondence_method !== 'digital' && (
+                <label className="check-row"><input type="checkbox" checked={profile.international_snail_mail} onChange={(event) => setProfile({ ...profile, international_snail_mail: event.target.checked })} /> I’m open to exchanging physical letters with pen pals in other countries.</label>
+              )}
               <label className="check-row"><input type="checkbox" checked={profile.accepting_new_penpals} onChange={(event) => setProfile({ ...profile, accepting_new_penpals: event.target.checked })} /> I’m currently accepting new pen pals.</label>
             </section>
 
             <div className="save-row">
               <button className="primary" type="submit" disabled={busy}>{busy ? 'Saving…' : profile.onboarding_complete ? 'Save profile' : 'Finish profile'}</button>
-              <span>Your email address is never displayed publicly.</span>
+              <span>Your email address and mailing address are never displayed publicly.</span>
             </div>
           </form>
         </section>
@@ -621,15 +657,15 @@ export default function AppV6() {
           <>
             <p className="eyebrow">Friendship-first correspondence</p>
             <h1>Friendships worth writing for.</h1>
-            <p className="hero-copy">Meet people around the world who want genuine platonic friendship, meaningful conversation, and letters that are worth opening.</p>
+            <p className="hero-copy">Meet people around the world who want genuine platonic friendship, meaningful conversation, and letters that are worth opening — on screen or in the mailbox.</p>
             <div className="actions">
               <button className="primary" onClick={() => setMode('signup')}>Create account</button>
               <button className="secondary" onClick={() => setMode('signin')}>Sign in</button>
             </div>
             <div className="feature-grid">
-              <article><strong>Better matches</strong><span>Interests, friendship goals, and communication style.</span></article>
+              <article><strong>Better matches</strong><span>Interests, friendship goals, communication style, and correspondence preferences.</span></article>
               <article><strong>Letters, not feeds</strong><span>A calmer space built around real one-to-one correspondence.</span></article>
-              <article><strong>Platonic by design</strong><span>No follower counts, popularity contests, or dating-first mechanics.</span></article>
+              <article><strong>Digital or handwritten</strong><span>Build trust here, then exchange mailing addresses only when both pen pals choose to.</span></article>
             </div>
           </>
         ) : (
