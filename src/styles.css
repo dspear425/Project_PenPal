@@ -97,6 +97,7 @@ h1 { margin: 0; max-width: 720px; font-family: Georgia, 'Times New Roman', serif
 .section-heading p { margin: 6px 0 0; color: #756c63; line-height: 1.5; }
 .two-column { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
 .optional { color: #91877d; font-weight: 500; font-size: .86rem; }
+.field-help { color: #8a8178; font-size: .82rem; line-height: 1.45; font-weight: 500; }
 .choice-grid, .interest-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 .choice { border: 1px solid #d2c6b9; background: #fffdf9; color: #554b42; border-radius: 999px; padding: 11px 15px; font-weight: 700; }
 .choice.small { padding: 9px 13px; font-size: .94rem; }
