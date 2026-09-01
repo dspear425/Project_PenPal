@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import ProfileAvatar from './ProfileAvatar'
+import SnailMailPanel from './SnailMailPanel'
 
 type Letter = {
   id: string
@@ -313,6 +314,13 @@ export default function Correspondence({
           Your shared correspondence is preserved here as read-only history.
         </div>
       )}
+
+      <SnailMailPanel
+        userId={userId}
+        relationshipId={relationshipId}
+        relationshipStatus={relationshipStatus}
+        otherName={otherName}
+      />
 
       {message && <p className="status-message correspondence-status">{message}</p>}
 
