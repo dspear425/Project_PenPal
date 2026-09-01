@@ -1,4 +1,5 @@
 import type { HelpContext } from './lib/helpContent'
+import './help-layer.css'
 
 let lastContext: HelpContext | null = null
 let scheduled = false
