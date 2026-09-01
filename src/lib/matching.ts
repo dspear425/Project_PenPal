@@ -12,6 +12,8 @@ export type MatchProfile = {
   friendship_goals: string[] | null
   communication_style: string | null
   correspondence_frequency: string | null
+  correspondence_method?: 'digital' | 'both' | 'snail_mail' | null
+  international_snail_mail?: boolean | null
   accepting_new_penpals: boolean | null
   max_penpals: number | null
 }
@@ -79,6 +81,15 @@ function locationScore(
   return 2
 }
 
+function bothOpenToSnailMail(current: CurrentProfile, other: MatchProfile) {
+  return Boolean(
+    current.correspondence_method
+    && current.correspondence_method !== 'digital'
+    && other.correspondence_method
+    && other.correspondence_method !== 'digital',
+  )
+}
+
 export function calculateMatch(
   current: CurrentProfile,
   other: MatchProfile,
@@ -104,6 +115,8 @@ export function calculateMatch(
   const sharedLanguages = intersection(currentLanguages, otherLanguages)
   const languagePoints = sharedLanguages.length ? 5 : 0
 
+  // Keep the established 100-point weighting intact. Snail-mail preference is an
+  // additional compatibility signal/reason rather than silently changing scores.
   const score = Math.max(
     0,
     Math.min(
@@ -121,6 +134,7 @@ export function calculateMatch(
   if (sharedGoals.length) {
     reasons.push(`${sharedGoals.length} shared friendship goal${sharedGoals.length === 1 ? '' : 's'}`)
   }
+  if (bothOpenToSnailMail(current, other)) reasons.push('Both open to snail mail')
   if (frequencyPoints >= 12) reasons.push('Similar reply rhythm')
   else if (frequencyPoints >= 10) reasons.push('Compatible reply rhythm')
   if (sharedLanguages.length) reasons.push(`Shared language: ${sharedLanguages[0]}`)
