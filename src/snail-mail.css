@@ -1,0 +1,255 @@
+.snail-mail-panel {
+  margin-top: 34px;
+  border: 1px solid #d9cbbb;
+  border-radius: 22px;
+  padding: clamp(20px, 3vw, 30px);
+  background: linear-gradient(145deg, #fffaf3, #fffdf9);
+}
+
+.snail-mail-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.snail-mail-heading h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+}
+
+.snail-mail-heading p:last-child {
+  margin: 8px 0 0;
+  max-width: 720px;
+  color: #70665d;
+  line-height: 1.55;
+}
+
+.snail-mail-stamp {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #aa705b;
+  border-radius: 13px;
+  background: #fff7ef;
+  font-size: 25px;
+  transform: rotate(2deg);
+}
+
+.snail-mail-status { margin: 18px 0 0; }
+
+.snail-preference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.snail-preference-grid article {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #e1d5c9;
+  border-radius: 16px;
+  padding: 15px 16px;
+  background: rgba(255,255,255,.72);
+}
+
+.snail-preference-grid span,
+.snail-address-card-heading span {
+  color: #9a5945;
+  font-size: .74rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.snail-preference-grid small { color: #786e65; }
+
+.snail-mail-info,
+.snail-exchange-request,
+.snail-mail-safety-note {
+  margin-top: 16px;
+  border: 1px solid #ddcfbf;
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: #fbf5ed;
+}
+
+.snail-mail-info p,
+.snail-exchange-request p,
+.snail-mail-safety-note p {
+  margin: 5px 0 0;
+  color: #71665d;
+  line-height: 1.55;
+}
+
+.snail-exchange-request {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.snail-exchange-request.pending { background: #f8f5ef; }
+.snail-exchange-request.incoming { border-color: #c79c8a; background: #fff5ee; }
+.snail-mail-safety-note { border-style: dashed; }
+.snail-mail-safety-note strong { color: #754839; }
+
+.snail-mail-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.snail-address-card {
+  min-width: 0;
+  border: 1px solid #dfd2c5;
+  border-radius: 18px;
+  padding: 18px;
+  background: white;
+}
+
+.snail-address-card-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.snail-address-card-heading h3 {
+  margin: 3px 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.3rem;
+}
+
+.snail-shared-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #edf4eb;
+  color: #4f6849 !important;
+  font-size: .7rem !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap;
+}
+
+.snail-shared-badge.received { background: #f2e9df; color: #7b4c3d !important; }
+
+.snail-address-block {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 16px;
+  border: 1px solid #e3d8ce;
+  border-radius: 14px;
+  padding: 15px;
+  background: #fffdf9;
+  color: #403832;
+  font-style: normal;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.snail-address-block strong { margin-bottom: 2px; }
+
+.snail-address-form {
+  display: grid;
+  gap: 12px;
+}
+
+.snail-address-form label {
+  display: grid;
+  gap: 7px;
+  color: #4a413a;
+  font-weight: 750;
+}
+
+.snail-address-form input {
+  width: 100%;
+  border: 1px solid #d1c5b9;
+  border-radius: 12px;
+  padding: 12px 13px;
+  background: #fffdf9;
+  color: #2d2925;
+  outline: none;
+}
+
+.snail-address-form input:focus {
+  border-color: #8a4e3d;
+  box-shadow: 0 0 0 3px rgba(138,78,61,.1);
+}
+
+.snail-address-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.snail-mail-actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.snail-address-note,
+.snail-address-form > small {
+  display: block;
+  margin-top: 10px;
+  color: #7b7168;
+  line-height: 1.5;
+}
+
+.snail-waiting-address {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+  gap: 7px;
+  border: 1px dashed #d8cabd;
+  border-radius: 14px;
+  padding: 20px;
+  background: #fffdfa;
+}
+
+.snail-waiting-address > span { font-size: 1.6rem; }
+.snail-waiting-address p { margin: 0; max-width: 300px; color: #786e65; line-height: 1.5; }
+
+.snail-mail-closed {
+  color: #6f665f;
+}
+
+.snail-mail-closed > p {
+  margin: 14px 0 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 780px) {
+  .snail-preference-grid,
+  .snail-mail-columns,
+  .snail-address-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .snail-exchange-request {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .snail-address-card-heading { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .snail-mail-panel { padding: 16px; border-radius: 18px; }
+  .snail-mail-heading { gap: 12px; }
+  .snail-mail-stamp { width: 44px; height: 44px; font-size: 21px; }
+  .snail-mail-actions { align-items: stretch; flex-direction: column; }
+  .snail-mail-actions button { width: 100%; }
+}
