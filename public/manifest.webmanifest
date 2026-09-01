@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "Project PenPal",
+  "short_name": "PenPal",
+  "description": "Friendship-first correspondence for meaningful digital and handwritten pen-pal connections.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#8a4e3d",
+  "orientation": "any",
+  "categories": ["social", "lifestyle"],
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
