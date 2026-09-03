@@ -14,6 +14,28 @@ alter table public.profiles
   add constraint profiles_staff_avatar_path_length
   check (staff_avatar_path is null or char_length(staff_avatar_path) <= 240);
 
+-- If pre-beta cleanup cleared the old member avatar metadata but the underlying
+-- private Storage object still exists, reuse the newest avatar object as the
+-- staff identity photo. This does not make that object member-visible because
+-- staff_only profiles are excluded by the profile-photo visibility policy.
+update public.profiles p
+set staff_avatar_path = candidate.name,
+    staff_avatar_updated_at = now()
+from lateral (
+  select o.name
+  from storage.objects o
+  where o.bucket_id = 'profile-photos'
+    and o.name like p.id::text || '/avatar-%'
+  order by coalesce(o.updated_at, o.created_at) desc, o.name desc
+  limit 1
+) candidate
+where p.staff_only = true
+  and p.staff_avatar_path is null
+  and exists (
+    select 1 from public.admin_users a
+    where a.user_id = p.id
+  );
+
 create or replace function public.save_my_staff_photo(photo_path text)
 returns table(
   staff_avatar_path text,
