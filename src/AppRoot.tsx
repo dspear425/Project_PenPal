@@ -59,53 +59,61 @@ export default function AppRoot() {
   useEffect(() => {
     let active = true
 
-    async function initialize() {
-      const { data } = await supabase.auth.getSession()
-      if (!active) return
-      setSession(data.session)
-      if (data.session) await refreshSecurityState(data.session.user.id)
-      else setChecking(false)
+    function clearSignedOutState() {
+      setSession(null)
+      setRole(null)
+      setAccountStatus('active')
+      setSuspendedUntil(null)
+      setAdminMessageCount(0)
+      setPasswordRecovery(false)
+      setChecking(false)
+      if (window.location.hash === '#admin') window.location.hash = ''
     }
 
-    void initialize()
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+    async function synchronizeSession() {
+      const { data } = await supabase.auth.getSession()
       if (!active) return
-      setSession(nextSession)
 
-      if (event === 'PASSWORD_RECOVERY' && nextSession) {
-        setPasswordRecovery(true)
-        setChecking(false)
+      if (!data.session) {
+        clearSignedOutState()
         return
       }
 
-      if (nextSession) {
-        if (event === 'SIGNED_IN') setChecking(true)
-        void refreshSecurityState(nextSession.user.id)
-      } else {
-        setRole(null)
-        setAccountStatus('active')
-        setSuspendedUntil(null)
-        setAdminMessageCount(0)
-        setPasswordRecovery(false)
-        setChecking(false)
-        if (window.location.hash === '#admin') window.location.hash = ''
+      // Commit the authenticated shell immediately. Security-role/account checks
+      // can finish afterward; they should never leave the signed-in dashboard
+      // paired with signed-out controls such as Forgot password.
+      setSession(data.session)
+      setChecking(false)
+      void refreshSecurityState(data.session.user.id)
+    }
+
+    void synchronizeSession()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (!active) return
+
+      if (!nextSession) {
+        clearSignedOutState()
+        return
       }
+
+      setSession(nextSession)
+      setChecking(false)
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true)
+        return
+      }
+
+      void refreshSecurityState(nextSession.user.id)
     })
 
     const onHashChange = () => setRoute(window.location.hash)
-    const onFocus = () => {
-      void supabase.auth.getSession().then(({ data }) => {
-        if (data.session) void refreshSecurityState(data.session.user.id)
-      })
-    }
+    const onFocus = () => void synchronizeSession()
+
     window.addEventListener('hashchange', onHashChange)
     window.addEventListener('focus', onFocus)
-    const timer = window.setInterval(() => {
-      void supabase.auth.getSession().then(({ data }) => {
-        if (data.session) void refreshSecurityState(data.session.user.id)
-      })
-    }, 60000)
+    const timer = window.setInterval(() => void synchronizeSession(), 60000)
 
     return () => {
       active = false
@@ -221,13 +229,13 @@ export default function AppRoot() {
     return <PasswordRecovery onComplete={finishPasswordRecovery} onSignOut={() => void signOut()} />
   }
 
-  if (checking && session) {
+  if (checking) {
     return (
       <main className="page-shell">
         <section className="hero-card dashboard-card">
           <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
-          <p className="eyebrow">Checking account</p>
-          <h1 className="dashboard-title">Opening your correspondence…</h1>
+          <p className="eyebrow">Opening Project PenPal</p>
+          <h1 className="dashboard-title">Checking your session…</h1>
         </section>
       </main>
     )
