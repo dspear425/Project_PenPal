@@ -33,6 +33,12 @@
     cursor: pointer;
   }
 
+  /* Admin has its own fixed staff controls along the bottom edge. Lift the
+     universal Menu above them so neither control group obscures the other. */
+  .mobile-action-menu.admin-context .mobile-menu-trigger {
+    bottom: calc(88px + var(--pp-safe-bottom));
+  }
+
   .mobile-menu-trigger > span { font-size: 1.05rem; line-height: 1; }
   .mobile-menu-trigger > strong { font-size: .9rem; }
   .mobile-menu-trigger > i {
@@ -72,6 +78,10 @@
     padding: 12px;
     background: #fffdf9;
     box-shadow: 0 24px 64px rgba(43,33,26,.3);
+  }
+
+  .mobile-action-menu.admin-context .mobile-menu-sheet {
+    bottom: calc(154px + var(--pp-safe-bottom));
   }
 
   .mobile-menu-heading {
