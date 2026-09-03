@@ -36,7 +36,8 @@ export default function MobileActionMenu() {
   const [installMode, setInstallMode] = useState<InstallMode>(() => getPwaInstallMode())
   const [helpUnread, setHelpUnread] = useState(false)
   const [noticeUnread, setNoticeUnread] = useState(false)
-  const inAdmin = window.location.hash === '#admin'
+  const [adminContext, setAdminContext] = useState(() => window.location.hash === '#admin')
+  const [staffOnlyContext, setStaffOnlyContext] = useState(false)
 
   useEffect(() => {
     let scheduled = false
@@ -52,6 +53,8 @@ export default function MobileActionMenu() {
       })
       setHelpUnread(Boolean(document.querySelector('.support-launcher.has-unread-support')))
       setNoticeUnread(Boolean(document.querySelector('.member-notice-launcher.has-unread-notices')))
+      setAdminContext(window.location.hash === '#admin' || toolAvailable('.admin-route'))
+      setStaffOnlyContext(toolAvailable('.admin-route.staff-only'))
       setInstallMode(getPwaInstallMode())
     }
 
@@ -77,10 +80,10 @@ export default function MobileActionMenu() {
   }, [])
 
   const installAvailable = installMode === 'native' || installMode === 'ios'
-  const memberShellAvailable = Object.values(tools).some(Boolean) || inAdmin
+  const memberShellAvailable = Object.values(tools).some(Boolean) || adminContext
   const visibleCount = useMemo(() => {
-    return Object.values(tools).filter(Boolean).length + (memberShellAvailable ? 1 : 0) + (installAvailable ? 1 : 0) + (inAdmin ? 1 : 0)
-  }, [tools, memberShellAvailable, installAvailable, inAdmin])
+    return Object.values(tools).filter(Boolean).length + (memberShellAvailable ? 1 : 0) + (installAvailable ? 1 : 0) + (adminContext ? 1 : 0)
+  }, [tools, memberShellAvailable, installAvailable, adminContext])
 
   function runTool(selector: string) {
     setOpen(false)
@@ -104,17 +107,17 @@ export default function MobileActionMenu() {
 
   return (
     <>
-      <div className={`mobile-action-menu ${open ? 'open' : ''} ${inAdmin ? 'admin-context' : ''}`}>
+      <div className={`mobile-action-menu ${open ? 'open' : ''} ${adminContext ? 'admin-context' : ''}`}>
         {open && (
           <>
             <button className="mobile-menu-backdrop" type="button" aria-label="Close menu" onClick={() => setOpen(false)} />
             <div className="mobile-menu-sheet" role="menu" aria-label="Project PenPal menu">
               <div className="mobile-menu-heading">
-                <div><span>Project PenPal</span><strong>{inAdmin ? 'Staff menu' : 'Quick actions'}</strong></div>
+                <div><span>Project PenPal</span><strong>{adminContext ? 'Staff menu' : 'Quick actions'}</strong></div>
                 <button type="button" aria-label="Close" onClick={() => setOpen(false)}>×</button>
               </div>
 
-              {inAdmin && (
+              {adminContext && !staffOnlyContext && (
                 <button type="button" role="menuitem" onClick={() => { setOpen(false); window.location.hash = '' }}>
                   <span aria-hidden="true">←</span><div><strong>Back to Project PenPal</strong><small>Leave the moderation dashboard.</small></div>
                 </button>
@@ -124,7 +127,7 @@ export default function MobileActionMenu() {
               {tools.notices && <button type="button" role="menuitem" onClick={() => runTool('.member-notice-launcher')}><span aria-hidden="true">!</span><div><strong>Account notices {noticeUnread && <em>New</em>}</strong><small>Review moderation notices and account history.</small></div></button>}
               {tools.help && <button type="button" role="menuitem" onClick={() => runTool('.support-launcher')}><span aria-hidden="true">?</span><div><strong>Help {helpUnread && <em>New reply</em>}</strong><small>Search help, contact support, or report a bug.</small></div></button>}
               {memberShellAvailable && <button type="button" role="menuitem" onClick={() => { setOpen(false); openLegalCenter() }}><span aria-hidden="true">§</span><div><strong>Legal & safety</strong><small>Terms, privacy, community rules, and safety guidelines.</small></div></button>}
-              {tools.admin && !inAdmin && <button type="button" role="menuitem" onClick={() => runTool('.admin-launcher')}><span aria-hidden="true">◆</span><div><strong>Staff dashboard</strong><small>Open moderation and administration tools.</small></div></button>}
+              {tools.admin && !adminContext && <button type="button" role="menuitem" onClick={() => runTool('.admin-launcher')}><span aria-hidden="true">◆</span><div><strong>Staff dashboard</strong><small>Open moderation and administration tools.</small></div></button>}
               {installAvailable && <button type="button" role="menuitem" onClick={() => void install()}><span aria-hidden="true">↓</span><div><strong>Install Project PenPal</strong><small>{installMode === 'ios' ? 'Add it to your Home Screen.' : 'Use it like an app on this device.'}</small></div></button>}
             </div>
           </>
