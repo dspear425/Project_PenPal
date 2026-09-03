@@ -16,12 +16,8 @@ alter table public.profiles
 
 -- If pre-beta cleanup cleared the old member avatar metadata but the underlying
 -- private Storage object still exists, reuse the newest avatar object as the
--- staff identity photo. This does not make that object member-visible because
--- staff_only profiles are excluded by the profile-photo visibility policy.
---
--- Build the candidate set first rather than using a LATERAL subquery against the
--- UPDATE target. PostgreSQL does not expose the target-table alias to that
--- LATERAL FROM item.
+-- staff identity photo. This supports both the original <uuid>/avatar.jpg path
+-- and the later versioned <uuid>/avatar-....jpg path.
 with newest_staff_avatar as (
   select distinct on (p.id)
     p.id as user_id,
@@ -31,7 +27,10 @@ with newest_staff_avatar as (
     on a.user_id = p.id
   join storage.objects o
     on o.bucket_id = 'profile-photos'
-   and o.name like p.id::text || '/avatar-%'
+   and (
+     o.name = p.id::text || '/avatar.jpg'
+     or o.name like p.id::text || '/avatar-%'
+   )
   where p.staff_only = true
     and p.staff_avatar_path is null
   order by
@@ -67,7 +66,7 @@ begin
   end if;
 
   if clean_path is null
-     or clean_path !~ ('^' || caller::text || '/staff-avatar-[A-Za-z0-9._-]+\.jpg$')
+     or clean_path !~ ('^' || caller::text || '/staff-avatar-[A-Za-z0-9._-]+\\.jpg$')
      or char_length(clean_path) > 240 then
     raise exception 'Staff-photo path is invalid.' using errcode = 'P0001';
   end if;
