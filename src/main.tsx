@@ -9,6 +9,7 @@ import App from './AppRoot'
 import MobileActionMenu from './components/MobileActionMenu'
 import ConnectivityBanner from './components/ConnectivityBanner'
 import './mobile.css'
+import './mobile-tablet.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
