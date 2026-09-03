@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getPwaInstallMode, promptPwaInstall } from '../pwa'
+import { openLegalCenter } from '../lib/legalEvents'
 
 type InstallMode = ReturnType<typeof getPwaInstallMode>
 
@@ -76,9 +77,10 @@ export default function MobileActionMenu() {
   }, [])
 
   const installAvailable = installMode === 'native' || installMode === 'ios'
+  const memberShellAvailable = Object.values(tools).some(Boolean) || inAdmin
   const visibleCount = useMemo(() => {
-    return Object.values(tools).filter(Boolean).length + (installAvailable ? 1 : 0) + (inAdmin ? 1 : 0)
-  }, [tools, installAvailable, inAdmin])
+    return Object.values(tools).filter(Boolean).length + (memberShellAvailable ? 1 : 0) + (installAvailable ? 1 : 0) + (inAdmin ? 1 : 0)
+  }, [tools, memberShellAvailable, installAvailable, inAdmin])
 
   function runTool(selector: string) {
     setOpen(false)
@@ -121,6 +123,7 @@ export default function MobileActionMenu() {
               {tools.settings && <button type="button" role="menuitem" onClick={() => runTool('.settings-launcher')}><span aria-hidden="true">⚙</span><div><strong>Settings</strong><small>Privacy, security, notifications, and data.</small></div></button>}
               {tools.notices && <button type="button" role="menuitem" onClick={() => runTool('.member-notice-launcher')}><span aria-hidden="true">!</span><div><strong>Account notices {noticeUnread && <em>New</em>}</strong><small>Review moderation notices and account history.</small></div></button>}
               {tools.help && <button type="button" role="menuitem" onClick={() => runTool('.support-launcher')}><span aria-hidden="true">?</span><div><strong>Help {helpUnread && <em>New reply</em>}</strong><small>Search help, contact support, or report a bug.</small></div></button>}
+              {memberShellAvailable && <button type="button" role="menuitem" onClick={() => { setOpen(false); openLegalCenter() }}><span aria-hidden="true">§</span><div><strong>Legal & safety</strong><small>Terms, privacy, community rules, and safety guidelines.</small></div></button>}
               {tools.admin && !inAdmin && <button type="button" role="menuitem" onClick={() => runTool('.admin-launcher')}><span aria-hidden="true">◆</span><div><strong>Staff dashboard</strong><small>Open moderation and administration tools.</small></div></button>}
               {installAvailable && <button type="button" role="menuitem" onClick={() => void install()}><span aria-hidden="true">↓</span><div><strong>Install Project PenPal</strong><small>{installMode === 'ios' ? 'Add it to your Home Screen.' : 'Use it like an app on this device.'}</small></div></button>}
             </div>
