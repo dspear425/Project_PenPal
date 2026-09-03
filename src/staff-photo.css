@@ -1,20 +1,18 @@
 .staff-identity-chip {
-  position: fixed;
-  left: max(1rem, env(safe-area-inset-left));
-  bottom: max(1rem, env(safe-area-inset-bottom));
-  z-index: 36;
+  position: static;
+  z-index: auto;
   display: inline-flex;
   align-items: center;
-  gap: .65rem;
-  padding: .55rem .75rem .55rem .55rem;
+  gap: .55rem;
+  padding: .3rem .55rem .3rem .35rem;
   border: 1px solid rgba(87, 60, 42, .18);
   border-radius: 999px;
-  background: rgba(255, 251, 244, .96);
-  box-shadow: 0 8px 28px rgba(52, 38, 26, .14);
+  background: rgba(255, 251, 244, .92);
+  box-shadow: 0 4px 14px rgba(52, 38, 26, .08);
   color: inherit;
   cursor: pointer;
   text-align: left;
-  backdrop-filter: blur(10px);
+  vertical-align: middle;
 }
 
 .staff-identity-chip:hover {
@@ -23,17 +21,23 @@
 
 .staff-identity-chip > span {
   display: grid;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 .staff-identity-chip strong {
-  font-size: .86rem;
+  font-size: .8rem;
 }
 
 .staff-identity-chip small {
-  margin-top: .15rem;
+  margin-top: .1rem;
   opacity: .68;
-  font-size: .72rem;
+  font-size: .68rem;
+}
+
+.staff-identity-chip .profile-avatar-small {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
 }
 
 .staff-photo-layout {
@@ -65,9 +69,11 @@
 
 @media (max-width: 800px) {
   .staff-identity-chip {
-    left: .75rem;
-    bottom: calc(5rem + env(safe-area-inset-bottom));
-    max-width: calc(100vw - 6.5rem);
+    max-width: 11rem;
+  }
+
+  .staff-identity-chip > span {
+    display: none;
   }
 
   .staff-photo-layout {
