@@ -1,0 +1,84 @@
+.beta-feedback-dashboard-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.beta-feedback-overlay {
+  position:fixed;
+  inset:0;
+  z-index:103;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(38,31,26,.5);
+  backdrop-filter:blur(4px);
+}
+
+.beta-feedback-panel {
+  width:min(720px,100%);
+  max-height:92vh;
+  overflow:auto;
+  border-radius:24px;
+  padding:clamp(24px,4vw,34px);
+  background:#fffdf9;
+  box-shadow:0 28px 80px rgba(38,29,22,.28);
+}
+
+.beta-feedback-panel header {
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:flex-start;
+}
+
+.beta-feedback-panel h2 {
+  margin:4px 0 7px;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:clamp(1.9rem,4vw,2.6rem);
+}
+
+.beta-feedback-panel header p:last-child {
+  margin:0;
+  color:#756b62;
+  line-height:1.5;
+}
+
+.beta-feedback-status { margin-top:16px; }
+
+.beta-feedback-form {
+  display:grid;
+  gap:16px;
+  margin-top:20px;
+}
+
+.beta-feedback-form label {
+  display:grid;
+  gap:7px;
+  color:#493f37;
+  font-weight:800;
+}
+
+.beta-feedback-form input,
+.beta-feedback-form select,
+.beta-feedback-form textarea {
+  width:100%;
+  border:1px solid #cfc4b8;
+  border-radius:13px;
+  padding:12px 14px;
+  background:white;
+  color:#302a25;
+  font:inherit;
+  outline:none;
+}
+
+.beta-feedback-form textarea { resize:vertical;line-height:1.5; }
+.beta-feedback-form input:focus,
+.beta-feedback-form select:focus,
+.beta-feedback-form textarea:focus { border-color:#8a4e3d;box-shadow:0 0 0 3px rgba(138,78,61,.1); }
+.beta-feedback-actions { display:flex;gap:9px;flex-wrap:wrap; }
+
+@media(max-width:800px){
+  .beta-feedback-overlay { padding:0;align-items:end; }
+  .beta-feedback-panel { width:100%;max-height:94vh;border-radius:24px 24px 0 0;padding:22px 18px calc(24px + env(safe-area-inset-bottom)); }
+}
