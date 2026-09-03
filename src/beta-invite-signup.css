@@ -1,0 +1,16 @@
+.auth-form > label { order:0; }
+.beta-invite-signup { order:1; }
+.legal-signup-consent { order:2; }
+.auth-form > .primary { order:3; }
+
+.beta-invite-signup > span {
+  color:#7d736a;
+  font-size:.82rem;
+  font-weight:500;
+  line-height:1.45;
+}
+
+.beta-invite-signup input {
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
