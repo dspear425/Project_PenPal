@@ -62,6 +62,7 @@ type Props = {
   role: 'moderator' | 'admin'
   onBack: () => void
   onSignOut: () => void
+  allowBack?: boolean
 }
 
 const categoryLabels: Record<string, string> = {
@@ -91,7 +92,7 @@ function formatDate(value: string | null) {
   }).format(new Date(value))
 }
 
-export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
+export default function AdminPanel({ userId, role, onBack, onSignOut, allowBack = true }: Props) {
   const [reports, setReports] = useState<ReportRow[]>([])
   const [profiles, setProfiles] = useState<Map<string, ProfileSummary>>(new Map())
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null)
@@ -123,51 +124,43 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
   }), [reports])
 
   const repeatReportCounts = useMemo(() => {
-    const result = new Map<string, number>()
-    for (const report of reports) {
-      result.set(report.reported_id, (result.get(report.reported_id) ?? 0) + 1)
-    }
-    return result
+    const map = new Map<string, number>()
+    for (const report of reports) map.set(report.reported_id, (map.get(report.reported_id) ?? 0) + 1)
+    return map
   }, [reports])
 
   const selectedReport = reports.find((report) => report.id === selectedReportId) ?? null
-  const selectedTarget = selectedReport ? profiles.get(selectedReport.reported_id) : undefined
+  const selectedTarget = selectedReport ? profiles.get(selectedReport.reported_id) ?? null : null
 
-  async function loadReports(preserveSelection = true) {
+  async function loadReports() {
     setLoading(true)
     setMessage('')
-
     try {
       const { data, error } = await supabase
         .from('reports')
         .select('id, reporter_id, reported_id, relationship_id, category, details, status, created_at, reviewed_at, moderator_notes, assigned_to, photo_evidence_path, photo_visibility_at_report, photo_violation_category')
         .order('created_at', { ascending: false })
+      if (error) throw error
 
-      if (error) throw new Error(`Could not load reports: ${errorMessage(error)}`)
+      const nextReports = (data ?? []) as ReportRow[]
+      setReports(nextReports)
 
-      const rows = (data ?? []) as ReportRow[]
-      setReports(rows)
-
-      const ids = Array.from(new Set(rows.flatMap((report) => [report.reporter_id, report.reported_id])))
-      if (ids.length) {
-        const { data: profileRows, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, display_name, country, account_status, suspended_until, avatar_path')
-          .in('id', ids)
-
-        if (profileError) throw new Error(`Could not load report profiles: ${errorMessage(profileError)}`)
-
-        const next = new Map<string, ProfileSummary>()
-        for (const row of profileRows ?? []) {
-          const profile = row as ProfileSummary
-          next.set(profile.id, profile)
-        }
-        setProfiles(next)
-      } else {
+      const profileIds = Array.from(new Set(nextReports.flatMap((report) => [report.reporter_id, report.reported_id])))
+      if (!profileIds.length) {
         setProfiles(new Map())
+        setSelectedReportId(null)
+        setContext(null)
+        return
       }
 
-      if (!preserveSelection || (selectedReportId && !rows.some((report) => report.id === selectedReportId))) {
+      const { data: profileRows, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, display_name, country, account_status, suspended_until, avatar_path')
+        .in('id', profileIds)
+      if (profileError) throw profileError
+      setProfiles(new Map(((profileRows ?? []) as ProfileSummary[]).map((profile) => [profile.id, profile])))
+
+      if (selectedReportId && !nextReports.some((report) => report.id === selectedReportId)) {
         setSelectedReportId(null)
         setContext(null)
       }
@@ -184,14 +177,13 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
     setActionReason('')
     setContextLoading(true)
     setMessage('')
-
     try {
       const { data, error } = await supabase.rpc('moderation_report_context', { target_report: report.id })
       if (error) throw error
-      setContext((data ?? null) as ReportContext | null)
+      setContext(data as ReportContext)
     } catch (error) {
-      setMessage(errorMessage(error))
       setContext(null)
+      setMessage(errorMessage(error))
     } finally {
       setContextLoading(false)
     }
@@ -201,16 +193,14 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
     if (!selectedReport) return
     setWorking(true)
     setMessage('')
-
     try {
       const { error } = await supabase.rpc('moderation_update_report', {
         target_report: selectedReport.id,
-        new_status: status,
+        next_status: status,
         notes: moderatorNotes.trim() || null,
       })
       if (error) throw error
       await loadReports()
-      await openReport({ ...selectedReport, status, moderator_notes: moderatorNotes.trim() || selectedReport.moderator_notes })
       setMessage(`Report marked ${status}.`)
     } catch (error) {
       setMessage(errorMessage(error))
@@ -236,7 +226,6 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
 
     setWorking(true)
     setMessage('')
-
     try {
       const { error } = await supabase.rpc('moderation_take_action', {
         target_user: selectedReport.reported_id,
@@ -272,7 +261,7 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
           </div>
           <nav className="discover-nav" aria-label="Administration navigation">
             <span className="admin-role-badge">{role}</span>
-            <button className="text-button discover-link" onClick={onBack}>Back to app</button>
+            {allowBack && <button className="text-button discover-link" onClick={onBack}>Back to app</button>}
             <button className="text-button discover-link" onClick={onSignOut}>Sign out</button>
           </nav>
         </header>
@@ -342,23 +331,14 @@ export default function AdminPanel({ userId, role, onBack, onSignOut }: Props) {
                     <h2>{categoryLabels[selectedReport.category] || selectedReport.category}</h2>
                     <p>Submitted {formatDate(selectedReport.created_at)}</p>
                   </div>
+                  <button className="secondary" onClick={() => { setSelectedReportId(null); setContext(null) }}>Close</button>
                 </div>
 
                 <div className="admin-people-grid">
-                  <article>
-                    <span>Reporter</span>
-                    <strong>{person(selectedReport.reporter_id)?.display_name || 'Unknown member'}</strong>
-                    <small>{person(selectedReport.reporter_id)?.country || 'Country not listed'}</small>
-                  </article>
-                  <article className="reported-person-card">
-                    <span>Reported member</span>
-                    <strong>{selectedTarget?.display_name || 'Unknown member'}</strong>
-                    <small>{selectedTarget?.country || 'Country not listed'}</small>
-                    <span className={`account-status ${selectedTarget?.account_status || 'active'}`}>
-                      {selectedTarget?.account_status || 'active'}
-                      {selectedTarget?.account_status === 'suspended' && selectedTarget.suspended_until ? ` until ${formatDate(selectedTarget.suspended_until)}` : ''}
-                    </span>
-                  </article>
+                  <article><span>Reporter</span><strong>{person(selectedReport.reporter_id)?.display_name || 'Unknown member'}</strong><small>{person(selectedReport.reporter_id)?.country || 'Country unavailable'}</small></article>
+                  <article><span>Reported member</span><strong>{selectedTarget?.display_name || 'Unknown member'}</strong><small>{selectedTarget?.country || 'Country unavailable'}</small></article>
+                  <article><span>Account</span><strong>{selectedTarget?.account_status || 'unknown'}</strong>{selectedTarget?.suspended_until && <small>Until {formatDate(selectedTarget.suspended_until)}</small>}</article>
+                  <article><span>Repeat reports</span><strong>{repeatReportCounts.get(selectedReport.reported_id) ?? 1}</strong></article>
                 </div>
 
                 <section className="admin-detail-section">
