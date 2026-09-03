@@ -1,0 +1,76 @@
+.staff-identity-chip {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 36;
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .55rem .75rem .55rem .55rem;
+  border: 1px solid rgba(87, 60, 42, .18);
+  border-radius: 999px;
+  background: rgba(255, 251, 244, .96);
+  box-shadow: 0 8px 28px rgba(52, 38, 26, .14);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  backdrop-filter: blur(10px);
+}
+
+.staff-identity-chip:hover {
+  transform: translateY(-1px);
+}
+
+.staff-identity-chip > span {
+  display: grid;
+  line-height: 1.15;
+}
+
+.staff-identity-chip strong {
+  font-size: .86rem;
+}
+
+.staff-identity-chip small {
+  margin-top: .15rem;
+  opacity: .68;
+  font-size: .72rem;
+}
+
+.staff-photo-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, .8fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.staff-photo-privacy-note {
+  padding: 1.1rem;
+  border: 1px solid rgba(87, 60, 42, .16);
+  border-radius: 16px;
+  background: rgba(250, 244, 233, .72);
+}
+
+.staff-photo-privacy-note h3 {
+  margin: 0 0 .55rem;
+}
+
+.staff-photo-privacy-note p {
+  margin: 0 0 .75rem;
+  line-height: 1.55;
+}
+
+.staff-photo-privacy-note p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 800px) {
+  .staff-identity-chip {
+    left: .75rem;
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+    max-width: calc(100vw - 6.5rem);
+  }
+
+  .staff-photo-layout {
+    grid-template-columns: 1fr;
+  }
+}
