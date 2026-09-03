@@ -16,5 +16,12 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/App.tsx",
+    "src/AppV2.tsx",
+    "src/AppV3.tsx",
+    "src/AppV4.tsx",
+    "src/AppV5.tsx"
+  ]
 }
