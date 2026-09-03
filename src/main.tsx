@@ -8,12 +8,17 @@ import './pwa'
 import App from './AppRoot'
 import MobileActionMenu from './components/MobileActionMenu'
 import ConnectivityBanner from './components/ConnectivityBanner'
+import LegalCenter from './components/LegalCenter'
+import LegalAcceptanceGate from './components/LegalAcceptanceGate'
 import './mobile.css'
 import './mobile-tablet.css'
+import './legal.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
+    <LegalAcceptanceGate />
+    <LegalCenter />
     <MobileActionMenu />
     <ConnectivityBanner />
   </StrictMode>,
