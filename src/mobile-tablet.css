@@ -1,0 +1,163 @@
+/* Tablet/small-window extension for the consolidated mobile action menu.
+   The phone rules live in mobile.css. This layer keeps the same menu through
+   1024px without forcing every tablet layout into the phone layout. */
+@media (min-width: 801px) and (max-width: 1024px) {
+  .profile-photo-launcher,
+  .settings-launcher,
+  .support-launcher,
+  .member-notice-launcher,
+  .admin-launcher {
+    display: none !important;
+  }
+
+  .mobile-action-menu { display: block; }
+
+  .mobile-menu-trigger {
+    position: fixed;
+    z-index: 126;
+    right: max(16px, calc(var(--pp-safe-right) + 10px));
+    bottom: max(16px, calc(var(--pp-safe-bottom) + 10px));
+    min-width: 96px;
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #704233;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: #2f2924;
+    color: white;
+    box-shadow: 0 12px 32px rgba(46,36,29,.28);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .mobile-menu-trigger > span { font-size: 1.05rem; line-height: 1; }
+  .mobile-menu-trigger > strong { font-size: .9rem; }
+  .mobile-menu-trigger > i {
+    position: absolute;
+    right: 4px;
+    top: 3px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid #2f2924;
+    border-radius: 50%;
+    background: #d86c4b;
+  }
+
+  .mobile-menu-backdrop {
+    position: fixed;
+    z-index: 123;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: rgba(38,31,26,.42);
+    backdrop-filter: blur(3px);
+  }
+
+  .mobile-menu-sheet {
+    position: fixed;
+    z-index: 125;
+    right: max(16px, var(--pp-safe-right));
+    bottom: calc(82px + var(--pp-safe-bottom));
+    width: min(440px, calc(100vw - 32px));
+    display: grid;
+    gap: 7px;
+    max-height: min(72dvh, 650px);
+    overflow: auto;
+    border: 1px solid #d6c8bb;
+    border-radius: 22px;
+    padding: 12px;
+    background: #fffdf9;
+    box-shadow: 0 24px 64px rgba(43,33,26,.3);
+  }
+
+  .mobile-menu-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 5px 5px 10px;
+    border-bottom: 1px solid #eadfd5;
+  }
+  .mobile-menu-heading > div { display: grid; gap: 2px; }
+  .mobile-menu-heading span { color: #8a4e3d; font-size: .7rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+  .mobile-menu-heading strong { font-family: Georgia,'Times New Roman',serif; font-size: 1.25rem; }
+  .mobile-menu-heading > button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d8ccc0;
+    border-radius: 50%;
+    background: white;
+    color: #5c5148;
+    font-size: 1.3rem;
+  }
+
+  .mobile-menu-sheet > button[role='menuitem'] {
+    width: 100%;
+    min-height: 62px;
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #e1d6cb;
+    border-radius: 15px;
+    padding: 10px 12px;
+    background: #fffdfa;
+    color: #413831;
+    text-align: left;
+  }
+  .mobile-menu-sheet > button[role='menuitem'] > span {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #f2e9df;
+    color: #7c4a3b;
+    font-size: 1.05rem;
+    font-weight: 900;
+  }
+  .mobile-menu-sheet > button[role='menuitem'] > div { display: grid; gap: 2px; min-width: 0; }
+  .mobile-menu-sheet > button[role='menuitem'] strong { font-size: .92rem; }
+  .mobile-menu-sheet > button[role='menuitem'] small { color: #7b7168; line-height: 1.35; }
+  .mobile-menu-sheet em {
+    display: inline-flex;
+    margin-left: 5px;
+    border-radius: 999px;
+    padding: 2px 6px;
+    background: #a5513c;
+    color: white;
+    font-size: .62rem;
+    font-style: normal;
+  }
+
+  .mobile-install-overlay {
+    position: fixed;
+    z-index: 170;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(38,31,26,.48);
+    backdrop-filter: blur(4px);
+  }
+  .mobile-install-card {
+    position: relative;
+    width: min(560px, 100%);
+    max-height: 86dvh;
+    overflow: auto;
+    border-radius: 24px;
+    padding: 30px;
+    background: #fffdf9;
+    box-shadow: 0 28px 80px rgba(38,29,22,.3);
+  }
+  .mobile-install-card h2 { margin: 3px 0 12px; font-family: Georgia,'Times New Roman',serif; font-size: 2rem; }
+  .mobile-install-card > p:not(.eyebrow) { color: #665b52; line-height: 1.65; }
+  .mobile-install-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 16px; border: 1px dashed #a66a55; border-radius: 13px; color: #8a4e3d; font-size: 1.4rem; }
+  .mobile-install-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 1px solid #d8ccc0; border-radius: 50%; background: white; color: #62564e; font-size: 1.3rem; }
+
+  .page-shell { padding-bottom: calc(82px + var(--pp-safe-bottom)); }
+}
