@@ -13,11 +13,13 @@ import LegalCenter from './components/LegalCenter'
 import LegalAcceptanceGate from './components/LegalAcceptanceGate'
 import LegalFooter from './components/LegalFooter'
 import SettingsLegalShortcut from './components/SettingsLegalShortcut'
+import SignupLegalConsent from './components/SignupLegalConsent'
 import './mobile.css'
 import './mobile-tablet.css'
 import './legal.css'
 import './legal-footer.css'
 import './legal-settings.css'
+import './legal-signup.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -26,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
     <LegalCenter />
     <LegalFooter />
     <SettingsLegalShortcut />
+    <SignupLegalConsent />
     <MobileActionMenu />
     <ConnectivityBanner />
   </StrictMode>,
