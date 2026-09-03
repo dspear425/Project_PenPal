@@ -37,7 +37,7 @@
 }
 
 .admin-invite-panel {
-  width:min(1080px,100%);
+  width:min(1120px,100%);
   max-height:92vh;
   overflow:auto;
   border-radius:26px;
@@ -69,6 +69,32 @@
 }
 
 .admin-invite-status { margin-top:16px; }
+
+.admin-beta-tabs {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:20px;
+  padding-bottom:14px;
+  border-bottom:1px solid #e1d6cc;
+}
+
+.admin-beta-tabs button {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  border:1px solid #d7cbbf;
+  border-radius:999px;
+  padding:9px 13px;
+  background:white;
+  color:#554b43;
+  font:inherit;
+  font-weight:800;
+}
+
+.admin-beta-tabs button.selected { border-color:#8a4e3d;background:#8a4e3d;color:white; }
+.admin-beta-tabs button span { min-width:20px;height:20px;display:grid;place-items:center;border-radius:999px;background:#f0e5dc;color:#7b4939;font-size:.7rem; }
+.admin-beta-tabs button.selected span { background:#fff3eb;color:#7b4939; }
 
 .admin-invite-created {
   display:grid;
@@ -107,14 +133,18 @@
 .admin-invite-created small { color:#7d6c55;line-height:1.45; }
 
 .admin-invite-create-section,
-.admin-invite-list-section {
+.admin-invite-list-section,
+.admin-beta-members-section,
+.admin-beta-readiness-section {
   margin-top:24px;
-  border-top:1px solid #e1d6cc;
-  padding-top:22px;
 }
 
+.admin-invite-create-section,
+.admin-invite-list-section { border-top:1px solid #e1d6cc;padding-top:22px; }
+
 .admin-invite-create-section h3,
-.admin-invite-list-heading h3 {
+.admin-invite-list-heading h3,
+.admin-beta-manual-checks h3 {
   margin:0 0 5px;
   font-family:Georgia,'Times New Roman',serif;
   font-size:1.35rem;
@@ -152,13 +182,15 @@
   font:inherit;
 }
 
-.admin-invite-list {
+.admin-invite-list,
+.admin-beta-member-list {
   display:grid;
   gap:10px;
   margin-top:16px;
 }
 
-.admin-invite-row {
+.admin-invite-row,
+.admin-beta-member-list article {
   display:grid;
   gap:10px;
   border:1px solid #ded3c8;
@@ -167,12 +199,15 @@
   background:white;
 }
 
+.admin-invite-row.test-invite { border-color:#d4bc8e;background:#fffaf0; }
 .admin-invite-row.disabled,
 .admin-invite-row.expired,
-.admin-invite-row.used { opacity:.72; }
+.admin-invite-row.used { opacity:.78; }
 
 .admin-invite-row-main,
-.admin-invite-meta {
+.admin-invite-meta,
+.admin-beta-member-main,
+.admin-beta-member-meta {
   display:flex;
   justify-content:space-between;
   gap:14px;
@@ -189,10 +224,16 @@
 
 .admin-invite-row h4 { margin:0;font-size:1rem; }
 .admin-invite-row-main>strong { color:#665b52;font-size:.86rem; }
-.admin-invite-meta { color:#82776e;font-size:.8rem; }
-.admin-invite-row .secondary { justify-self:start; }
+.admin-invite-meta,.admin-beta-member-meta { color:#82776e;font-size:.8rem;justify-content:flex-start; }
+.admin-invite-meta span:last-child { flex-basis:100%; }
 
-.admin-invite-status-pill {
+.admin-beta-row-actions { display:flex;gap:8px;flex-wrap:wrap; }
+.admin-beta-row-actions .secondary,.admin-beta-row-actions .danger-button { justify-self:start; }
+.admin-beta-row-actions .danger-button { border:1px solid #cda9a0;border-radius:999px;padding:10px 14px;background:#fff7f5;color:#8a4338;font:inherit;font-weight:800; }
+.admin-beta-row-actions .danger-button:hover { background:#fbeae6; }
+
+.admin-invite-status-pill,
+.admin-beta-test-pill {
   display:inline-flex;
   border-radius:999px;
   padding:5px 8px;
@@ -206,6 +247,47 @@
 .admin-invite-status-pill.used { background:#e9e7e4;color:#5f5852; }
 .admin-invite-status-pill.expired { background:#f0e6d8;color:#785f37; }
 .admin-invite-status-pill.disabled { background:#eee0dd;color:#774f48; }
+.admin-beta-test-pill { background:#fff0ca;color:#765921; }
+
+.admin-beta-member-main>div { display:grid;gap:4px; }
+.admin-beta-member-main>div span { color:#796f66;font-size:.85rem; }
+.admin-beta-member-meta strong { color:#6e493a; }
+
+.admin-beta-ready-banner {
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  border:1px solid #d8cec3;
+  border-radius:17px;
+  padding:17px;
+}
+.admin-beta-ready-banner.ready { background:#f0f7f0;border-color:#bfd4c1; }
+.admin-beta-ready-banner.attention { background:#fff8eb;border-color:#dec89b; }
+.admin-beta-ready-banner>span { width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:white;font-weight:950; }
+.admin-beta-ready-banner strong { display:block;margin-bottom:4px; }
+.admin-beta-ready-banner p { margin:0;color:#746a61;line-height:1.45; }
+
+.admin-beta-check-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:16px;
+}
+.admin-beta-check-grid article { display:flex;gap:11px;border:1px solid #ded4ca;border-radius:14px;padding:14px;background:white; }
+.admin-beta-check-grid article>span { width:26px;height:26px;display:grid;place-items:center;border-radius:50%;font-weight:950;flex:0 0 auto; }
+.admin-beta-check-grid article.pass>span { background:#e5f1e6;color:#46674c; }
+.admin-beta-check-grid article.fail>span { background:#f5e5df;color:#8a493d; }
+.admin-beta-check-grid strong { display:block;margin-bottom:3px; }
+.admin-beta-check-grid p { margin:0;color:#7a7067;font-size:.84rem;line-height:1.4; }
+
+.admin-beta-stats { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px; }
+.admin-beta-stats article { display:grid;gap:3px;border:1px solid #ded4ca;border-radius:14px;padding:14px;background:white; }
+.admin-beta-stats strong { font-family:Georgia,'Times New Roman',serif;font-size:1.45rem;color:#704537; }
+.admin-beta-stats span { color:#7d736a;font-size:.83rem; }
+
+.admin-beta-manual-checks { margin-top:20px;border:1px solid #dfd4c9;border-radius:16px;padding:17px;background:#fbf7f1; }
+.admin-beta-manual-checks>p { margin:4px 0 10px;color:#766c63;line-height:1.45; }
+.admin-beta-manual-checks ul { margin:10px 0 0;padding-left:21px;display:grid;gap:7px;color:#5f574f;line-height:1.45; }
 
 @media (max-width: 800px) {
   .admin-invite-overlay { padding:0;align-items:end; }
@@ -214,4 +296,5 @@
   .admin-invite-form { grid-template-columns:1fr; }
   .admin-invite-form .primary { width:100%; }
   .admin-invite-list-heading { align-items:center; }
+  .admin-beta-check-grid,.admin-beta-stats { grid-template-columns:1fr; }
 }
