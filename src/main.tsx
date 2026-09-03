@@ -14,6 +14,7 @@ import LegalAcceptanceGate from './components/LegalAcceptanceGate'
 import LegalFooter from './components/LegalFooter'
 import SettingsLegalShortcut from './components/SettingsLegalShortcut'
 import SignupLegalConsent from './components/SignupLegalConsent'
+import BetaInviteSignup from './components/BetaInviteSignup'
 import AdminInvitations from './components/AdminInvitations'
 import './mobile.css'
 import './mobile-tablet.css'
@@ -21,6 +22,7 @@ import './legal.css'
 import './legal-footer.css'
 import './legal-settings.css'
 import './legal-signup.css'
+import './beta-invite-signup.css'
 import './admin-invitations.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -31,6 +33,7 @@ createRoot(document.getElementById('root')!).render(
     <LegalFooter />
     <SettingsLegalShortcut />
     <SignupLegalConsent />
+    <BetaInviteSignup />
     <AdminInvitations />
     <MobileActionMenu />
     <ConnectivityBanner />
