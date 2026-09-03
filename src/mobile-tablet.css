@@ -1,7 +1,7 @@
-/* Tablet/small-window extension for the consolidated mobile action menu.
-   The phone rules live in mobile.css. This layer keeps the same menu through
-   1024px without forcing every tablet layout into the phone layout. */
-@media (min-width: 801px) and (max-width: 1024px) {
+/* Tablet/desktop extension for the consolidated Project PenPal action menu.
+   The phone rules live in mobile.css. From 801px upward, keep the roomier
+   layout while using the same single Menu control instead of stacked bubbles. */
+@media (min-width: 801px) {
   .profile-photo-launcher,
   .settings-launcher,
   .support-launcher,
