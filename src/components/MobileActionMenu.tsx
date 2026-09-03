@@ -102,7 +102,7 @@ export default function MobileActionMenu() {
 
   return (
     <>
-      <div className={`mobile-action-menu ${open ? 'open' : ''}`}>
+      <div className={`mobile-action-menu ${open ? 'open' : ''} ${inAdmin ? 'admin-context' : ''}`}>
         {open && (
           <>
             <button className="mobile-menu-backdrop" type="button" aria-label="Close menu" onClick={() => setOpen(false)} />
