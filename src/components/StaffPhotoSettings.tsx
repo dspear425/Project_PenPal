@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { validateProfilePhotoFile } from '../lib/profilePhoto'
 import ProfileAvatar from './ProfileAvatar'
@@ -34,10 +35,20 @@ export default function StaffPhotoSettings({ userId, role }: Props) {
   const [avatarPath, setAvatarPath] = useState<string | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [cropFile, setCropFile] = useState<File | null>(null)
+  const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     void loadStaffPhoto()
   }, [userId])
+
+  useEffect(() => {
+    const findHeader = () => {
+      setHeaderTarget(document.querySelector<HTMLElement>('.admin-header .discover-nav'))
+    }
+    findHeader()
+    const frame = window.requestAnimationFrame(findHeader)
+    return () => window.cancelAnimationFrame(frame)
+  }, [])
 
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
@@ -149,17 +160,21 @@ export default function StaffPhotoSettings({ userId, role }: Props) {
     }
   }
 
+  const identityControl = (
+    <button
+      className="staff-identity-chip"
+      type="button"
+      onClick={() => { setOpen(true); setMessage('') }}
+      title="Open staff photo settings"
+    >
+      <ProfileAvatar avatarPath={avatarPath} displayName={displayName} size="small" />
+      <span><strong>{displayName || 'Staff account'}</strong><small>{roleLabel(role)}</small></span>
+    </button>
+  )
+
   return (
     <>
-      <button
-        className="staff-identity-chip"
-        type="button"
-        onClick={() => { setOpen(true); setMessage('') }}
-        title="Open staff photo settings"
-      >
-        <ProfileAvatar avatarPath={avatarPath} displayName={displayName} size="small" />
-        <span><strong>{displayName || 'Staff account'}</strong><small>{roleLabel(role)}</small></span>
-      </button>
+      {headerTarget ? createPortal(identityControl, headerTarget) : identityControl}
 
       <button
         className="profile-photo-launcher staff-photo-launcher"
