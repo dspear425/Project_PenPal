@@ -16,6 +16,7 @@ import SettingsLegalShortcut from './components/SettingsLegalShortcut'
 import SignupLegalConsent from './components/SignupLegalConsent'
 import BetaInviteSignup from './components/BetaInviteSignup'
 import AdminInvitations from './components/AdminInvitations'
+import BetaFeedbackShortcut from './components/BetaFeedbackShortcut'
 import './mobile.css'
 import './mobile-tablet.css'
 import './legal.css'
@@ -24,6 +25,7 @@ import './legal-settings.css'
 import './legal-signup.css'
 import './beta-invite-signup.css'
 import './admin-invitations.css'
+import './beta-feedback.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -35,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
     <SignupLegalConsent />
     <BetaInviteSignup />
     <AdminInvitations />
+    <BetaFeedbackShortcut />
     <MobileActionMenu />
     <ConnectivityBanner />
   </StrictMode>,
