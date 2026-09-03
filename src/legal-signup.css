@@ -1,0 +1,16 @@
+.auth-form > .legal-signup-consent { order: 3; }
+.auth-form > .primary { order: 4; }
+
+.legal-signup-consent input[type='checkbox'] {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 2px 0 0;
+  padding: 0 !important;
+  border-radius: 4px;
+  accent-color: #8a4e3d;
+  box-shadow: none !important;
+}
+
+.legal-signup-consent > div { display: grid; gap: 7px; }
+.legal-signup-consent label { display: block !important; font-weight: 650; line-height: 1.5; cursor: pointer; }
+.legal-signup-consent p { margin: 0; color: #80736a; font-size: .8rem; }
