@@ -51,6 +51,7 @@ export default function AppRoot() {
   const [role, setRole] = useState<ModeratorRole | null>(null)
   const [accountStatus, setAccountStatus] = useState<AccountStatus>('active')
   const [suspendedUntil, setSuspendedUntil] = useState<string | null>(null)
+  const [staffOnly, setStaffOnly] = useState(false)
   const [route, setRoute] = useState(window.location.hash)
   const [checking, setChecking] = useState(true)
   const [adminMessageCount, setAdminMessageCount] = useState(0)
@@ -58,12 +59,14 @@ export default function AppRoot() {
 
   useEffect(() => {
     let active = true
+    let initialized = false
 
     function clearSignedOutState() {
       setSession(null)
       setRole(null)
       setAccountStatus('active')
       setSuspendedUntil(null)
+      setStaffOnly(false)
       setAdminMessageCount(0)
       setPasswordRecovery(false)
       setChecking(false)
@@ -75,16 +78,15 @@ export default function AppRoot() {
       if (!active) return
 
       if (!data.session) {
+        initialized = true
         clearSignedOutState()
         return
       }
 
-      // Commit the authenticated shell immediately. Security-role/account checks
-      // can finish afterward; they should never leave the signed-in dashboard
-      // paired with signed-out controls such as Forgot password.
       setSession(data.session)
-      setChecking(false)
-      void refreshSecurityState(data.session.user.id)
+      if (!initialized) setChecking(true)
+      await refreshSecurityState(data.session.user.id)
+      initialized = true
     }
 
     void synchronizeSession()
@@ -93,19 +95,21 @@ export default function AppRoot() {
       if (!active) return
 
       if (!nextSession) {
+        initialized = true
         clearSignedOutState()
         return
       }
 
       setSession(nextSession)
-      setChecking(false)
 
       if (event === 'PASSWORD_RECOVERY') {
         setPasswordRecovery(true)
+        setChecking(false)
         return
       }
 
-      void refreshSecurityState(nextSession.user.id)
+      if (event === 'SIGNED_IN') setChecking(true)
+      void refreshSecurityState(nextSession.user.id).finally(() => { initialized = true })
     })
 
     const onHashChange = () => setRoute(window.location.hash)
@@ -182,7 +186,7 @@ export default function AppRoot() {
       const [profileResult, roleResult] = await Promise.all([
         supabase
           .from('profiles')
-          .select('account_status, suspended_until')
+          .select('account_status, suspended_until, staff_only')
           .eq('id', userId)
           .maybeSingle(),
         supabase
@@ -195,6 +199,7 @@ export default function AppRoot() {
       if (!profileResult.error && profileResult.data) {
         setAccountStatus((profileResult.data.account_status || 'active') as AccountStatus)
         setSuspendedUntil(profileResult.data.suspended_until ?? null)
+        setStaffOnly(Boolean(profileResult.data.staff_only))
       }
 
       if (!roleResult.error && roleResult.data?.role) {
@@ -212,7 +217,7 @@ export default function AppRoot() {
   }
 
   function closeAdmin() {
-    window.location.hash = ''
+    if (!staffOnly) window.location.hash = ''
   }
 
   async function signOut() {
@@ -241,10 +246,16 @@ export default function AppRoot() {
     )
   }
 
-  if (route === '#admin' && session && role && accountStatus === 'active') {
+  if ((route === '#admin' || staffOnly) && session && role && accountStatus === 'active') {
     return (
-      <div className={`admin-route staff-role-${role}`}>
-        <AdminPanel userId={session.user.id} role={role === 'owner' ? 'admin' : role} onBack={closeAdmin} onSignOut={() => void signOut()} />
+      <div className={`admin-route staff-role-${role} ${staffOnly ? 'staff-only' : ''}`}>
+        <AdminPanel
+          userId={session.user.id}
+          role={role === 'owner' ? 'admin' : role}
+          onBack={closeAdmin}
+          onSignOut={() => void signOut()}
+          allowBack={!staffOnly}
+        />
         <div className="admin-floating-toolbar">
           <AdminActivity />
           <AdminMemberDirectory userId={session.user.id} />
