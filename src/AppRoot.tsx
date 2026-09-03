@@ -12,6 +12,7 @@ import AdminTeam from './components/AdminTeam'
 import MemberIdentity from './components/MemberIdentity'
 import SettingsPrivacy from './components/SettingsPrivacy'
 import ProfilePhotoSettings from './components/ProfilePhotoSettings'
+import StaffPhotoSettings from './components/StaffPhotoSettings'
 import PasswordRecovery from './components/PasswordRecovery'
 import ForgotPassword from './components/ForgotPassword'
 import './admin.css'
@@ -25,6 +26,7 @@ import './admin-activity.css'
 import './admin-team.css'
 import './settings.css'
 import './profile-photo.css'
+import './staff-photo.css'
 
 type ModeratorRole = 'moderator' | 'admin' | 'owner'
 type AccountStatus = 'active' | 'suspended' | 'banned'
@@ -197,9 +199,11 @@ export default function AppRoot() {
       ])
 
       if (!profileResult.error && profileResult.data) {
+        const isStaffOnly = Boolean(profileResult.data.staff_only)
         setAccountStatus((profileResult.data.account_status || 'active') as AccountStatus)
         setSuspendedUntil(profileResult.data.suspended_until ?? null)
-        setStaffOnly(Boolean(profileResult.data.staff_only))
+        setStaffOnly(isStaffOnly)
+        if (isStaffOnly && window.location.hash !== '#admin') window.location.hash = '#admin'
       }
 
       if (!roleResult.error && roleResult.data?.role) {
@@ -262,6 +266,7 @@ export default function AppRoot() {
           <AdminQuickTools userId={session.user.id} />
           <AdminTeam currentUserId={session.user.id} role={role} />
         </div>
+        <StaffPhotoSettings userId={session.user.id} role={role} />
         <HelpCenter userId={session.user.id} initialContext="admin" />
       </div>
     )
