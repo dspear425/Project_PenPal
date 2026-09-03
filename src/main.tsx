@@ -12,10 +12,12 @@ import ConnectivityBanner from './components/ConnectivityBanner'
 import LegalCenter from './components/LegalCenter'
 import LegalAcceptanceGate from './components/LegalAcceptanceGate'
 import LegalFooter from './components/LegalFooter'
+import SettingsLegalShortcut from './components/SettingsLegalShortcut'
 import './mobile.css'
 import './mobile-tablet.css'
 import './legal.css'
 import './legal-footer.css'
+import './legal-settings.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -23,6 +25,7 @@ createRoot(document.getElementById('root')!).render(
     <LegalAcceptanceGate />
     <LegalCenter />
     <LegalFooter />
+    <SettingsLegalShortcut />
     <MobileActionMenu />
     <ConnectivityBanner />
   </StrictMode>,
