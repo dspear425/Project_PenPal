@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 
 type StaffRole = 'moderator' | 'admin' | 'owner'
@@ -21,10 +22,6 @@ type CreatedInvite = {
   label: string | null
   max_uses: number
   expires_at: string | null
-}
-
-type Props = {
-  role: StaffRole
 }
 
 function errorMessage(error: unknown) {
@@ -50,7 +47,9 @@ function inviteStatus(invite: InviteRow) {
   return 'active'
 }
 
-export default function AdminInvitations({ role }: Props) {
+export default function AdminInvitations() {
+  const [role, setRole] = useState<StaffRole | null>(null)
+  const [toolbarTarget, setToolbarTarget] = useState<Element | null>(null)
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [working, setWorking] = useState(false)
@@ -64,6 +63,45 @@ export default function AdminInvitations({ role }: Props) {
 
   const canManage = role === 'admin' || role === 'owner'
   const activeCount = useMemo(() => invites.filter((invite) => inviteStatus(invite) === 'active').length, [invites])
+
+  useEffect(() => {
+    let active = true
+
+    async function refreshRole() {
+      const { data: sessionData } = await supabase.auth.getSession()
+      if (!active) return
+      const userId = sessionData.session?.user.id
+      if (!userId) {
+        setRole(null)
+        setOpen(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle()
+      if (!active) return
+      setRole(error ? null : ((data?.role ?? null) as StaffRole | null))
+    }
+
+    const refreshTarget = () => setToolbarTarget(document.querySelector('.admin-floating-toolbar'))
+    void refreshRole()
+    refreshTarget()
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => void refreshRole())
+    const observer = new MutationObserver(refreshTarget)
+    observer.observe(document.body, { childList: true, subtree: true })
+    window.addEventListener('hashchange', refreshTarget)
+
+    return () => {
+      active = false
+      listener.subscription.unsubscribe()
+      observer.disconnect()
+      window.removeEventListener('hashchange', refreshTarget)
+    }
+  }, [])
 
   useEffect(() => {
     if (open && canManage) void loadInvites()
@@ -142,82 +180,87 @@ export default function AdminInvitations({ role }: Props) {
     }
   }
 
-  if (!canManage) return null
+  if (!canManage || !toolbarTarget) return null
+
+  const launcher = (
+    <button className="admin-invite-launcher" type="button" onClick={() => { setOpen(true); setMessage('') }}>
+      Invitations{activeCount > 0 && <span>{activeCount}</span>}
+    </button>
+  )
+
+  const panel = open ? (
+    <div className="admin-invite-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !working) setOpen(false) }}>
+      <section className="admin-invite-panel" role="dialog" aria-modal="true" aria-labelledby="admin-invite-title">
+        <header className="admin-invite-header">
+          <div>
+            <p className="eyebrow">Closed beta access</p>
+            <h2 id="admin-invite-title">Invitations.</h2>
+            <p>Create controlled signup codes. Project PenPal stores only a hash of each code, so copy the code when it is created.</p>
+          </div>
+          <button className="admin-tool-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
+        </header>
+
+        {message && <p className="status-message admin-invite-status">{message}</p>}
+
+        {createdInvite && (
+          <section className="admin-invite-created" aria-live="polite">
+            <span>New invitation — copy this now</span>
+            <code>{createdInvite.invite_code}</code>
+            <button className="primary" type="button" onClick={() => void copyCode()}>{copied ? 'Copied!' : 'Copy invitation code'}</button>
+            <small>This raw code is shown only in this browser session. The database keeps only its one-way hash.</small>
+          </section>
+        )}
+
+        <section className="admin-invite-create-section">
+          <div>
+            <h3>Create an invitation</h3>
+            <p>One use and 14 days is a good default for individual beta testers.</p>
+          </div>
+          <form className="admin-invite-form" onSubmit={createInvite}>
+            <label>Label <span>optional</span><input value={label} maxLength={100} onChange={(event) => setLabel(event.target.value)} placeholder="e.g. Jamie — first beta group" /></label>
+            <label>Number of uses<select value={uses} onChange={(event) => setUses(Number(event.target.value))}><option value={1}>1 use</option><option value={2}>2 uses</option><option value={3}>3 uses</option><option value={5}>5 uses</option><option value={10}>10 uses</option><option value={25}>25 uses</option></select></label>
+            <label>Expires<select value={expiresDays} onChange={(event) => setExpiresDays(event.target.value === '' ? '' : Number(event.target.value))}><option value={1}>1 day</option><option value={3}>3 days</option><option value={7}>7 days</option><option value={14}>14 days</option><option value={30}>30 days</option><option value={90}>90 days</option><option value="">No expiration</option></select></label>
+            <button className="primary" type="submit" disabled={working}>{working ? 'Creating…' : 'Create invitation'}</button>
+          </form>
+        </section>
+
+        <section className="admin-invite-list-section">
+          <div className="admin-invite-list-heading">
+            <div><h3>Invitation history</h3><p>Codes themselves cannot be retrieved after creation.</p></div>
+            <button className="secondary" type="button" onClick={() => void loadInvites()} disabled={loading || working}>{loading ? 'Refreshing…' : 'Refresh'}</button>
+          </div>
+
+          {loading ? <p className="connection-empty">Loading invitations…</p> : invites.length === 0 ? (
+            <p className="connection-empty">No beta invitations have been created yet.</p>
+          ) : (
+            <div className="admin-invite-list">
+              {invites.map((invite) => {
+                const status = inviteStatus(invite)
+                return (
+                  <article key={invite.id} className={`admin-invite-row ${status}`}>
+                    <div className="admin-invite-row-main">
+                      <div><span className={`admin-invite-status-pill ${status}`}>{status}</span><h4>{invite.label || 'Unlabeled invitation'}</h4></div>
+                      <strong>{invite.use_count} / {invite.max_uses} used</strong>
+                    </div>
+                    <div className="admin-invite-meta">
+                      <span>Created {formatDate(invite.created_at)}{invite.created_by_name ? ` by ${invite.created_by_name}` : ''}</span>
+                      <span>{invite.expires_at ? `Expires ${formatDate(invite.expires_at)}` : 'No expiration'}</span>
+                    </div>
+                    {status === 'active' && <button className="secondary" type="button" disabled={working} onClick={() => void disableInvite(invite)}>Disable</button>}
+                  </article>
+                )
+              })}
+            </div>
+          )}
+        </section>
+      </section>
+    </div>
+  ) : null
 
   return (
     <>
-      <button className="admin-invite-launcher" type="button" onClick={() => { setOpen(true); setMessage('') }}>
-        Invitations{activeCount > 0 && <span>{activeCount}</span>}
-      </button>
-
-      {open && (
-        <div className="admin-invite-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !working) setOpen(false) }}>
-          <section className="admin-invite-panel" role="dialog" aria-modal="true" aria-labelledby="admin-invite-title">
-            <header className="admin-invite-header">
-              <div>
-                <p className="eyebrow">Closed beta access</p>
-                <h2 id="admin-invite-title">Invitations.</h2>
-                <p>Create controlled signup codes. Project PenPal stores only a hash of each code, so copy the code when it is created.</p>
-              </div>
-              <button className="admin-tool-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
-            </header>
-
-            {message && <p className="status-message admin-invite-status">{message}</p>}
-
-            {createdInvite && (
-              <section className="admin-invite-created" aria-live="polite">
-                <span>New invitation — copy this now</span>
-                <code>{createdInvite.invite_code}</code>
-                <button className="primary" type="button" onClick={() => void copyCode()}>{copied ? 'Copied!' : 'Copy invitation code'}</button>
-                <small>This raw code is shown only in this browser session. The database keeps only its one-way hash.</small>
-              </section>
-            )}
-
-            <section className="admin-invite-create-section">
-              <div>
-                <h3>Create an invitation</h3>
-                <p>One use and 14 days is a good default for individual beta testers.</p>
-              </div>
-              <form className="admin-invite-form" onSubmit={createInvite}>
-                <label>Label <span>optional</span><input value={label} maxLength={100} onChange={(event) => setLabel(event.target.value)} placeholder="e.g. Jamie — first beta group" /></label>
-                <label>Number of uses<select value={uses} onChange={(event) => setUses(Number(event.target.value))}><option value={1}>1 use</option><option value={2}>2 uses</option><option value={3}>3 uses</option><option value={5}>5 uses</option><option value={10}>10 uses</option><option value={25}>25 uses</option></select></label>
-                <label>Expires<select value={expiresDays} onChange={(event) => setExpiresDays(event.target.value === '' ? '' : Number(event.target.value))}><option value={1}>1 day</option><option value={3}>3 days</option><option value={7}>7 days</option><option value={14}>14 days</option><option value={30}>30 days</option><option value={90}>90 days</option><option value="">No expiration</option></select></label>
-                <button className="primary" type="submit" disabled={working}>{working ? 'Creating…' : 'Create invitation'}</button>
-              </form>
-            </section>
-
-            <section className="admin-invite-list-section">
-              <div className="admin-invite-list-heading">
-                <div><h3>Invitation history</h3><p>Codes themselves cannot be retrieved after creation.</p></div>
-                <button className="secondary" type="button" onClick={() => void loadInvites()} disabled={loading || working}>{loading ? 'Refreshing…' : 'Refresh'}</button>
-              </div>
-
-              {loading ? <p className="connection-empty">Loading invitations…</p> : invites.length === 0 ? (
-                <p className="connection-empty">No beta invitations have been created yet.</p>
-              ) : (
-                <div className="admin-invite-list">
-                  {invites.map((invite) => {
-                    const status = inviteStatus(invite)
-                    return (
-                      <article key={invite.id} className={`admin-invite-row ${status}`}>
-                        <div className="admin-invite-row-main">
-                          <div><span className={`admin-invite-status-pill ${status}`}>{status}</span><h4>{invite.label || 'Unlabeled invitation'}</h4></div>
-                          <strong>{invite.use_count} / {invite.max_uses} used</strong>
-                        </div>
-                        <div className="admin-invite-meta">
-                          <span>Created {formatDate(invite.created_at)}{invite.created_by_name ? ` by ${invite.created_by_name}` : ''}</span>
-                          <span>{invite.expires_at ? `Expires ${formatDate(invite.expires_at)}` : 'No expiration'}</span>
-                        </div>
-                        {status === 'active' && <button className="secondary" type="button" disabled={working} onClick={() => void disableInvite(invite)}>Disable</button>}
-                      </article>
-                    )
-                  })}
-                </div>
-              )}
-            </section>
-          </section>
-        </div>
-      )}
+      {createPortal(launcher, toolbarTarget)}
+      {panel ? createPortal(panel, document.body) : null}
     </>
   )
 }
