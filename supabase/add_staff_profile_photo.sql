@@ -18,23 +18,32 @@ alter table public.profiles
 -- private Storage object still exists, reuse the newest avatar object as the
 -- staff identity photo. This does not make that object member-visible because
 -- staff_only profiles are excluded by the profile-photo visibility policy.
+--
+-- Build the candidate set first rather than using a LATERAL subquery against the
+-- UPDATE target. PostgreSQL does not expose the target-table alias to that
+-- LATERAL FROM item.
+with newest_staff_avatar as (
+  select distinct on (p.id)
+    p.id as user_id,
+    o.name
+  from public.profiles p
+  join public.admin_users a
+    on a.user_id = p.id
+  join storage.objects o
+    on o.bucket_id = 'profile-photos'
+   and o.name like p.id::text || '/avatar-%'
+  where p.staff_only = true
+    and p.staff_avatar_path is null
+  order by
+    p.id,
+    coalesce(o.updated_at, o.created_at) desc,
+    o.name desc
+)
 update public.profiles p
 set staff_avatar_path = candidate.name,
     staff_avatar_updated_at = now()
-from lateral (
-  select o.name
-  from storage.objects o
-  where o.bucket_id = 'profile-photos'
-    and o.name like p.id::text || '/avatar-%'
-  order by coalesce(o.updated_at, o.created_at) desc, o.name desc
-  limit 1
-) candidate
-where p.staff_only = true
-  and p.staff_avatar_path is null
-  and exists (
-    select 1 from public.admin_users a
-    where a.user_id = p.id
-  );
+from newest_staff_avatar candidate
+where p.id = candidate.user_id;
 
 create or replace function public.save_my_staff_photo(photo_path text)
 returns table(
