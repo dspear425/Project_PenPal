@@ -230,6 +230,33 @@ export default function AdminInvitations() {
     }
   }
 
+  async function markInviteAsTest(invite: InviteRow) {
+    if (role !== 'owner' || isTestInvite(invite)) return
+    const name = invite.label || 'this invitation'
+    if (!window.confirm(`Mark “${name}” as test data? This does not delete anything yet. It only enables the protected test-cleanup action for this invitation.`)) return
+    const phrase = window.prompt('Type MARK AS TEST to confirm:')
+    if (phrase !== 'MARK AS TEST') {
+      setMessage('Nothing changed. The confirmation phrase did not match.')
+      return
+    }
+
+    setWorking(true)
+    setMessage('Marking invitation as test data…')
+    try {
+      const { error } = await supabase.rpc('mark_beta_invite_as_test', {
+        target_invite: invite.id,
+        confirmation: phrase,
+      })
+      if (error) throw error
+      await loadBetaOperations()
+      setMessage('Invitation marked as test data. You can now use Clean up test data.')
+    } catch (error) {
+      setMessage(errorMessage(error))
+    } finally {
+      setWorking(false)
+    }
+  }
+
   async function removeTestStorage(userId: string) {
     const bucket = supabase.storage.from('profile-photos')
     const { data, error } = await bucket.list(userId, { limit: 100 })
@@ -328,7 +355,7 @@ export default function AdminInvitations() {
 
             <section className="admin-invite-list-section">
               <div className="admin-invite-list-heading">
-                <div><h3>Invitation history</h3><p>Codes themselves cannot be retrieved after creation. Test-labelled invitations can be fully cleaned up by the Owner.</p></div>
+                <div><h3>Invitation history</h3><p>Codes themselves cannot be retrieved after creation. The Owner can explicitly mark a used test invitation before using the protected cleanup action.</p></div>
                 <button className="secondary" type="button" onClick={() => void loadBetaOperations()} disabled={loading || working}>{loading ? 'Refreshing…' : 'Refresh'}</button>
               </div>
 
@@ -352,6 +379,7 @@ export default function AdminInvitations() {
                         </div>
                         <div className="admin-beta-row-actions">
                           {status === 'active' && <button className="secondary" type="button" disabled={working} onClick={() => void disableInvite(invite)}>Disable</button>}
+                          {role === 'owner' && !isTestInvite(invite) && invite.use_count > 0 && <button className="secondary" type="button" disabled={working} onClick={() => void markInviteAsTest(invite)}>Mark as test</button>}
                           {role === 'owner' && isTestInvite(invite) && <button className="danger-button" type="button" disabled={working} onClick={() => void cleanupTestInvite(invite)}>Clean up test data</button>}
                         </div>
                       </article>
