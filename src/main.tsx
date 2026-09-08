@@ -5,6 +5,7 @@ import './notifications.css'
 import './safety.css'
 import './helpContextBridge'
 import './lib/legalHelpExtension'
+import './lib/chosenFamilyHelpExtension'
 import './pwa'
 import App from './AppRoot'
 import MobileActionMenu from './components/MobileActionMenu'
@@ -26,6 +27,7 @@ import './legal-signup.css'
 import './beta-invite-signup.css'
 import './admin-invitations.css'
 import './beta-feedback.css'
+import './chosen-family.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
