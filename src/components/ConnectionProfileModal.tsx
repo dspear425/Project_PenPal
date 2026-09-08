@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { careLabels, chosenFamilyGoalLabels } from '../lib/chosenFamily'
 import ProfileAvatar from './ProfileAvatar'
 import '../connection-profile.css'
 
@@ -21,6 +22,8 @@ type Profile = {
   correspondence_frequency: string | null
   correspondence_method: 'digital' | 'both' | 'snail_mail' | null
   international_snail_mail: boolean | null
+  care_offered: string[] | null
+  care_appreciated: string[] | null
   accepting_new_penpals: boolean | null
 }
 
@@ -44,6 +47,7 @@ const goalLabels: Record<string, string> = {
   'snail-mail': 'Snail-mail friendship',
   local: 'Local friendship',
   international: 'International friendship',
+  ...chosenFamilyGoalLabels,
 }
 
 const styleLabels: Record<string, string> = {
@@ -106,7 +110,7 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, display_name, username, avatar_path, avatar_visibility, birth_year, country, region, about_me, languages, friendship_goals, communication_style, correspondence_frequency, correspondence_method, international_snail_mail, accepting_new_penpals')
+        .select('id, display_name, username, avatar_path, avatar_visibility, birth_year, country, region, about_me, languages, friendship_goals, communication_style, correspondence_frequency, correspondence_method, international_snail_mail, care_offered, care_appreciated, accepting_new_penpals')
         .eq('id', targetUserId)
         .maybeSingle()
 
@@ -154,6 +158,8 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
   const goals = profile?.friendship_goals ?? []
   const languages = profile?.languages ?? []
   const correspondenceMethod = profile?.correspondence_method ?? 'digital'
+  const careOffered = profile?.care_offered ?? []
+  const careAppreciated = profile?.care_appreciated ?? []
 
   return (
     <div className="connection-profile-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
@@ -179,9 +185,13 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
                 <p className="connection-profile-location">
                   {location}{age ? ` · Age ${age}` : ''}
                 </p>
-                {correspondenceMethod !== 'digital' && (
-                  <span className="snail-mail-profile-badge">📬 {correspondenceLabels[correspondenceMethod]}{profile.international_snail_mail ? ' · international okay' : ''}</span>
-                )}
+                <div className="connection-intention-badges">
+                  {goals.includes('chosen-family') && <span>♡ Chosen family</span>}
+                  {goals.includes('supportive') && <span>Supportive friendship</span>}
+                  {correspondenceMethod !== 'digital' && (
+                    <span className="snail-mail-profile-badge">📬 {correspondenceLabels[correspondenceMethod]}{profile.international_snail_mail ? ' · international okay' : ''}</span>
+                  )}
+                </div>
                 {relationshipStatus === 'pending' && profile.avatar_path && profile.avatar_visibility === 'connections' && (
                   <span className="connection-profile-photo-note">Photo shared after you become pen pals</span>
                 )}
@@ -213,6 +223,28 @@ export default function ConnectionProfileModal({ targetUserId, relationshipStatu
                   ) : <p className="connection-profile-muted">No friendship goals listed.</p>}
                 </section>
               </div>
+
+              {(careOffered.length > 0 || careAppreciated.length > 0) && (
+                <section className="connection-profile-care">
+                  <div>
+                    <h3>How I like to show care</h3>
+                    {careOffered.length ? (
+                      <div className="connection-profile-tags">
+                        {careOffered.map((value) => <span key={value}>{careLabels[value] || value}</span>)}
+                      </div>
+                    ) : <p className="connection-profile-muted">Not specified.</p>}
+                  </div>
+                  <div>
+                    <h3>What feels meaningful to me</h3>
+                    {careAppreciated.length ? (
+                      <div className="connection-profile-tags">
+                        {careAppreciated.map((value) => <span key={value}>{careLabels[value] || value}</span>)}
+                      </div>
+                    ) : <p className="connection-profile-muted">Not specified.</p>}
+                  </div>
+                  <p className="connection-profile-care-note">These are friendship preferences, not promises of counseling, financial help, housing, or crisis support.</p>
+                </section>
+              )}
 
               <section className="connection-profile-writing">
                 <h3>Correspondence style</h3>
