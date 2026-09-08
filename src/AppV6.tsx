@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
+import { careOptions } from './lib/chosenFamily'
 import Discover from './components/Discover'
 import Connections from './components/Connections'
 import ProfileAvatar from './components/ProfileAvatar'
@@ -28,6 +29,8 @@ type Profile = {
   correspondence_frequency: string | null
   correspondence_method: CorrespondenceMethod
   international_snail_mail: boolean
+  care_offered: string[]
+  care_appreciated: string[]
   accepting_new_penpals: boolean
   max_penpals: number
   onboarding_complete: boolean
@@ -41,8 +44,10 @@ type ProfileDraft = {
 
 const currentYear = new Date().getFullYear()
 
-const goalOptions = [
+const goalOptions: Array<[string, string]> = [
   ['long-term', 'Long-term friendship'],
+  ['chosen-family', 'Chosen family'],
+  ['supportive', 'Supportive friendship'],
   ['casual', 'Casual correspondence'],
   ['culture', 'Cultural exchange'],
   ['language', 'Language exchange'],
@@ -63,6 +68,8 @@ const emptyProfile: Profile = {
   correspondence_frequency: 'weekly',
   correspondence_method: 'digital',
   international_snail_mail: false,
+  care_offered: [],
+  care_appreciated: [],
   accepting_new_penpals: true,
   max_penpals: 3,
   onboarding_complete: false,
@@ -287,6 +294,8 @@ export default function AppV6() {
         correspondence_frequency: profileData.correspondence_frequency ?? 'weekly',
         correspondence_method: (profileData.correspondence_method ?? 'digital') as CorrespondenceMethod,
         international_snail_mail: profileData.international_snail_mail ?? false,
+        care_offered: Array.isArray(profileData.care_offered) ? profileData.care_offered : [],
+        care_appreciated: Array.isArray(profileData.care_appreciated) ? profileData.care_appreciated : [],
         accepting_new_penpals: profileData.accepting_new_penpals ?? true,
         max_penpals: profileData.max_penpals ?? 3,
         onboarding_complete: profileData.onboarding_complete ?? false,
@@ -311,7 +320,12 @@ export default function AppV6() {
           try {
             const draft = JSON.parse(rawDraft) as ProfileDraft
             if (draft?.profile && Array.isArray(draft.selectedInterests)) {
-              nextProfile = { ...loadedProfile, ...draft.profile }
+              nextProfile = {
+                ...loadedProfile,
+                ...draft.profile,
+                care_offered: Array.isArray(draft.profile.care_offered) ? draft.profile.care_offered : loadedProfile.care_offered,
+                care_appreciated: Array.isArray(draft.profile.care_appreciated) ? draft.profile.care_appreciated : loadedProfile.care_appreciated,
+              }
               nextInterests = draft.selectedInterests.map(Number)
             }
           } catch {
@@ -394,6 +408,18 @@ export default function AppV6() {
     })
   }
 
+  function toggleCare(field: 'care_offered' | 'care_appreciated', value: string) {
+    setProfile((previous) => {
+      const current = previous[field]
+      return {
+        ...previous,
+        [field]: current.includes(value)
+          ? current.filter((item) => item !== value)
+          : [...current, value],
+      }
+    })
+  }
+
   function toggleInterest(id: number) {
     setSelectedInterests((previous) =>
       previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id],
@@ -435,6 +461,8 @@ export default function AppV6() {
           friendship_goals: profile.friendship_goals,
           communication_style: profile.communication_style,
           correspondence_frequency: profile.correspondence_frequency,
+          care_offered: profile.care_offered,
+          care_appreciated: profile.care_appreciated,
           accepting_new_penpals: profile.accepting_new_penpals,
           max_penpals: profile.max_penpals,
           onboarding_complete: true,
@@ -537,7 +565,7 @@ export default function AppV6() {
             </div>
           </div>
           <p className="hero-copy">
-            Discover compatible people, manage your pen-pal requests, and build friendships one letter at a time.
+            Discover compatible people, manage your pen-pal requests, and build friendships one letter at a time — including connections that may grow into chosen family.
           </p>
           <div className="profile-summary">
             <article><strong>{profile.country}</strong><span>{profile.region || 'Region kept private'}</span></article>
@@ -606,10 +634,42 @@ export default function AppV6() {
                   <button key={value} type="button" className={`choice ${profile.friendship_goals.includes(value) ? 'selected' : ''}`} onClick={() => toggleGoal(value)}>{label}</button>
                 ))}
               </div>
+              <div className="chosen-family-explainer">
+                <strong>About chosen family</strong>
+                <p>Chosen family means adult platonic friendships that may become deeply caring and family-like over time. You never need to explain family conflict, rejection, abuse, or trauma to select it, and Project PenPal does not match strangers into parent/child roles.</p>
+              </div>
             </section>
 
             <section className="form-section">
-              <div className="section-heading"><span>03</span><div><h2>Interests</h2><p>Choose at least three. These will power compatibility matching.</p></div></div>
+              <div className="section-heading"><span>03</span><div><h2>What does caring friendship look like to you?</h2><p>Optional preferences that help surface compatible ways of showing up for each other.</p></div></div>
+              <div className="care-preference-grid">
+                <div>
+                  <h3>How I like to show care</h3>
+                  <p>Choose any that feel natural for you.</p>
+                  <div className="choice-grid">
+                    {careOptions.map(([value, label]) => (
+                      <button key={`offer-${value}`} type="button" className={`choice small ${profile.care_offered.includes(value) ? 'selected' : ''}`} onClick={() => toggleCare('care_offered', value)}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3>What feels meaningful to me</h3>
+                  <p>Choose the kinds of care you appreciate in friendship.</p>
+                  <div className="choice-grid">
+                    {careOptions.map(([value, label]) => (
+                      <button key={`appreciate-${value}`} type="button" className={`choice small ${profile.care_appreciated.includes(value) ? 'selected' : ''}`} onClick={() => toggleCare('care_appreciated', value)}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="chosen-family-safety-note">
+                <strong>Keep it friendship-first.</strong>
+                <span>These preferences are not promises of counseling, money, housing, employment, legal guardianship, or emergency/crisis support. Do not put private trauma details, an exact address, or financial need here.</span>
+              </div>
+            </section>
+
+            <section className="form-section">
+              <div className="section-heading"><span>04</span><div><h2>Interests</h2><p>Choose at least three. These will power compatibility matching.</p></div></div>
               <div className="interest-grid">
                 {interests.map((interest) => (
                   <button key={interest.id} type="button" className={`choice small ${selectedInterests.includes(interest.id) ? 'selected' : ''}`} onClick={() => toggleInterest(interest.id)}>{interest.name}</button>
@@ -618,7 +678,7 @@ export default function AppV6() {
             </section>
 
             <section className="form-section">
-              <div className="section-heading"><span>04</span><div><h2>How do you like to write?</h2><p>Matching communication styles should reduce disappointing connections.</p></div></div>
+              <div className="section-heading"><span>05</span><div><h2>How do you like to write?</h2><p>Matching communication styles should reduce disappointing connections.</p></div></div>
               <div className="two-column">
                 <label>Letter style<select value={profile.communication_style ?? 'long'} onChange={(event) => setProfile({ ...profile, communication_style: event.target.value })}><option value="short">Short messages</option><option value="medium">Medium-length messages</option><option value="long">Long letters</option><option value="any">Anything</option></select></label>
                 <label>Preferred frequency<select value={profile.correspondence_frequency ?? 'weekly'} onChange={(event) => setProfile({ ...profile, correspondence_frequency: event.target.value })}><option value="several_week">Several times a week</option><option value="weekly">About weekly</option><option value="biweekly">Every couple of weeks</option><option value="monthly">About monthly</option><option value="flexible">Flexible</option></select></label>
@@ -657,13 +717,13 @@ export default function AppV6() {
           <>
             <p className="eyebrow">Friendship-first correspondence</p>
             <h1>Friendships worth writing for.</h1>
-            <p className="hero-copy">Meet people around the world who want genuine platonic friendship, meaningful conversation, and letters that are worth opening — on screen or in the mailbox.</p>
+            <p className="hero-copy">Meet people around the world who want genuine platonic friendship, meaningful conversation, and connections that can grow over time — sometimes even into chosen family.</p>
             <div className="actions">
               <button className="primary" onClick={() => setMode('signup')}>Create account</button>
               <button className="secondary" onClick={() => setMode('signin')}>Sign in</button>
             </div>
             <div className="feature-grid">
-              <article><strong>Better matches</strong><span>Interests, friendship goals, communication style, and correspondence preferences.</span></article>
+              <article><strong>Friendship with intention</strong><span>Match on interests, communication style, chosen-family goals, supportive friendship, and the ways you like to show care.</span></article>
               <article><strong>Letters, not feeds</strong><span>A calmer space built around real one-to-one correspondence.</span></article>
               <article><strong>Digital or handwritten</strong><span>Build trust here, then exchange mailing addresses only when both pen pals choose to.</span></article>
             </div>
