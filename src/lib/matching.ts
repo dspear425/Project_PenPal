@@ -1,3 +1,5 @@
+import { careOverlap } from './chosenFamily'
+
 export type MatchProfile = {
   id: string
   display_name: string | null
@@ -14,6 +16,8 @@ export type MatchProfile = {
   correspondence_frequency: string | null
   correspondence_method?: 'digital' | 'both' | 'snail_mail' | null
   international_snail_mail?: boolean | null
+  care_offered?: string[] | null
+  care_appreciated?: string[] | null
   accepting_new_penpals: boolean | null
   max_penpals: number | null
 }
@@ -115,8 +119,12 @@ export function calculateMatch(
   const sharedLanguages = intersection(currentLanguages, otherLanguages)
   const languagePoints = sharedLanguages.length ? 5 : 0
 
-  // Keep the established 100-point weighting intact. Snail-mail preference is an
-  // additional compatibility signal/reason rather than silently changing scores.
+  const currentReceivesFromOther = careOverlap(other.care_offered, current.care_appreciated)
+  const otherReceivesFromCurrent = careOverlap(current.care_offered, other.care_appreciated)
+
+  // Keep the established 100-point weighting intact. Snail-mail and care-style
+  // compatibility are additional reasons rather than silently changing scores.
+  // Chosen-family/supportive goals already participate in the existing 20% goal weight.
   const score = Math.max(
     0,
     Math.min(
@@ -126,18 +134,28 @@ export function calculateMatch(
   )
 
   const reasons: string[] = []
+  if (sharedGoals.includes('chosen-family')) reasons.push('Both open to chosen-family friendship')
+  if (sharedGoals.includes('supportive')) reasons.push('Both value supportive friendship')
+  if (currentReceivesFromOther.length && otherReceivesFromCurrent.length) {
+    reasons.push('Your ways of showing and receiving care complement each other')
+  } else if (currentReceivesFromOther.length) {
+    reasons.push('They like to show care in ways you value')
+  } else if (otherReceivesFromCurrent.length) {
+    reasons.push('You like to show care in ways they value')
+  }
   if (sharedInterestIds.length) {
     reasons.push(`${sharedInterestIds.length} shared interest${sharedInterestIds.length === 1 ? '' : 's'}`)
   }
   if (writePoints >= 20) reasons.push('Very compatible writing style')
   else if (writePoints >= 14) reasons.push('Compatible writing style')
-  if (sharedGoals.length) {
-    reasons.push(`${sharedGoals.length} shared friendship goal${sharedGoals.length === 1 ? '' : 's'}`)
+  const ordinarySharedGoals = sharedGoals.filter((goal) => goal !== 'chosen-family' && goal !== 'supportive')
+  if (ordinarySharedGoals.length) {
+    reasons.push(`${ordinarySharedGoals.length} other shared friendship goal${ordinarySharedGoals.length === 1 ? '' : 's'}`)
   }
   if (bothOpenToSnailMail(current, other)) reasons.push('Both open to snail mail')
   if (frequencyPoints >= 12) reasons.push('Similar reply rhythm')
   else if (frequencyPoints >= 10) reasons.push('Compatible reply rhythm')
   if (sharedLanguages.length) reasons.push(`Shared language: ${sharedLanguages[0]}`)
 
-  return { profile: other, score, sharedInterestIds, reasons: reasons.slice(0, 4) }
+  return { profile: other, score, sharedInterestIds, reasons: reasons.slice(0, 5) }
 }
