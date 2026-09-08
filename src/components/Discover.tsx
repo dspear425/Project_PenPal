@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { calculateMatch, type CurrentProfile, type MatchProfile, type MatchResult } from '../lib/matching'
+import { careLabels } from '../lib/chosenFamily'
 import ProfileAvatar from './ProfileAvatar'
 import SafetyPanel from './SafetyPanel'
 
@@ -82,7 +83,7 @@ export default function Discover({
     try {
       const { data: profileRows, error: profileError } = await supabase
         .from('profiles')
-        .select('id, display_name, username, avatar_path, avatar_visibility, avatar_updated_at, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, correspondence_method, international_snail_mail, accepting_new_penpals, max_penpals')
+        .select('id, display_name, username, avatar_path, avatar_visibility, avatar_updated_at, birth_year, country, about_me, languages, friendship_goals, communication_style, correspondence_frequency, correspondence_method, international_snail_mail, care_offered, care_appreciated, accepting_new_penpals, max_penpals')
         .neq('id', userId)
         .eq('account_status', 'active')
         .eq('onboarding_complete', true)
@@ -212,7 +213,7 @@ export default function Discover({
             <h1 className="discover-title">People worth writing to.</h1>
             <p className="hero-copy discover-copy">
               Matches are ranked by shared interests, friendship goals, writing style,
-              reply rhythm, location preference, and language compatibility. Snail-mail preference is shown as an additional compatibility signal without changing the established score weighting.
+              reply rhythm, location preference, and language compatibility. Chosen-family and supportive-friendship goals use the existing friendship-goal weighting; snail-mail and care-style compatibility are shown as additional signals.
             </p>
           </div>
           <button className="secondary refresh-button" onClick={() => void loadMatches()} disabled={loading}>
@@ -246,6 +247,9 @@ export default function Discover({
             const isPaused = existingConnection?.status === 'paused'
             const isComposing = composingFor === match.profile.id
             const snailLabel = snailMailLabel(match.profile)
+            const chosenFamily = Boolean(match.profile.friendship_goals?.includes('chosen-family'))
+            const supportive = Boolean(match.profile.friendship_goals?.includes('supportive'))
+            const valuedCare = (match.profile.care_appreciated ?? []).map((value) => careLabels[value] || value)
 
             return (
               <article className="match-card" key={match.profile.id}>
@@ -263,9 +267,11 @@ export default function Discover({
                       </div>
                       <h2>{match.profile.display_name || 'New member'}</h2>
                       {match.profile.username && <div className="person-username">@{match.profile.username}</div>}
-                      {snailLabel && (
-                        <div className="snail-mail-profile-badge">📬 {snailLabel}{match.profile.international_snail_mail ? ' · international okay' : ''}</div>
-                      )}
+                      <div className="connection-intention-badges">
+                        {chosenFamily && <span>♡ Chosen family</span>}
+                        {supportive && <span>Supportive friendship</span>}
+                        {snailLabel && <span className="snail-mail-profile-badge">📬 {snailLabel}{match.profile.international_snail_mail ? ' · international okay' : ''}</span>}
+                      </div>
                     </div>
                   </div>
                   <div className="match-score" aria-label={`${match.score}% compatibility`}>
@@ -275,6 +281,14 @@ export default function Discover({
                 </div>
 
                 {match.profile.about_me && <p className="match-bio">{match.profile.about_me}</p>}
+
+                {(chosenFamily || supportive || valuedCare.length > 0) && (
+                  <div className="care-profile-summary">
+                    <strong>Connection & care</strong>
+                    {(chosenFamily || supportive) && <span>{[chosenFamily ? 'Open to friendships that may grow into chosen family' : '', supportive ? 'Values mutual encouragement and consistency' : ''].filter(Boolean).join(' · ')}</span>}
+                    {valuedCare.length > 0 && <span>Values in friendship: {valuedCare.slice(0, 4).join(' · ')}{valuedCare.length > 4 ? ' · +' + (valuedCare.length - 4) : ''}</span>}
+                  </div>
+                )}
 
                 <div className="reason-list">
                   {match.reasons.map((reason) => <span key={reason}>✓ {reason}</span>)}
