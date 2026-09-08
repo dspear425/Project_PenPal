@@ -1,0 +1,152 @@
+.chosen-family-explainer {
+  display:grid;
+  gap:7px;
+  border:1px solid #dbcdbd;
+  border-radius:16px;
+  padding:16px 18px;
+  background:#fffaf4;
+  max-width:860px;
+}
+
+.chosen-family-explainer strong {
+  color:#754837;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:1.05rem;
+}
+
+.chosen-family-explainer p {
+  margin:0;
+  color:#6f655c;
+  line-height:1.6;
+}
+
+.care-preference-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+.care-preference-grid>div {
+  display:grid;
+  align-content:start;
+  gap:12px;
+  border:1px solid #ded3c8;
+  border-radius:18px;
+  padding:18px;
+  background:#fffdf9;
+}
+
+.care-preference-grid h3 {
+  margin:0;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:1.25rem;
+}
+
+.care-preference-grid p {
+  margin:-5px 0 0;
+  color:#7b7168;
+  line-height:1.45;
+  font-size:.9rem;
+}
+
+.chosen-family-safety-note {
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  border-left:3px solid #aa7b68;
+  padding:10px 13px;
+  color:#70665d;
+  line-height:1.5;
+  background:#faf6f1;
+  border-radius:0 12px 12px 0;
+}
+
+.chosen-family-safety-note strong {
+  flex:0 0 auto;
+  color:#704537;
+}
+
+.connection-intention-badges {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:8px;
+}
+
+.connection-intention-badges>span:not(.snail-mail-profile-badge) {
+  display:inline-flex;
+  align-items:center;
+  border:1px solid #dec8ba;
+  border-radius:999px;
+  padding:5px 9px;
+  background:#fff7f1;
+  color:#754b3e;
+  font-size:.75rem;
+  font-weight:800;
+}
+
+.connection-intention-badges .snail-mail-profile-badge {
+  margin:0;
+}
+
+.care-profile-summary {
+  display:grid;
+  gap:5px;
+  margin:14px 0 4px;
+  border:1px solid #e1d5ca;
+  border-radius:14px;
+  padding:12px 14px;
+  background:#fffaf6;
+}
+
+.care-profile-summary strong {
+  color:#704537;
+  font-size:.82rem;
+}
+
+.care-profile-summary span {
+  color:#746961;
+  font-size:.84rem;
+  line-height:1.45;
+}
+
+.connection-profile-care {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  border-top:1px solid #e1d6cc;
+  padding-top:22px;
+}
+
+.connection-profile-care>div {
+  display:grid;
+  gap:10px;
+  align-content:start;
+}
+
+.connection-profile-care h3 {
+  margin:0;
+}
+
+.connection-profile-care-note {
+  grid-column:1 / -1;
+  margin:0;
+  color:#81766d;
+  font-size:.82rem;
+  line-height:1.5;
+}
+
+@media (max-width:800px) {
+  .care-preference-grid,
+  .connection-profile-care {
+    grid-template-columns:1fr;
+  }
+
+  .chosen-family-safety-note {
+    display:grid;
+  }
+
+  .connection-profile-care-note {
+    grid-column:auto;
+  }
+}
