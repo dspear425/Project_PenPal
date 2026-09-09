@@ -65,9 +65,28 @@
   font-weight:800;
 }
 
+.public-early-access-footer {
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-end;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
 .public-early-access-note {
   display:block;
-  margin-top:14px;
+  max-width:680px;
   color:#85776d;
   line-height:1.45;
 }
+
+.public-early-access-footer a {
+  color:#754434;
+  font-size:.86rem;
+  font-weight:900;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.public-early-access-footer a:hover { text-decoration:underline; }
