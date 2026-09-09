@@ -63,7 +63,10 @@ export default function PublicEarlyAccessMessaging() {
         <span>Letters instead of feeds</span>
         <span>No swiping · no followers · no dating</span>
       </div>
-      <small className="public-early-access-note">Early access means we’re still improving the experience with member feedback while the community grows.</small>
+      <div className="public-early-access-footer">
+        <small className="public-early-access-note">Early access means we’re still improving the experience with member feedback while the community grows.</small>
+        <a href="/about.html">Why Project PenPal? →</a>
+      </div>
     </section>,
     host,
   )
