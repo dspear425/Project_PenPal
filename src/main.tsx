@@ -15,19 +15,19 @@ import LegalAcceptanceGate from './components/LegalAcceptanceGate'
 import LegalFooter from './components/LegalFooter'
 import SettingsLegalShortcut from './components/SettingsLegalShortcut'
 import SignupLegalConsent from './components/SignupLegalConsent'
-import BetaInviteSignup from './components/BetaInviteSignup'
-import AdminInvitations from './components/AdminInvitations'
-import BetaFeedbackShortcut from './components/BetaFeedbackShortcut'
+import LaunchOps from './components/LaunchOps'
+import FeedbackShortcut from './components/FeedbackShortcut'
+import PublicEarlyAccessMessaging from './components/PublicEarlyAccessMessaging'
 import './mobile.css'
 import './mobile-tablet.css'
 import './legal.css'
 import './legal-footer.css'
 import './legal-settings.css'
 import './legal-signup.css'
-import './beta-invite-signup.css'
-import './admin-invitations.css'
 import './beta-feedback.css'
 import './chosen-family.css'
+import './launch-ops.css'
+import './public-early-access.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -37,9 +37,9 @@ createRoot(document.getElementById('root')!).render(
     <LegalFooter />
     <SettingsLegalShortcut />
     <SignupLegalConsent />
-    <BetaInviteSignup />
-    <AdminInvitations />
-    <BetaFeedbackShortcut />
+    <LaunchOps />
+    <FeedbackShortcut />
+    <PublicEarlyAccessMessaging />
     <MobileActionMenu />
     <ConnectivityBanner />
   </StrictMode>,
