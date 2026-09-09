@@ -1,9 +1,10 @@
 const CACHE_PREFIX = 'project-penpal-shell-'
-const CACHE_VERSION = 'v14'
+const CACHE_VERSION = 'v15'
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`
 const APP_SHELL = [
   '/',
   '/index.html',
+  '/about.html',
   '/manifest.webmanifest',
   '/app-icon.svg',
   '/icon-180.png',
