@@ -1,3 +1,7 @@
+.turnstile-portal-host {
+  width:100%;
+}
+
 .turnstile-field {
   display:grid;
   gap:7px;
@@ -22,7 +26,7 @@
   line-height:1.35;
 }
 
-.auth-form > .turnstile-field { order:3; }
+.auth-form > .turnstile-portal-host { order:3; }
 .auth-form > .legal-signup-consent { order:4; }
 .auth-form > .primary { order:5; }
 
