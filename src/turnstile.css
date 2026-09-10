@@ -1,0 +1,33 @@
+.turnstile-field {
+  display:grid;
+  gap:7px;
+  margin-top:2px;
+}
+
+.turnstile-widget {
+  min-height:65px;
+  max-width:100%;
+  overflow:hidden;
+}
+
+.turnstile-message {
+  color:#8a4338;
+  font-weight:750;
+  line-height:1.4;
+}
+
+.turnstile-privacy {
+  color:#857a71;
+  font-size:.74rem;
+  line-height:1.35;
+}
+
+.auth-form > .turnstile-field { order:3; }
+.auth-form > .legal-signup-consent { order:4; }
+.auth-form > .primary { order:5; }
+
+@media (max-width: 420px) {
+  .turnstile-widget {
+    transform-origin:left top;
+  }
+}
