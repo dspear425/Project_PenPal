@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
+import { isTurnstileConfigured } from '../lib/turnstile'
 
 type StaffRole = 'moderator' | 'admin' | 'owner'
 type Tab = 'overview' | 'members' | 'checklist'
@@ -55,6 +56,7 @@ export default function LaunchOps() {
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<LaunchStatus | null>(null)
   const [members, setMembers] = useState<LaunchMember[]>([])
+  const turnstileConfigured = isTurnstileConfigured()
 
   const canView = role === 'admin' || role === 'owner'
   const ready = useMemo(() => Boolean(
@@ -62,8 +64,9 @@ export default function LaunchOps() {
     && status.owner_staff_only
     && status.owner_hidden_from_discovery
     && status.feedback_channel_installed
-    && status.required_policy_count >= 3,
-  ), [status])
+    && status.required_policy_count >= 3
+    && turnstileConfigured,
+  ), [status, turnstileConfigured])
 
   useEffect(() => {
     let active = true
@@ -145,7 +148,7 @@ export default function LaunchOps() {
           <div>
             <p className="eyebrow">Public early access</p>
             <h2 id="launch-ops-title">Launch Ops.</h2>
-            <p>Watch early growth, onboarding, discoverability, and feedback as Project PenPal opens to the public.</p>
+            <p>Watch early growth, onboarding, discoverability, feedback, and launch safeguards as Project PenPal opens to the public.</p>
           </div>
           <button className="admin-tool-close" type="button" onClick={() => setOpen(false)}>×</button>
         </header>
@@ -165,8 +168,8 @@ export default function LaunchOps() {
             <div className={`launch-ops-banner ${ready ? 'ready' : 'attention'}`}>
               <span aria-hidden="true">{ready ? '✓' : '!'}</span>
               <div>
-                <strong>{ready ? 'Public signup is open.' : 'Public launch configuration needs attention.'}</strong>
-                <p>{ready ? 'Project PenPal is running in public early-access mode.' : 'Open Readiness to see which launch controls still need work.'}</p>
+                <strong>{ready ? 'Public signup safeguards are configured.' : 'Public launch configuration needs attention.'}</strong>
+                <p>{ready ? 'Project PenPal is running in public early-access mode with browser-side Turnstile configured.' : 'Open Readiness to see which launch controls still need work.'}</p>
               </div>
             </div>
 
@@ -219,6 +222,7 @@ export default function LaunchOps() {
           <section className="launch-ops-readiness">
             <div className="launch-check-grid">
               <article className={status.open_signup_enabled ? 'pass' : 'fail'}><span>{status.open_signup_enabled ? '✓' : '×'}</span><div><strong>Open signup</strong><p>Beta invitation enforcement is removed.</p></div></article>
+              <article className={turnstileConfigured ? 'pass' : 'fail'}><span>{turnstileConfigured ? '✓' : '×'}</span><div><strong>Turnstile frontend</strong><p>{turnstileConfigured ? 'Cloudflare Turnstile site key is present in the production app.' : 'Add VITE_TURNSTILE_SITE_KEY to the Cloudflare Pages production environment.'}</p></div></article>
               <article className={status.owner_staff_only ? 'pass' : 'fail'}><span>{status.owner_staff_only ? '✓' : '×'}</span><div><strong>Owner staff-only</strong><p>The Owner account stays out of the member experience.</p></div></article>
               <article className={status.owner_hidden_from_discovery ? 'pass' : 'fail'}><span>{status.owner_hidden_from_discovery ? '✓' : '×'}</span><div><strong>Owner hidden</strong><p>Members cannot discover or request the Owner account.</p></div></article>
               <article className={status.feedback_channel_installed ? 'pass' : 'fail'}><span>{status.feedback_channel_installed ? '✓' : '×'}</span><div><strong>Feedback channel</strong><p>Private member feedback threads are available.</p></div></article>
@@ -229,7 +233,9 @@ export default function LaunchOps() {
               <h3>Human checks before promotion</h3>
               <ul>
                 <li>Newest Cloudflare production deployment shows <strong>Success</strong>.</li>
-                <li>Incognito signup works with no invitation code.</li>
+                <li>Cloudflare Turnstile appears on Create account, Sign in, and Forgot password.</li>
+                <li>Supabase Authentication → Bot and Abuse Protection has CAPTCHA enabled with <strong>Cloudflare Turnstile</strong> and the private secret key.</li>
+                <li>Incognito signup succeeds after Turnstile verification and fails if verification is not completed.</li>
                 <li>Email verification returns to the production Project PenPal URL.</li>
                 <li>A new member can finish onboarding and appear in Discover.</li>
                 <li>Send feedback opens and creates a private support thread.</li>
