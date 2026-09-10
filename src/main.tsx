@@ -18,6 +18,7 @@ import SignupLegalConsent from './components/SignupLegalConsent'
 import LaunchOps from './components/LaunchOps'
 import FeedbackShortcut from './components/FeedbackShortcut'
 import PublicEarlyAccessMessaging from './components/PublicEarlyAccessMessaging'
+import AuthBotProtection from './components/AuthBotProtection'
 import './mobile.css'
 import './mobile-tablet.css'
 import './legal.css'
@@ -28,6 +29,7 @@ import './beta-feedback.css'
 import './chosen-family.css'
 import './launch-ops.css'
 import './public-early-access.css'
+import './turnstile.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -37,6 +39,7 @@ createRoot(document.getElementById('root')!).render(
     <LegalFooter />
     <SettingsLegalShortcut />
     <SignupLegalConsent />
+    <AuthBotProtection />
     <LaunchOps />
     <FeedbackShortcut />
     <PublicEarlyAccessMessaging />
