@@ -3,7 +3,6 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
-  X-Robots-Tag: noindex, nofollow, noarchive
 
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate
