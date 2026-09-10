@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'project-penpal-shell-'
-const CACHE_VERSION = 'v15'
+const CACHE_VERSION = 'v16'
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`
 const APP_SHELL = [
   '/',
