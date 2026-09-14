@@ -124,9 +124,9 @@ export default function LegalAcceptanceGate() {
     <div className="legal-gate-overlay">
       <section className="legal-gate-card" role="dialog" aria-modal="true" aria-labelledby="legal-gate-title">
         <div className="legal-gate-mark" aria-hidden="true">✉</div>
-        <p className="eyebrow">Project PenPal policies</p>
+        <p className="eyebrow">OutKin policies</p>
         <h2 id="legal-gate-title">Please review the current rules before continuing.</h2>
-        <p className="legal-gate-copy">Project PenPal keeps policy acceptance versioned so you can see exactly what applies to your account. These documents cover the service terms, privacy practices, and community behavior standards.</p>
+        <p className="legal-gate-copy">OutKin keeps policy acceptance versioned so you can see exactly what applies to your account. These documents cover the service terms, privacy practices, and community behavior standards.</p>
 
         <div className="legal-gate-documents">
           {missing.map((row) => (
