@@ -111,15 +111,15 @@ export default function MobileActionMenu() {
         {open && (
           <>
             <button className="mobile-menu-backdrop" type="button" aria-label="Close menu" onClick={() => setOpen(false)} />
-            <div className="mobile-menu-sheet" role="menu" aria-label="Project PenPal menu">
+            <div className="mobile-menu-sheet" role="menu" aria-label="OutKin menu">
               <div className="mobile-menu-heading">
-                <div><span>Project PenPal</span><strong>{adminContext ? 'Staff menu' : 'Quick actions'}</strong></div>
+                <div><span>OutKin</span><strong>{adminContext ? 'Staff menu' : 'Quick actions'}</strong></div>
                 <button type="button" aria-label="Close" onClick={() => setOpen(false)}>×</button>
               </div>
 
               {adminContext && !staffOnlyContext && (
                 <button type="button" role="menuitem" onClick={() => { setOpen(false); window.location.hash = '' }}>
-                  <span aria-hidden="true">←</span><div><strong>Back to Project PenPal</strong><small>Leave the moderation dashboard.</small></div>
+                  <span aria-hidden="true">←</span><div><strong>Back to OutKin</strong><small>Leave the moderation dashboard.</small></div>
                 </button>
               )}
               {tools.photo && <button type="button" role="menuitem" onClick={() => runTool('.profile-photo-launcher')}><span aria-hidden="true">◎</span><div><strong>Profile photo</strong><small>Upload, crop, or change photo privacy.</small></div></button>}
@@ -128,7 +128,7 @@ export default function MobileActionMenu() {
               {tools.help && <button type="button" role="menuitem" onClick={() => runTool('.support-launcher')}><span aria-hidden="true">?</span><div><strong>Help {helpUnread && <em>New reply</em>}</strong><small>Search help, contact support, or report a bug.</small></div></button>}
               {memberShellAvailable && <button type="button" role="menuitem" onClick={() => { setOpen(false); openLegalCenter() }}><span aria-hidden="true">§</span><div><strong>Legal & safety</strong><small>Terms, privacy, community rules, and safety guidelines.</small></div></button>}
               {tools.admin && !adminContext && <button type="button" role="menuitem" onClick={() => runTool('.admin-launcher')}><span aria-hidden="true">◆</span><div><strong>Staff dashboard</strong><small>Open moderation and administration tools.</small></div></button>}
-              {installAvailable && <button type="button" role="menuitem" onClick={() => void install()}><span aria-hidden="true">↓</span><div><strong>Install Project PenPal</strong><small>{installMode === 'ios' ? 'Add it to your Home Screen.' : 'Use it like an app on this device.'}</small></div></button>}
+              {installAvailable && <button type="button" role="menuitem" onClick={() => void install()}><span aria-hidden="true">↓</span><div><strong>Install OutKin</strong><small>{installMode === 'ios' ? 'Add it to your Home Screen.' : 'Use it like an app on this device.'}</small></div></button>}
             </div>
           </>
         )}
@@ -137,7 +137,7 @@ export default function MobileActionMenu() {
           className="mobile-menu-trigger"
           type="button"
           aria-expanded={open}
-          aria-label={open ? 'Close Project PenPal menu' : 'Open Project PenPal menu'}
+          aria-label={open ? 'Close OutKin menu' : 'Open OutKin menu'}
           onClick={() => setOpen((value) => !value)}
         >
           <span aria-hidden="true">{open ? '×' : '☰'}</span>
@@ -151,9 +151,9 @@ export default function MobileActionMenu() {
           <section className="mobile-install-card" role="dialog" aria-modal="true" aria-labelledby="ios-install-title">
             <button className="mobile-install-close" type="button" aria-label="Close" onClick={() => setIosHelp(false)}>×</button>
             <span className="mobile-install-icon" aria-hidden="true">✉</span>
-            <p className="eyebrow">Install Project PenPal</p>
+            <p className="eyebrow">Install OutKin</p>
             <h2 id="ios-install-title">Add it to your Home Screen.</h2>
-            <p>In Safari, tap the <strong>Share</strong> button, scroll to <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>. Project PenPal will open in its own app-style window.</p>
+            <p>In Safari, tap the <strong>Share</strong> button, scroll to <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>. OutKin will open in its own app-style window.</p>
             <button className="primary" type="button" onClick={() => setIosHelp(false)}>Got it</button>
           </section>
         </div>
