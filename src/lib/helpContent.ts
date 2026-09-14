@@ -62,7 +62,7 @@ export const helpArticles: HelpArticle[] = [
     contexts: ['profile', 'snail-mail'],
     keywords: ['correspondence format', 'digital', 'snail mail', 'physical letters', 'handwritten'],
     sections: [
-      { bullets: ['Digital letters only keeps all correspondence inside Project PenPal.', 'Digital + snail mail means you are open to both in-app and physical letters.', 'Snail mail preferred tells matches that handwritten mail is your preferred format, while the app can still be used to connect and establish trust.'] },
+      { bullets: ['Digital letters only keeps all correspondence inside OutKin.', 'Digital + snail mail means you are open to both in-app and physical letters.', 'Snail mail preferred tells matches that handwritten mail is your preferred format, while the app can still be used to connect and establish trust.'] },
       { paragraphs: ['Choosing a snail-mail option never publishes your address. Physical addresses use a separate, private consent process after two people become established pen pals.'] },
     ],
   },
@@ -101,7 +101,7 @@ export const helpArticles: HelpArticle[] = [
     sections: [
       { bullets: ['Show in Discover lets eligible members see the photo while browsing.', 'Pen pals only shows initials to strangers and the photo to established pen pals.', 'Hidden keeps the stored photo visible only to you and authorized moderation staff.'] },
       { paragraphs: ['The in-app cropper creates a fresh 512×512 JPEG before upload, which removes the original image metadata such as embedded GPS/EXIF information.'] },
-      { note: 'A profile photo does not mean Project PenPal has verified that member’s identity.' },
+      { note: 'A profile photo does not mean OutKin has verified that member’s identity.' },
     ],
   },
   {
@@ -113,7 +113,7 @@ export const helpArticles: HelpArticle[] = [
     keywords: ['report photo', 'inappropriate image', 'nudity', 'impersonation', 'hate'],
     sections: [
       { paragraphs: ['Open Safety for the member and choose the profile-photo report option when available. Select the closest reason and add context that will help moderation review it.'] },
-      { paragraphs: ['Project PenPal records the exact photo version that was reported. If the member replaces it before review, moderators can still review the historical evidence without accidentally removing the newer photo.'] },
+      { paragraphs: ['OutKin records the exact photo version that was reported. If the member replaces it before review, moderators can still review the historical evidence without accidentally removing the newer photo.'] },
     ],
   },
   {
@@ -160,7 +160,7 @@ export const helpArticles: HelpArticle[] = [
     keywords: ['write letter', 'subject', 'send', 'word count', 'reply'],
     sections: [
       { paragraphs: ['Open an active pen pal and choose Write a letter. The subject is optional and the body can contain up to 12,000 characters. Letters appear chronologically in the shared correspondence history.'] },
-      { note: 'Project PenPal is intentionally built around slower correspondence. There is no expectation that a letter needs an immediate reply.' },
+      { note: 'OutKin is intentionally built around slower correspondence. There is no expectation that a letter needs an immediate reply.' },
     ],
   },
   {
@@ -183,7 +183,7 @@ export const helpArticles: HelpArticle[] = [
     contexts: ['correspondence', 'connections'],
     keywords: ['read receipt', 'sent', 'received', 'unread', 'notification'],
     sections: [
-      { paragraphs: ['A sent letter is marked Read after the recipient opens that correspondence and Project PenPal records the read time. Incoming unread letters also contribute to the notification badge on Pen pals & requests.'] },
+      { paragraphs: ['A sent letter is marked Read after the recipient opens that correspondence and OutKin records the read time. Incoming unread letters also contribute to the notification badge on Pen pals & requests.'] },
     ],
   },
   {
@@ -207,8 +207,8 @@ export const helpArticles: HelpArticle[] = [
     keywords: ['address privacy', 'po box', 'private mailbox', 'revoke', 'snapshot', 'home address'],
     sections: [
       { paragraphs: ['A PO box, commercial/private mailbox, or mail-forwarding address can reduce how much home-location information you disclose. Use whichever address you are genuinely comfortable giving another person.'] },
-      { paragraphs: ['When you share an address, Project PenPal stores a per-relationship snapshot. Editing your private vault later does not silently give the new address to people who had the old one. Revoke and share again when you intentionally want to update a pen pal.'] },
-      { note: 'Revoking access stops Project PenPal from displaying the address. It cannot erase a copy the recipient already wrote down, printed, photographed, or saved elsewhere.' },
+      { paragraphs: ['When you share an address, OutKin stores a per-relationship snapshot. Editing your private vault later does not silently give the new address to people who had the old one. Revoke and share again when you intentionally want to update a pen pal.'] },
+      { note: 'Revoking access stops OutKin from displaying the address. It cannot erase a copy the recipient already wrote down, printed, photographed, or saved elsewhere.' },
     ],
   },
   {
@@ -219,8 +219,8 @@ export const helpArticles: HelpArticle[] = [
     contexts: ['snail-mail', 'profile'],
     keywords: ['international mail', 'different countries', 'overseas', 'postage'],
     sections: [
-      { paragraphs: ['When pen pals are in different countries, both people must opt into international snail mail before Project PenPal allows an address exchange to begin.'] },
-      { note: 'Project PenPal does not calculate postage, customs requirements, prohibited-mail rules, or delivery estimates. Check the relevant postal services before mailing internationally.' },
+      { paragraphs: ['When pen pals are in different countries, both people must opt into international snail mail before OutKin allows an address exchange to begin.'] },
+      { note: 'OutKin does not calculate postage, customs requirements, prohibited-mail rules, or delivery estimates. Check the relevant postal services before mailing internationally.' },
     ],
   },
   {
@@ -251,7 +251,7 @@ export const helpArticles: HelpArticle[] = [
     id: 'data-export-delete',
     title: 'Export or delete your account data',
     category: 'account',
-    summary: 'Download your own Project PenPal data or permanently delete a member account.',
+    summary: 'Download your own OutKin data or permanently delete a member account.',
     contexts: ['settings'],
     keywords: ['export data', 'delete account', 'privacy', 'json', 'mailing address'],
     sections: [
@@ -278,13 +278,13 @@ export const helpArticles: HelpArticle[] = [
     contexts: ['restricted', 'dashboard'],
     keywords: ['warning', 'suspension', 'ban', 'notice', 'appeal', 'moderation'],
     sections: [
-      { paragraphs: ['Moderation actions that affect your account can create an Account Notice explaining the action. Notices remain available even when normal Project PenPal features are restricted.'] },
+      { paragraphs: ['Moderation actions that affect your account can create an Account Notice explaining the action. Notices remain available even when normal OutKin features are restricted.'] },
       { paragraphs: ['If you believe an action needs review, open Help and contact the moderation team. Choose Moderation appeal when that category is available and explain the specific decision you are asking staff to reconsider.'] },
     ],
   },
   {
     id: 'support-conversations',
-    title: 'Contact Project PenPal support',
+    title: 'Contact OutKin support',
     category: 'moderation',
     summary: 'Start a private support conversation and follow moderator replies.',
     contexts: ['dashboard', 'settings', 'restricted'],
@@ -303,7 +303,7 @@ export const helpArticles: HelpArticle[] = [
     keywords: ['bug', 'error', 'broken', 'technical', 'issue', 'problem'],
     sections: [
       { heading: 'Include what you can', bullets: ['What you were trying to do', 'What you expected to happen', 'What actually happened', 'Any error text you saw', 'Whether refreshing or trying again changed anything'] },
-      { paragraphs: ['The Report a bug shortcut automatically adds the current Project PenPal area to the support message so staff have useful context. Do not include passwords, authentication tokens, or another person’s private mailing address.'] },
+      { paragraphs: ['The Report a bug shortcut automatically adds the current OutKin area to the support message so staff have useful context. Do not include passwords, authentication tokens, or another person’s private mailing address.'] },
     ],
   },
   {
