@@ -11,7 +11,7 @@ if (!helpArticles.some((article) => article.id === 'chosen-family-friendship')) 
     sections: [
       {
         paragraphs: [
-          'Chosen family on Project PenPal means adult platonic friendships that may become deeply caring and family-like over time. Selecting it does not assign anyone a parent, child, sibling, guardian, counselor, or caregiver role.',
+          'Chosen family on OutKin means adult platonic friendships that may become deeply caring and family-like over time. Selecting it does not assign anyone a parent, child, sibling, guardian, counselor, or caregiver role.',
           'You do not need to explain estrangement, rejection, abuse, trauma, identity, or any other private reason for wanting this kind of friendship. Share only what you are comfortable having potential pen pals read.',
         ],
       },
@@ -53,7 +53,7 @@ if (!helpArticles.some((article) => article.id === 'chosen-family-safety')) {
       {
         heading: 'Let trust grow before increasing access',
         bullets: [
-          'Keep early conversations inside Project PenPal while you get to know someone.',
+          'Keep early conversations inside OutKin while you get to know someone.',
           'Do not feel pressured to disclose trauma, financial circumstances, exact location, workplace, or other sensitive details.',
           'Use the separate snail-mail consent flow only when you are comfortable sharing a mailing address; a PO box or private mailbox can reduce home-location exposure.',
           'Be cautious if someone quickly asks for money, housing, account access, intimate material, secrecy, or major personal commitments.',
@@ -61,7 +61,7 @@ if (!helpArticles.some((article) => article.id === 'chosen-family-safety')) {
         ],
       },
       {
-        note: 'Project PenPal is a friendship platform, not an emergency or crisis service. If you are in immediate danger, use appropriate local emergency or trusted in-person support resources.',
+        note: 'OutKin is a friendship platform, not an emergency or crisis service. If you are in immediate danger, use appropriate local emergency or trusted in-person support resources.',
       },
     ],
   })
