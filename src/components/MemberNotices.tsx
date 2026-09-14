@@ -141,7 +141,7 @@ export default function MemberNotices({ userId }: Props) {
           <section className="member-notice-panel" role="dialog" aria-modal="true" aria-labelledby="member-notice-title">
             <div className="member-notice-panel-header">
               <div>
-                <p className="eyebrow">Project PenPal account notices</p>
+                <p className="eyebrow">OutKin account notices</p>
                 <h2 id="member-notice-title">Important information about your account.</h2>
                 <p>Moderation notices remain here after you acknowledge them so you can review your account history later.</p>
               </div>
