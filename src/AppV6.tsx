@@ -431,7 +431,7 @@ export default function AppV6() {
     if (!session) return
 
     if (!profile.birth_year || age === null || age < 18) {
-      setMessage('Project PenPal is currently limited to adults age 18 and older.')
+      setMessage('OutKin is currently limited to adults age 18 and older.')
       return
     }
 
@@ -553,7 +553,7 @@ export default function AppV6() {
           <div className="dashboard-topline">
             <div className="brand-row compact-brand">
               <div className="stamp" aria-hidden="true">✉</div>
-              <span className="brand-name">Project PenPal</span>
+              <span className="brand-name">OutKin</span>
             </div>
             <button className="secondary" onClick={signOut}>Sign out</button>
           </div>
@@ -601,7 +601,7 @@ export default function AppV6() {
           <div className="dashboard-topline">
             <div className="brand-row compact-brand">
               <div className="stamp" aria-hidden="true">✉</div>
-              <span className="brand-name">Project PenPal</span>
+              <span className="brand-name">OutKin</span>
             </div>
             <button className="text-button top-signout" onClick={signOut}>Sign out</button>
           </div>
@@ -636,7 +636,7 @@ export default function AppV6() {
               </div>
               <div className="chosen-family-explainer">
                 <strong>About chosen family</strong>
-                <p>Chosen family means adult platonic friendships that may become deeply caring and family-like over time. You never need to explain family conflict, rejection, abuse, or trauma to select it, and Project PenPal does not match strangers into parent/child roles.</p>
+                <p>Chosen family means adult platonic friendships that may become deeply caring and family-like over time. You never need to explain family conflict, rejection, abuse, or trauma to select it, and OutKin does not match strangers into parent/child roles.</p>
               </div>
             </section>
 
@@ -710,7 +710,7 @@ export default function AppV6() {
       <section className="hero-card">
         <div className="brand-row">
           <div className="stamp" aria-hidden="true">✉</div>
-          <span className="brand-name">Project PenPal</span>
+          <span className="brand-name">OutKin</span>
         </div>
 
         {mode === 'welcome' ? (
