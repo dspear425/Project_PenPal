@@ -1,13 +1,13 @@
 {
   "id": "/",
-  "name": "Project PenPal",
-  "short_name": "PenPal",
-  "description": "Friendship-first correspondence for meaningful platonic friendship, supportive connections, chosen family, and digital or handwritten letters.",
+  "name": "OutKin",
+  "short_name": "OutKin",
+  "description": "LGBTQ+-rooted friendship-first correspondence for meaningful platonic friendship, supportive connection, chosen family, and digital or handwritten letters.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f4efe6",
-  "theme_color": "#8a4e3d",
+  "background_color": "#f8f1ea",
+  "theme_color": "#742c52",
   "orientation": "any",
   "categories": ["social", "lifestyle"],
   "icons": [
