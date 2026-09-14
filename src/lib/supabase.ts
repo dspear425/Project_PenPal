@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { legalSignupMetadata } from './legalDocuments'
+import './outkinLegalRebrand'
 import { hasSignupLegalConsent } from './legalSignupState'
 import { isTurnstileConfigured } from './turnstile'
 import { getAuthCaptchaToken, requestAuthCaptchaReset } from './authBotProtectionState'
@@ -92,8 +93,8 @@ supabase.auth.resetPasswordForEmail = (async (email: string, options?: ResetOpti
   }
 }) as typeof supabase.auth.resetPasswordForEmail
 
-// Do not globally filter Supabase auth events here. Multiple parts of Project
-// PenPal subscribe to the same client (the app shell, member UI, legal gate, etc.).
+// Do not globally filter Supabase auth events here. Multiple parts of OutKin
+// subscribe to the same client (the app shell, member UI, legal gate, etc.).
 // A shared event filter can deliver a real SIGNED_IN event to the first listener
 // and accidentally suppress it for the rest. Each subscriber is responsible for
 // ignoring routine refresh/focus events without interfering with other listeners.
