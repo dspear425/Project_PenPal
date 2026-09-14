@@ -175,7 +175,7 @@ export default function SafetyPanel({
             <p className="eyebrow">Safety & boundaries</p>
             <h2 id="safety-title">Manage your connection with {targetName}.</h2>
             <p className="safety-copy">
-              Reporting sends information to Project PenPal for review. Blocking is private and immediately prevents further contact between your accounts.
+              Reporting sends information to OutKin for review. Blocking is private and immediately prevents further contact between your accounts.
             </p>
 
             <div className="safety-option-list">
