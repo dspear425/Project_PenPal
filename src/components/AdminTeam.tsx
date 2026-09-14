@@ -177,7 +177,7 @@ export default function AdminTeam({ currentUserId, role }: Props) {
               <div>
                 <p className="eyebrow">Staff & permissions</p>
                 <h2 id="admin-team-title">Admin Team.</h2>
-                <p>See who can moderate Project PenPal and keep staff-role changes accountable.</p>
+                <p>See who can moderate OutKin and keep staff-role changes accountable.</p>
               </div>
               <button className="admin-tool-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
             </header>
