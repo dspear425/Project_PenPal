@@ -44,7 +44,7 @@ export default function LegalCenter() {
       <section className="legal-center-panel" role="dialog" aria-modal="true" aria-labelledby="legal-center-title">
         <header className="legal-center-header">
           <div>
-            <p className="eyebrow">Project PenPal</p>
+            <p className="eyebrow">OutKin</p>
             <h2 id="legal-center-title">Legal & safety center.</h2>
             <p>Terms, privacy information, community rules, and safety guidance for digital and physical correspondence.</p>
           </div>
@@ -100,7 +100,7 @@ export default function LegalCenter() {
             </div>
 
             <footer className="legal-document-footer">
-              <p>Questions about these policies can be sent through Project PenPal Help and private support.</p>
+              <p>Questions about these policies can be sent through OutKin Help and private support.</p>
               <button className="secondary" type="button" onClick={() => setOpen(false)}>Done</button>
             </footer>
           </article>
