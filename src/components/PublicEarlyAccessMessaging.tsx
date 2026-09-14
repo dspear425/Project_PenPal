@@ -12,8 +12,7 @@ export default function PublicEarlyAccessMessaging() {
       if (authForm) {
         const card = authForm.closest('.hero-card')
         const eyebrow = card?.querySelector('.eyebrow')
-        const isSignup = Boolean(authForm.querySelector('input[autocomplete="new-password"]'))
-        if (isSignup && eyebrow && eyebrow.textContent?.trim() !== 'Join OutKin') eyebrow.textContent = 'Join OutKin'
+        if (eyebrow?.textContent?.trim() === 'Join the beta') eyebrow.textContent = 'Join Project PenPal'
       }
 
       const featureGrid = document.querySelector('.hero-card .feature-grid')
@@ -26,11 +25,6 @@ export default function PublicEarlyAccessMessaging() {
 
       const card = featureGrid.closest('.hero-card')
       if (!card) return
-
-      const landingEyebrow = card.querySelector('.eyebrow')
-      const landingHeading = card.querySelector('h1')
-      if (landingEyebrow) landingEyebrow.textContent = 'LGBTQ+-rooted · friendship-first'
-      if (landingHeading) landingHeading.textContent = 'Find your people. Build your chosen family.'
 
       let nextHost = card.querySelector<HTMLElement>('.public-launch-host')
       if (!nextHost) {
@@ -55,14 +49,14 @@ export default function PublicEarlyAccessMessaging() {
   if (!host) return null
 
   return createPortal(
-    <section className="public-early-access-card" aria-label="OutKin public early access">
+    <section className="public-early-access-card" aria-label="Project PenPal public early access">
       <div className="public-early-access-topline">
         <span>Public early access</span>
         <small>18+ · Free to join</small>
       </div>
-      <h2>Family is also something we find.</h2>
+      <h2>Find people who could become part of your life.</h2>
       <p>
-        OutKin is an LGBTQ+-rooted space for meaningful platonic friendship—from traditional pen pals to supportive friendships and chosen family that grow naturally over time.
+        Project PenPal is for meaningful platonic friendship—from traditional pen pals to supportive friendships and chosen family that grow naturally over time.
       </p>
       <div className="public-early-access-points">
         <span>Chosen family & supportive friendship</span>
@@ -71,7 +65,7 @@ export default function PublicEarlyAccessMessaging() {
       </div>
       <div className="public-early-access-footer">
         <small className="public-early-access-note">Early access means we’re still improving the experience with member feedback while the community grows.</small>
-        <a href="/about.html">Why OutKin? →</a>
+        <a href="/about.html">Why Project PenPal? →</a>
       </div>
     </section>,
     host,

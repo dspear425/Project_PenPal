@@ -4,10 +4,8 @@ import './styles.css'
 import './notifications.css'
 import './safety.css'
 import './helpContextBridge'
-import './lib/outkinLegalRebrand'
 import './lib/legalHelpExtension'
 import './lib/chosenFamilyHelpExtension'
-import './lib/outkinHelpRebrand'
 import './pwa'
 import App from './AppRoot'
 import MobileActionMenu from './components/MobileActionMenu'
@@ -32,7 +30,6 @@ import './chosen-family.css'
 import './launch-ops.css'
 import './public-early-access.css'
 import './turnstile.css'
-import './outkin-theme.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

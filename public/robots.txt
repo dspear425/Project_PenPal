@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://joinoutkin.com/sitemap.xml
+Sitemap: https://project-penpal.pages.dev/sitemap.xml

@@ -41,31 +41,11 @@ type AdminSupportMessage = {
   created_at: string
 }
 
-const SESSION_TIMEOUT_MS = 6000
-const SECURITY_TIMEOUT_MS = 6000
-
 function formatDate(value: string | null) {
   if (!value) return null
   return new Intl.DateTimeFormat(undefined, {
     month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
   }).format(new Date(value))
-}
-
-function withTimeout<T>(operation: PromiseLike<T>, timeoutMs: number, label: string): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timer = window.setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs)
-
-    Promise.resolve(operation).then(
-      (value) => {
-        window.clearTimeout(timer)
-        resolve(value)
-      },
-      (error) => {
-        window.clearTimeout(timer)
-        reject(error)
-      },
-    )
-  })
 }
 
 export default function AppRoot() {
@@ -96,26 +76,19 @@ export default function AppRoot() {
     }
 
     async function synchronizeSession() {
-      try {
-        const { data } = await withTimeout(supabase.auth.getSession(), SESSION_TIMEOUT_MS, 'Session lookup')
-        if (!active) return
+      const { data } = await supabase.auth.getSession()
+      if (!active) return
 
-        if (!data.session) {
-          initialized = true
-          clearSignedOutState()
-          return
-        }
-
-        setSession(data.session)
-        if (!initialized) setChecking(true)
-        await refreshSecurityState(data.session.user.id)
+      if (!data.session) {
         initialized = true
-      } catch (error) {
-        console.warn('OutKin session synchronization did not complete', error)
-        if (!active) return
-        initialized = true
-        setChecking(false)
+        clearSignedOutState()
+        return
       }
+
+      setSession(data.session)
+      if (!initialized) setChecking(true)
+      await refreshSecurityState(data.session.user.id)
+      initialized = true
     }
 
     void synchronizeSession()
@@ -137,7 +110,7 @@ export default function AppRoot() {
         return
       }
 
-      if (event === 'SIGNED_IN' && !initialized) setChecking(true)
+      if (event === 'SIGNED_IN') setChecking(true)
       void refreshSecurityState(nextSession.user.id).finally(() => { initialized = true })
     })
 
@@ -210,28 +183,20 @@ export default function AppRoot() {
 
   async function refreshSecurityState(userId: string) {
     try {
-      try {
-        await withTimeout(supabase.rpc('refresh_my_account_status'), SECURITY_TIMEOUT_MS, 'Account-status refresh')
-      } catch (error) {
-        console.warn('OutKin account-status refresh did not complete; continuing with stored status', error)
-      }
+      await supabase.rpc('refresh_my_account_status')
 
-      const [profileResult, roleResult] = await withTimeout(
-        Promise.all([
-          supabase
-            .from('profiles')
-            .select('account_status, suspended_until, staff_only')
-            .eq('id', userId)
-            .maybeSingle(),
-          supabase
-            .from('admin_users')
-            .select('role')
-            .eq('user_id', userId)
-            .maybeSingle(),
-        ]),
-        SECURITY_TIMEOUT_MS,
-        'Security profile lookup',
-      )
+      const [profileResult, roleResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('account_status, suspended_until, staff_only')
+          .eq('id', userId)
+          .maybeSingle(),
+        supabase
+          .from('admin_users')
+          .select('role')
+          .eq('user_id', userId)
+          .maybeSingle(),
+      ])
 
       if (!profileResult.error && profileResult.data) {
         const isStaffOnly = Boolean(profileResult.data.staff_only)
@@ -246,8 +211,6 @@ export default function AppRoot() {
       } else {
         setRole(null)
       }
-    } catch (error) {
-      console.warn('OutKin security-state lookup did not complete', error)
     } finally {
       setChecking(false)
     }
@@ -279,8 +242,8 @@ export default function AppRoot() {
     return (
       <main className="page-shell">
         <section className="hero-card dashboard-card">
-          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
-          <p className="eyebrow">Opening OutKin</p>
+          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
+          <p className="eyebrow">Opening Project PenPal</p>
           <h1 className="dashboard-title">Checking your session…</h1>
         </section>
       </main>
@@ -313,11 +276,11 @@ export default function AppRoot() {
     return (
       <main className="page-shell">
         <section className="hero-card dashboard-card">
-          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
+          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
           <p className="eyebrow">Private administration</p>
           <h1 className="dashboard-title">Access unavailable.</h1>
           <p className="hero-copy">This account does not have permission to open the moderation dashboard.</p>
-          <div className="actions"><button className="primary" onClick={closeAdmin}>Back to OutKin</button><button className="secondary" onClick={() => void signOut()}>Sign out</button></div>
+          <div className="actions"><button className="primary" onClick={closeAdmin}>Back to Project PenPal</button><button className="secondary" onClick={() => void signOut()}>Sign out</button></div>
         </section>
       </main>
     )
@@ -330,15 +293,15 @@ export default function AppRoot() {
         <main className="page-shell">
           <section className="hero-card dashboard-card account-restricted-card">
             <div className="dashboard-topline">
-              <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
+              <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
               <button className="secondary" onClick={() => void signOut()}>Sign out</button>
             </div>
             <p className="eyebrow">Account status</p>
             <h1 className="dashboard-title">{accountStatus === 'banned' ? 'This account has been banned.' : 'This account is temporarily suspended.'}</h1>
             <p className="hero-copy">
               {accountStatus === 'banned'
-                ? 'Normal OutKin features are unavailable for this account. Open Account Notices for the moderation notice associated with this action, or Help to contact the moderation team.'
-                : `Normal OutKin features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information, or Help to contact the moderation team.`}
+                ? 'Normal Project PenPal features are unavailable for this account. Open Account Notices for the moderation notice associated with this action, or Help to contact the moderation team.'
+                : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information, or Help to contact the moderation team.`}
             </p>
             {role && <p className="hero-copy compact">Staff moderation privileges are unavailable while this account is restricted.</p>}
           </section>
@@ -363,8 +326,8 @@ export default function AppRoot() {
           className={`admin-launcher ${adminMessageCount > 0 ? 'has-admin-message' : ''}`}
           type="button"
           onClick={openAdmin}
-          title={adminMessageCount > 0 ? `${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open OutKin moderation dashboard'}
-          aria-label={adminMessageCount > 0 ? `Admin, ${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open OutKin moderation dashboard'}
+          title={adminMessageCount > 0 ? `${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
+          aria-label={adminMessageCount > 0 ? `Admin, ${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
         >
           <span>{role === 'owner' ? 'Owner' : role === 'admin' ? 'Admin' : 'Moderator'}</span>
           {adminMessageCount > 0 && <strong className="admin-message-badge">{adminMessageCount > 99 ? '99+' : adminMessageCount}</strong>}
