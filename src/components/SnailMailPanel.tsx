@@ -208,7 +208,7 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
   }
 
   async function shareAddress() {
-    if (!window.confirm(`Share your saved mailing address with ${otherName}? They will be able to copy it and may retain it outside Project PenPal.`)) return
+    if (!window.confirm(`Share your saved mailing address with ${otherName}? They will be able to copy it and may retain it outside OutKin.`)) return
     await runAction(
       () => supabase.rpc('share_my_mailing_address', { target_relationship: relationshipId }),
       `Your mailing address is now shared with ${otherName}.`,
@@ -218,7 +218,7 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
   async function revokeShare() {
     await runAction(
       () => supabase.rpc('revoke_my_mailing_address_share', { target_relationship: relationshipId }),
-      `Project PenPal no longer shows your mailing address to ${otherName}.`,
+      `OutKin no longer shows your mailing address to ${otherName}.`,
     )
   }
 
@@ -337,7 +337,7 @@ export default function SnailMailPanel({ userId, relationshipId, relationshipSta
         <>
           <div className="snail-mail-safety-note">
             <strong>Share thoughtfully.</strong>
-            <p>A PO box, private mailbox, or mail-forwarding address can offer more privacy than a home address. Project PenPal does not verify mailing addresses or identities. Revoking access stops the app from displaying your address, but it cannot erase a copy someone already made.</p>
+            <p>A PO box, private mailbox, or mail-forwarding address can offer more privacy than a home address. OutKin does not verify mailing addresses or identities. Revoking access stops the app from displaying your address, but it cannot erase a copy someone already made.</p>
           </div>
 
           <div className="snail-mail-columns">
