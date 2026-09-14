@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  LEGAL_EFFECTIVE_DATE_LABEL,
   getLegalDocument,
   legalDocuments,
   type LegalDocumentKey,
 } from '../lib/legalDocuments'
 
 type OpenLegalEvent = CustomEvent<{ documentKey?: LegalDocumentKey }>
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+    .format(new Date(`${value}T12:00:00`))
+}
 
 export default function LegalCenter() {
   const [open, setOpen] = useState(false)
@@ -44,7 +48,7 @@ export default function LegalCenter() {
       <section className="legal-center-panel" role="dialog" aria-modal="true" aria-labelledby="legal-center-title">
         <header className="legal-center-header">
           <div>
-            <p className="eyebrow">Project PenPal</p>
+            <p className="eyebrow">OutKin</p>
             <h2 id="legal-center-title">Legal & safety center.</h2>
             <p>Terms, privacy information, community rules, and safety guidance for digital and physical correspondence.</p>
           </div>
@@ -55,7 +59,7 @@ export default function LegalCenter() {
           <nav className="legal-document-nav" aria-label="Legal and safety documents">
             <div className="legal-document-nav-heading">
               <strong>Documents</strong>
-              <span>Effective {LEGAL_EFFECTIVE_DATE_LABEL}</span>
+              <span>Effective {formatDate(selected.effectiveDate)}</span>
             </div>
             {legalDocuments.map((document) => (
               <button
@@ -80,7 +84,7 @@ export default function LegalCenter() {
               </div>
               <dl>
                 <div><dt>Version</dt><dd>{selected.version}</dd></div>
-                <div><dt>Effective</dt><dd>{LEGAL_EFFECTIVE_DATE_LABEL}</dd></div>
+                <div><dt>Effective</dt><dd>{formatDate(selected.effectiveDate)}</dd></div>
               </dl>
             </header>
 
@@ -100,7 +104,7 @@ export default function LegalCenter() {
             </div>
 
             <footer className="legal-document-footer">
-              <p>Questions about these policies can be sent through Project PenPal Help and private support.</p>
+              <p>Questions about these policies can be sent through OutKin Help and private support.</p>
               <button className="secondary" type="button" onClick={() => setOpen(false)}>Done</button>
             </footer>
           </article>
