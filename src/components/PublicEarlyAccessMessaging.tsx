@@ -12,7 +12,7 @@ export default function PublicEarlyAccessMessaging() {
       if (authForm) {
         const card = authForm.closest('.hero-card')
         const eyebrow = card?.querySelector('.eyebrow')
-        if (eyebrow?.textContent?.trim() === 'Join the beta') eyebrow.textContent = 'Join Project PenPal'
+        if (eyebrow?.textContent?.trim() === 'Join the beta') eyebrow.textContent = 'Join OutKin'
       }
 
       const featureGrid = document.querySelector('.hero-card .feature-grid')
@@ -49,14 +49,14 @@ export default function PublicEarlyAccessMessaging() {
   if (!host) return null
 
   return createPortal(
-    <section className="public-early-access-card" aria-label="Project PenPal public early access">
+    <section className="public-early-access-card" aria-label="OutKin public early access">
       <div className="public-early-access-topline">
         <span>Public early access</span>
         <small>18+ · Free to join</small>
       </div>
       <h2>Find people who could become part of your life.</h2>
       <p>
-        Project PenPal is for meaningful platonic friendship—from traditional pen pals to supportive friendships and chosen family that grow naturally over time.
+        OutKin is for meaningful platonic friendship—from traditional pen pals to supportive friendships and chosen family that grow naturally over time.
       </p>
       <div className="public-early-access-points">
         <span>Chosen family & supportive friendship</span>
@@ -65,7 +65,7 @@ export default function PublicEarlyAccessMessaging() {
       </div>
       <div className="public-early-access-footer">
         <small className="public-early-access-note">Early access means we’re still improving the experience with member feedback while the community grows.</small>
-        <a href="/about.html">Why Project PenPal? →</a>
+        <a href="/about.html">Why OutKin? →</a>
       </div>
     </section>,
     host,
