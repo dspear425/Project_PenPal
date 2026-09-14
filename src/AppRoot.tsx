@@ -242,8 +242,8 @@ export default function AppRoot() {
     return (
       <main className="page-shell">
         <section className="hero-card dashboard-card">
-          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
-          <p className="eyebrow">Opening Project PenPal</p>
+          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
+          <p className="eyebrow">Opening OutKin</p>
           <h1 className="dashboard-title">Checking your session…</h1>
         </section>
       </main>
@@ -276,11 +276,11 @@ export default function AppRoot() {
     return (
       <main className="page-shell">
         <section className="hero-card dashboard-card">
-          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
+          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
           <p className="eyebrow">Private administration</p>
           <h1 className="dashboard-title">Access unavailable.</h1>
           <p className="hero-copy">This account does not have permission to open the moderation dashboard.</p>
-          <div className="actions"><button className="primary" onClick={closeAdmin}>Back to Project PenPal</button><button className="secondary" onClick={() => void signOut()}>Sign out</button></div>
+          <div className="actions"><button className="primary" onClick={closeAdmin}>Back to OutKin</button><button className="secondary" onClick={() => void signOut()}>Sign out</button></div>
         </section>
       </main>
     )
@@ -293,15 +293,15 @@ export default function AppRoot() {
         <main className="page-shell">
           <section className="hero-card dashboard-card account-restricted-card">
             <div className="dashboard-topline">
-              <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
+              <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
               <button className="secondary" onClick={() => void signOut()}>Sign out</button>
             </div>
             <p className="eyebrow">Account status</p>
             <h1 className="dashboard-title">{accountStatus === 'banned' ? 'This account has been banned.' : 'This account is temporarily suspended.'}</h1>
             <p className="hero-copy">
               {accountStatus === 'banned'
-                ? 'Normal Project PenPal features are unavailable for this account. Open Account Notices for the moderation notice associated with this action, or Help to contact the moderation team.'
-                : `Normal Project PenPal features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information, or Help to contact the moderation team.`}
+                ? 'Normal OutKin features are unavailable for this account. Open Account Notices for the moderation notice associated with this action, or Help to contact the moderation team.'
+                : `Normal OutKin features are temporarily unavailable${until ? ` until ${until}` : ''}. Your existing data is retained while the restriction is in place. Open Account Notices for more information, or Help to contact the moderation team.`}
             </p>
             {role && <p className="hero-copy compact">Staff moderation privileges are unavailable while this account is restricted.</p>}
           </section>
@@ -326,8 +326,8 @@ export default function AppRoot() {
           className={`admin-launcher ${adminMessageCount > 0 ? 'has-admin-message' : ''}`}
           type="button"
           onClick={openAdmin}
-          title={adminMessageCount > 0 ? `${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
-          aria-label={adminMessageCount > 0 ? `Admin, ${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open Project PenPal moderation dashboard'}
+          title={adminMessageCount > 0 ? `${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open OutKin moderation dashboard'}
+          aria-label={adminMessageCount > 0 ? `Admin, ${adminMessageCount} unread member ${adminMessageCount === 1 ? 'message' : 'messages'}` : 'Open OutKin moderation dashboard'}
         >
           <span>{role === 'owner' ? 'Owner' : role === 'admin' ? 'Admin' : 'Moderator'}</span>
           {adminMessageCount > 0 && <strong className="admin-message-badge">{adminMessageCount > 99 ? '99+' : adminMessageCount}</strong>}
