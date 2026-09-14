@@ -197,7 +197,7 @@ export default function Discover({
         <header className="discover-header">
           <div className="brand-row compact-brand">
             <div className="stamp" aria-hidden="true">✉</div>
-            <span className="brand-name">Project PenPal</span>
+            <span className="brand-name">OutKin</span>
           </div>
           <nav className="discover-nav" aria-label="Account navigation">
             <button className="text-button discover-link" onClick={onConnections}>Pen pals</button>
