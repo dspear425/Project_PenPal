@@ -148,7 +148,7 @@ export default function LaunchOps() {
           <div>
             <p className="eyebrow">Public early access</p>
             <h2 id="launch-ops-title">Launch Ops.</h2>
-            <p>Watch early growth, onboarding, discoverability, feedback, and launch safeguards as Project PenPal opens to the public.</p>
+            <p>Watch early growth, onboarding, discoverability, feedback, and launch safeguards as OutKin opens to the public.</p>
           </div>
           <button className="admin-tool-close" type="button" onClick={() => setOpen(false)}>×</button>
         </header>
@@ -169,7 +169,7 @@ export default function LaunchOps() {
               <span aria-hidden="true">{ready ? '✓' : '!'}</span>
               <div>
                 <strong>{ready ? 'Public signup safeguards are configured.' : 'Public launch configuration needs attention.'}</strong>
-                <p>{ready ? 'Project PenPal is running in public early-access mode with browser-side Turnstile configured.' : 'Open Readiness to see which launch controls still need work.'}</p>
+                <p>{ready ? 'OutKin is running in public early-access mode with browser-side Turnstile configured.' : 'Open Readiness to see which launch controls still need work.'}</p>
               </div>
             </div>
 
@@ -236,7 +236,7 @@ export default function LaunchOps() {
                 <li>Cloudflare Turnstile appears on Create account, Sign in, and Forgot password.</li>
                 <li>Supabase Authentication → Bot and Abuse Protection has CAPTCHA enabled with <strong>Cloudflare Turnstile</strong> and the private secret key.</li>
                 <li>Incognito signup succeeds after Turnstile verification and fails if verification is not completed.</li>
-                <li>Email verification returns to the production Project PenPal URL.</li>
+                <li>Email verification returns to the production OutKin URL.</li>
                 <li>A new member can finish onboarding and appear in Discover.</li>
                 <li>Send feedback opens and creates a private support thread.</li>
                 <li>Check one phone-sized browser view.</li>
