@@ -127,9 +127,9 @@ export default function MemberIdentity({ userId, requireSetup = true, showLaunch
 
             <div className="member-code-card">
               <div>
-                <span>Your Project PenPal member code</span>
+                <span>Your OutKin member code</span>
                 <strong>{identity.member_code || 'Creating…'}</strong>
-                <small>Give this code to Project PenPal support if we need help locating your account.</small>
+                <small>Give this code to OutKin support if we need help locating your account.</small>
               </div>
               <button className="secondary" type="button" onClick={() => void copyMemberCode()}>{copied ? 'Copied!' : 'Copy code'}</button>
             </div>
