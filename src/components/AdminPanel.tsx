@@ -220,7 +220,7 @@ export default function AdminPanel({ userId, role, onBack, onSignOut, allowBack 
     const target = profiles.get(selectedReport.reported_id)
     const targetName = target?.display_name || 'this member'
 
-    if (action === 'ban' && !window.confirm(`Permanently ban ${targetName}? They will be prevented from using normal Project PenPal features until an administrator restores the account.`)) {
+    if (action === 'ban' && !window.confirm(`Permanently ban ${targetName}? They will be prevented from using normal OutKin features until an administrator restores the account.`)) {
       return
     }
 
@@ -257,7 +257,7 @@ export default function AdminPanel({ userId, role, onBack, onSignOut, allowBack 
         <header className="admin-header">
           <div className="brand-row compact-brand">
             <div className="stamp" aria-hidden="true">✉</div>
-            <div><span className="brand-name">Project PenPal</span><span className="admin-brand-tag">Moderation</span></div>
+            <div><span className="brand-name">OutKin</span><span className="admin-brand-tag">Moderation</span></div>
           </div>
           <nav className="discover-nav" aria-label="Administration navigation">
             <span className="admin-role-badge">{role}</span>
