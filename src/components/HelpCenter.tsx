@@ -351,7 +351,7 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
               <div>
                 <p className="eyebrow">Help Center</p>
                 <h2 id="help-center-title">How can we help?</h2>
-                <p>Answers for Project PenPal, with help for <strong>{helpContextLabel(context)}</strong> shown first.</p>
+                <p>Answers for OutKin, with help for <strong>{helpContextLabel(context)}</strong> shown first.</p>
               </div>
               <button className="support-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
             </div>
@@ -412,14 +412,14 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
                       <div className="help-no-results">
                         <span aria-hidden="true">?</span>
                         <h3>No article matched that search.</h3>
-                        <p>Try fewer words, browse the topics, or contact Project PenPal support.</p>
+                        <p>Try fewer words, browse the topics, or contact OutKin support.</p>
                       </div>
                     )}
                   </section>
                 )}
 
                 <section className="help-contact-card">
-                  <div><span>Still need help?</span><h3>Talk to the Project PenPal team.</h3><p>Start a private support conversation, review an existing conversation, or send a technical bug report with the current screen included automatically.</p></div>
+                  <div><span>Still need help?</span><h3>Talk to the OutKin team.</h3><p>Start a private support conversation, review an existing conversation, or send a technical bug report with the current screen included automatically.</p></div>
                   <div className="help-contact-actions">
                     <button className="primary" type="button" onClick={() => openSupportNew()}>Contact support</button>
                     <button className="secondary" type="button" onClick={() => { setView('conversations'); setMessage(''); void loadThreads() }}>My conversations{unreadTotal ? ` (${unreadTotal} new)` : ''}</button>
@@ -457,7 +457,7 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
             {view === 'conversations' && (
               <div className="help-support-view">
                 <button className="back" type="button" onClick={backToHelp}>← Help Center</button>
-                <div className="help-support-title"><span>Private support</span><h3>Your support conversations</h3><p>Messages here are between your account and authorized Project PenPal staff.</p></div>
+                <div className="help-support-title"><span>Private support</span><h3>Your support conversations</h3><p>Messages here are between your account and authorized OutKin staff.</p></div>
                 {memberCode && (
                   <div className="support-member-code">
                     <div><span>Your member code</span><strong>{memberCode}</strong><small>Support may ask for this code to locate your account quickly.</small></div>
@@ -470,7 +470,7 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
                 </div>
                 <div className="support-thread-list">
                   {threads.length === 0 ? (
-                    <div className="support-empty"><span>✉</span><h3>No support conversations yet.</h3><p>Use New message whenever you need help from the Project PenPal team.</p></div>
+                    <div className="support-empty"><span>✉</span><h3>No support conversations yet.</h3><p>Use New message whenever you need help from the OutKin team.</p></div>
                   ) : threads.map((thread) => {
                     const unread = unreadByThread.get(thread.id) ?? 0
                     return (
@@ -489,7 +489,7 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
             {view === 'new' && (
               <form className="support-form help-support-view" onSubmit={createThread}>
                 <button className="back" type="button" onClick={() => setView('conversations')}>← Support conversations</button>
-                <div className="help-support-title"><span>Private support</span><h3>Contact Project PenPal</h3><p>If this is a safety issue involving another member, you can also use that member’s Safety controls to create a moderation report.</p></div>
+                <div className="help-support-title"><span>Private support</span><h3>Contact OutKin</h3><p>If this is a safety issue involving another member, you can also use that member’s Safety controls to create a moderation report.</p></div>
                 <label>What do you need help with?
                   <select value={category} onChange={(event) => setCategory(event.target.value)}>
                     {Object.entries(categoryLabels)
@@ -501,7 +501,7 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
                   <input maxLength={120} minLength={3} required value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Briefly describe what you need help with" />
                 </label>
                 <label>Message <span className="optional">{body.length}/6000</span>
-                  <textarea rows={10} maxLength={6000} required value={body} onChange={(event) => setBody(event.target.value)} placeholder="Tell the Project PenPal team what happened or what you need help with." />
+                  <textarea rows={10} maxLength={6000} required value={body} onChange={(event) => setBody(event.target.value)} placeholder="Tell the OutKin team what happened or what you need help with." />
                 </label>
                 <div className="support-actions"><button className="primary" disabled={working}>{working ? 'Sending…' : 'Send to support'}</button><button className="secondary" type="button" onClick={() => setView('conversations')} disabled={working}>Cancel</button></div>
               </form>
@@ -517,7 +517,7 @@ export default function HelpCenter({ userId, initialContext = 'dashboard' }: Pro
                   <div className="support-message-list">
                     {messages.map((item) => (
                       <article className={`support-message ${item.sender_role}`} key={item.id}>
-                        <div><strong>{item.sender_role === 'member' ? 'You' : 'Project PenPal moderator'}</strong><time>{formatDate(item.created_at)}</time></div>
+                        <div><strong>{item.sender_role === 'member' ? 'You' : 'OutKin moderator'}</strong><time>{formatDate(item.created_at)}</time></div>
                         <p>{item.body}</p>
                       </article>
                     ))}
