@@ -54,7 +54,7 @@ export default function SignupLegalConsent() {
         onChange={(event) => update(event.target.checked)}
       />
       <div>
-        <label htmlFor="project-penpal-legal-consent">I agree to the Project PenPal Terms of Service and Community Guidelines and acknowledge the Privacy Policy.</label>
+        <label htmlFor="project-penpal-legal-consent">I agree to the OutKin Terms of Service and Community Guidelines and acknowledge the Privacy Policy.</label>
         <p>
           <button type="button" onClick={() => openLegalCenter('terms')}>Terms</button>
           {' · '}
