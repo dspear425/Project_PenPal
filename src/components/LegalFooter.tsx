@@ -21,8 +21,8 @@ export default function LegalFooter() {
   if (session) return null
 
   return (
-    <footer className="public-legal-footer" aria-label="Project PenPal policies">
-      <span>Project PenPal · 18+</span>
+    <footer className="public-legal-footer" aria-label="OutKin policies">
+      <span>OutKin · 18+</span>
       <button type="button" onClick={() => openLegalCenter('terms')}>Terms</button>
       <button type="button" onClick={() => openLegalCenter('privacy')}>Privacy</button>
       <button type="button" onClick={() => openLegalCenter('community')}>Community Guidelines</button>
