@@ -10,7 +10,6 @@ import './lib/chosenFamilyHelpExtension'
 import './lib/outkinHelpRebrand'
 import './pwa'
 import App from './AppRoot'
-import OutKinBrandBridge from './components/OutKinBrandBridge'
 import MobileActionMenu from './components/MobileActionMenu'
 import ConnectivityBanner from './components/ConnectivityBanner'
 import LegalCenter from './components/LegalCenter'
@@ -38,7 +37,6 @@ import './outkin-theme.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-    <OutKinBrandBridge />
     <LegalAcceptanceGate />
     <LegalCenter />
     <LegalFooter />
