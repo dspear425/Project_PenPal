@@ -23,7 +23,7 @@ export default function ForgotPassword() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin })
       if (error) throw error
-      setMessage('If that address belongs to a Project PenPal account, a password reset email has been sent.')
+      setMessage('If that address belongs to an OutKin account, a password reset email has been sent.')
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
@@ -38,7 +38,7 @@ export default function ForgotPassword() {
         <div className="settings-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !working) setOpen(false) }}>
           <section className="forgot-password-panel" role="dialog" aria-modal="true" aria-labelledby="forgot-title">
             <header className="settings-header">
-              <div><p className="eyebrow">Account recovery</p><h2 id="forgot-title">Reset your password.</h2><p>Enter the email address you used for Project PenPal and we’ll send a recovery link.</p></div>
+              <div><p className="eyebrow">Account recovery</p><h2 id="forgot-title">Reset your password.</h2><p>Enter the email address you used for OutKin and we’ll send a recovery link.</p></div>
               <button className="settings-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
             </header>
             {message && <p className="status-message settings-status">{message}</p>}
