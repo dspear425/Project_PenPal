@@ -37,7 +37,7 @@ export default function PasswordRecovery({ onComplete, onSignOut }: Props) {
     try {
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
-      setMessage('Password updated. You can continue to Project PenPal.')
+      setMessage('Password updated. You can continue to OutKin.')
       window.setTimeout(onComplete, 500)
     } catch (error) {
       setMessage(errorMessage(error))
@@ -50,12 +50,12 @@ export default function PasswordRecovery({ onComplete, onSignOut }: Props) {
     <main className="page-shell">
       <section className="hero-card dashboard-card recovery-card">
         <div className="dashboard-topline">
-          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">Project PenPal</span></div>
+          <div className="brand-row compact-brand"><div className="stamp" aria-hidden="true">✉</div><span className="brand-name">OutKin</span></div>
           <button className="secondary" type="button" onClick={onSignOut}>Cancel</button>
         </div>
         <p className="eyebrow">Account security</p>
         <h1 className="dashboard-title">Choose a new password.</h1>
-        <p className="hero-copy">Enter a new password for your Project PenPal account.</p>
+        <p className="hero-copy">Enter a new password for your OutKin account.</p>
         {message && <p className="status-message">{message}</p>}
         <form className="auth-form recovery-form" onSubmit={submit}>
           <label>New password<input type="password" minLength={8} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
