@@ -275,7 +275,7 @@ export default function AdminQuickTools({ userId }: Props) {
     }
 
     const targetName = selectedUser.display_name || 'this member'
-    if (action === 'ban' && !window.confirm(`Permanently ban ${targetName}? Normal Project PenPal access will remain unavailable until an administrator restores the account.`)) {
+    if (action === 'ban' && !window.confirm(`Permanently ban ${targetName}? Normal OutKin access will remain unavailable until an administrator restores the account.`)) {
       return
     }
 
@@ -555,7 +555,7 @@ export default function AdminQuickTools({ userId }: Props) {
                               <strong>Start a moderator conversation</strong>
                               <span>The member will receive this in Help and can reply directly.</span>
                             </div>
-                            <label>Subject<input maxLength={120} value={outreachSubject} onChange={(event) => setOutreachSubject(event.target.value)} placeholder="A message from Project PenPal moderation" /></label>
+                            <label>Subject<input maxLength={120} value={outreachSubject} onChange={(event) => setOutreachSubject(event.target.value)} placeholder="A message from OutKin moderation" /></label>
                             <label>Message<textarea rows={5} maxLength={6000} value={outreachMessage} onChange={(event) => setOutreachMessage(event.target.value)} placeholder="Write your message to the member…" /></label>
                             <div className="admin-case-actions"><button className="primary" disabled={working || outreachSubject.trim().length < 3 || !outreachMessage.trim()}>{working ? 'Sending…' : 'Send message'}</button><button className="secondary" type="button" onClick={() => setOutreachOpen(false)}>Cancel</button></div>
                           </form>
@@ -719,7 +719,7 @@ export default function AdminQuickTools({ userId }: Props) {
                         {caseTab === 'support' && (
                           <div className="admin-case-tab-content">
                             <div className="admin-case-section-heading">
-                              <div><h4>Support conversations</h4><p>Messages between this member and Project PenPal moderators.</p></div>
+                              <div><h4>Support conversations</h4><p>Messages between this member and OutKin moderators.</p></div>
                               <button className="primary" type="button" onClick={() => setOutreachOpen(true)}>Message member</button>
                             </div>
                             {userContext.support_threads.length === 0 ? (
