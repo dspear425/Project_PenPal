@@ -271,12 +271,12 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
       anchor.href = url
-      anchor.download = `project-penpal-data-${new Date().toISOString().slice(0, 10)}.json`
+      anchor.download = `outkin-data-${new Date().toISOString().slice(0, 10)}.json`
       document.body.appendChild(anchor)
       anchor.click()
       anchor.remove()
       URL.revokeObjectURL(url)
-      setMessage('Your Project PenPal data export has been created.')
+      setMessage('Your OutKin data export has been created.')
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
@@ -289,7 +289,7 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
       setMessage('Type DELETE MY ACCOUNT exactly before deleting your account.')
       return
     }
-    if (!window.confirm('Permanently delete this Project PenPal account and its associated member data? This cannot be undone.')) return
+    if (!window.confirm('Permanently delete this OutKin account and its associated member data? This cannot be undone.')) return
 
     setWorking(true)
     setMessage('')
@@ -343,9 +343,9 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
                   <form className="settings-section-stack" onSubmit={savePrivacy}>
                     <section className="settings-card">
                       <div className="settings-card-heading"><div><h3>Account identity</h3><p>Your display name stays friendly; these details help distinguish accounts safely.</p></div></div>
-                      <div className="settings-code-card"><div><span>Member code</span><strong>{identity?.member_code || '—'}</strong><small>Share this with Project PenPal support when they need to locate your account.</small></div><button className="secondary" type="button" onClick={() => void copyMemberCode()}>Copy code</button></div>
+                      <div className="settings-code-card"><div><span>Member code</span><strong>{identity?.member_code || '—'}</strong><small>Share this with OutKin support when they need to locate your account.</small></div><button className="secondary" type="button" onClick={() => void copyMemberCode()}>Copy code</button></div>
                       <div className="settings-grid">
-                        <label>Unique username<div className="settings-username"><span>@</span><input value={username} onChange={(event) => setUsername(event.target.value.toLowerCase().replace(/\s+/g, ''))} minLength={3} maxLength={30} required /></div><small>Visible to other members and unique across Project PenPal.</small></label>
+                        <label>Unique username<div className="settings-username"><span>@</span><input value={username} onChange={(event) => setUsername(event.target.value.toLowerCase().replace(/\s+/g, ''))} minLength={3} maxLength={30} required /></div><small>Visible to other members and unique across OutKin.</small></label>
                         <label>Last name <span className="optional">optional · private</span><input value={lastName} onChange={(event) => setLastName(event.target.value)} maxLength={80} /><small>Only you and authorized moderators can see this.</small></label>
                         <label>Nearest city / metro <span className="optional">optional</span><input value={nearestCity} onChange={(event) => setNearestCity(event.target.value)} maxLength={80} placeholder="Birmingham" /><small>Use a broad nearby city, never a street address.</small></label>
                         <label>Country<input value={profile.country ?? ''} readOnly /><small>Change this from Edit profile.</small></label>
@@ -400,8 +400,8 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
                       <label className="settings-toggle"><input type="checkbox" checked={preferences.email_penpal_requests} onChange={(event) => setPreferences({ ...preferences, email_penpal_requests: event.target.checked })} /><span><strong>New pen-pal requests</strong><small>Email me when someone asks to connect.</small></span></label>
                       <label className="settings-toggle"><input type="checkbox" checked={preferences.email_request_accepted} onChange={(event) => setPreferences({ ...preferences, email_request_accepted: event.target.checked })} /><span><strong>Request accepted</strong><small>Email me when a member accepts my request.</small></span></label>
                       <label className="settings-toggle"><input type="checkbox" checked={preferences.email_new_letters} onChange={(event) => setPreferences({ ...preferences, email_new_letters: event.target.checked })} /><span><strong>New letters</strong><small>Email me when a pen pal sends a new letter.</small></span></label>
-                      <label className="settings-toggle"><input type="checkbox" checked={preferences.email_support_replies} onChange={(event) => setPreferences({ ...preferences, email_support_replies: event.target.checked })} /><span><strong>Support replies</strong><small>Email me when Project PenPal moderation replies to Help.</small></span></label>
-                      <label className="settings-toggle"><input type="checkbox" checked={preferences.product_updates} onChange={(event) => setPreferences({ ...preferences, product_updates: event.target.checked })} /><span><strong>Product updates</strong><small>Occasional non-essential Project PenPal announcements.</small></span></label>
+                      <label className="settings-toggle"><input type="checkbox" checked={preferences.email_support_replies} onChange={(event) => setPreferences({ ...preferences, email_support_replies: event.target.checked })} /><span><strong>Support replies</strong><small>Email me when OutKin moderation replies to Help.</small></span></label>
+                      <label className="settings-toggle"><input type="checkbox" checked={preferences.product_updates} onChange={(event) => setPreferences({ ...preferences, product_updates: event.target.checked })} /><span><strong>Product updates</strong><small>Occasional non-essential OutKin announcements.</small></span></label>
                       <div className="settings-essential-note"><strong>Account & moderation notices</strong><span>Essential account actions remain available in-app and are not disabled by marketing notification preferences.</span></div>
                       <button className="primary" type="button" disabled={working} onClick={() => void saveNotifications()}>{working ? 'Saving…' : 'Save notification preferences'}</button>
                     </section>
@@ -412,7 +412,7 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
                   <div className="settings-section-stack">
                     <section className="settings-card">
                       <h3>Download your data</h3>
-                      <p>Create a JSON copy of your Project PenPal account information, profile, letters, relationships, support conversations, reports you submitted, blocks you created, and account notices.</p>
+                      <p>Create a JSON copy of your OutKin account information, profile, letters, relationships, support conversations, reports you submitted, blocks you created, and account notices.</p>
                       <p className="settings-muted">The export intentionally does not reveal who may have blocked or reported you.</p>
                       <button className="primary" type="button" disabled={working} onClick={() => void exportData()}>{working ? 'Preparing…' : 'Download my data'}</button>
                     </section>
@@ -420,7 +420,7 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
                     <section className="settings-card settings-danger-card">
                       <h3>Delete account</h3>
                       {isModerator ? (
-                        <div className="settings-protected-note"><strong>Protected moderation account</strong><span>Moderator and administrator accounts cannot delete themselves. Transfer or remove the moderation role first so Project PenPal cannot lose its administration path or audit integrity.</span></div>
+                        <div className="settings-protected-note"><strong>Protected moderation account</strong><span>Moderator and administrator accounts cannot delete themselves. Transfer or remove the moderation role first so OutKin cannot lose its administration path or audit integrity.</span></div>
                       ) : (
                         <>
                           <p>Permanently deletes your login and associated member data. This cannot be undone.</p>
