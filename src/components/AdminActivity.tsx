@@ -163,7 +163,7 @@ export default function AdminActivity() {
                 {loading && rows.length === 0 ? (
                   <p className="connection-empty">Loading member activity…</p>
                 ) : visibleRows.length === 0 ? (
-                  <div className="admin-tool-empty"><span>✓</span><h3>{showAll ? 'No recent activity.' : 'No activity needs review.'}</h3><p>{showAll ? 'Activity will appear here as members use Project PenPal.' : 'No recent member behavior crossed the review-signal thresholds.'}</p></div>
+                  <div className="admin-tool-empty"><span>✓</span><h3>{showAll ? 'No recent activity.' : 'No activity needs review.'}</h3><p>{showAll ? 'Activity will appear here as members use OutKin.' : 'No recent member behavior crossed the review-signal thresholds.'}</p></div>
                 ) : visibleRows.map((row) => (
                   <button className={`admin-activity-member ${selected?.user_id === row.user_id ? 'selected' : ''}`} key={row.user_id} onClick={() => setSelected(row)}>
                     <div>
