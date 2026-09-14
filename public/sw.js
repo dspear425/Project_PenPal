@@ -1,5 +1,6 @@
-const CACHE_PREFIX = 'project-penpal-shell-'
-const CACHE_VERSION = 'v16'
+const CACHE_PREFIX = 'outkin-shell-'
+const LEGACY_CACHE_PREFIX = 'project-penpal-shell-'
+const CACHE_VERSION = 'v17'
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`
 const APP_SHELL = [
   '/',
@@ -25,7 +26,10 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then((keys) => Promise.all(
         keys
-          .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .filter((key) => (
+            (key.startsWith(CACHE_PREFIX) || key.startsWith(LEGACY_CACHE_PREFIX))
+            && key !== CACHE_NAME
+          ))
           .map((key) => caches.delete(key)),
       ))
       .then(() => self.clients.claim()),
@@ -42,8 +46,8 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url)
 
-  // Never cache Supabase or any other third-party/API traffic. Project PenPal's
-  // offline cache is intentionally limited to the public application shell.
+  // Never cache Supabase or any other third-party/API traffic. OutKin's offline
+  // cache is intentionally limited to the public application shell.
   if (url.origin !== self.location.origin) return
 
   if (request.mode === 'navigate') {
