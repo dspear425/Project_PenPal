@@ -154,7 +154,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
 
   async function removePhoto() {
     if (!avatarPath) return
-    if (!window.confirm('Remove your current Project PenPal profile photo?')) return
+    if (!window.confirm('Remove your current OutKin profile photo?')) return
 
     setWorking(true)
     setMessage('')
@@ -186,7 +186,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
               <div>
                 <p className="eyebrow">Profile identity</p>
                 <h2 id="profile-photo-title">Profile photo.</h2>
-                <p>Add one optional photo to make correspondence feel more personal without turning Project PenPal into a photo-first matching app.</p>
+                <p>Add one optional photo to make correspondence feel more personal without turning OutKin into a photo-first matching app.</p>
               </div>
               <button className="settings-close" type="button" onClick={closePanel} disabled={working}>×</button>
             </header>
@@ -243,7 +243,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
 
                   <div className="profile-photo-safety-note">
                     <strong>Photo ≠ identity verification</strong>
-                    <p>A profile photo does not mean Project PenPal has verified who someone is. Photos must remain appropriate for a general 18+ friendship community; existing Safety tools can be used to report concerns.</p>
+                    <p>A profile photo does not mean OutKin has verified who someone is. Photos must remain appropriate for a general 18+ friendship community; existing Safety tools can be used to report concerns.</p>
                   </div>
                 </section>
               </div>
