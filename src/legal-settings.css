@@ -1,8 +1,8 @@
 .settings-legal-card {
   margin-top: 18px;
-  border-color: #d7c5b7;
+  border-color: var(--outkin-coral);
   background: var(--outkin-paper);
 }
 
 .settings-legal-card h3 { margin-bottom: 6px; }
-.settings-legal-card p { margin: 0; color: #74685f; line-height: 1.55; }
+.settings-legal-card p { margin: 0; color: var(--outkin-muted); line-height: 1.55; }

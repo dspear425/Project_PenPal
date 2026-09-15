@@ -9,8 +9,8 @@
   border: 1px solid var(--outkin-plum);
   border-radius: 999px;
   padding: 10px 15px;
-  background: var(--outkin-ink-strong);
-  color: #fff;
+  background: var(--outkin-plum);
+  color: var(--outkin-on-accent);
   font-weight: 850;
   letter-spacing: .03em;
   box-shadow: 0 10px 28px rgba(46, 36, 29, .24);
@@ -22,7 +22,7 @@
 }
 
 .admin-launcher.has-admin-message {
-  border-color: #b56b50;
+  border-color: var(--outkin-coral);
   box-shadow: 0 0 0 3px rgba(181, 107, 80, .14), 0 10px 28px rgba(46, 36, 29, .24);
 }
 
@@ -33,15 +33,15 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #c85f42;
-  color: #fff;
+  background: var(--outkin-coral);
+  color: var(--outkin-on-accent);
   font-size: .72rem;
   font-weight: 950;
   line-height: 1;
 }
 
 .account-restricted-card {
-  border: 1px solid #d4b6aa;
+  border: 1px solid var(--outkin-coral);
 }
 
 @media (max-width: 640px) {

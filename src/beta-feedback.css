@@ -40,7 +40,7 @@
 
 .beta-feedback-panel header p:last-child {
   margin:0;
-  color:#756b62;
+  color:var(--outkin-muted);
   line-height:1.5;
 }
 
@@ -55,7 +55,7 @@
 .beta-feedback-form label {
   display:grid;
   gap:7px;
-  color:#493f37;
+  color:var(--outkin-muted);
   font-weight:800;
 }
 
@@ -63,7 +63,7 @@
 .beta-feedback-form select,
 .beta-feedback-form textarea {
   width:100%;
-  border:1px solid #cfc4b8;
+  border:1px solid var(--outkin-line);
   border-radius:13px;
   padding:12px 14px;
   background: var(--outkin-paper-bright);
@@ -75,7 +75,7 @@
 .beta-feedback-form textarea { resize:vertical;line-height:1.5; }
 .beta-feedback-form input:focus,
 .beta-feedback-form select:focus,
-.beta-feedback-form textarea:focus { border-color:var(--outkin-berry);box-shadow:0 0 0 3px rgba(122,46,85,.1); }
+.beta-feedback-form textarea:focus { border-color:var(--outkin-berry);box-shadow:0 0 0 3px rgba(229,154,193,.1); }
 .beta-feedback-actions { display:flex;gap:9px;flex-wrap:wrap; }
 
 @media(max-width:800px){

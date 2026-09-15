@@ -30,11 +30,11 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  border: 1px solid #c88d72;
+  border: 1px solid var(--outkin-coral);
   border-radius: 16px;
   padding: 12px 14px;
-  background: #fff8f1;
-  color: #57463d;
+  background: var(--outkin-coral-soft);
+  color: var(--outkin-muted);
   box-shadow: 0 12px 34px rgba(55, 42, 33, .18);
 }
 .connectivity-banner > span {
@@ -44,13 +44,13 @@ body {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #f1ddd2;
+  background: var(--outkin-coral-soft);
   color: var(--outkin-berry);
   font-weight: 950;
 }
 .connectivity-banner > div { display: grid; gap: 2px; }
 .connectivity-banner strong { font-size: .92rem; }
-.connectivity-banner div > span { color: #75665e; font-size: .8rem; line-height: 1.4; }
+.connectivity-banner div > span { color: var(--outkin-muted); font-size: .8rem; line-height: 1.4; }
 
 /* Mobile quick-action menu ------------------------------------------------- */
 .mobile-action-menu,
@@ -81,7 +81,7 @@ body {
     border: 1px solid var(--outkin-plum);
     border-radius: 999px;
     padding: 10px 17px;
-    background: var(--outkin-ink-strong);
+    background: var(--outkin-plum);
     color: white;
     box-shadow: 0 12px 32px rgba(46,36,29,.28);
     font: inherit;
@@ -97,7 +97,7 @@ body {
     height: 11px;
     border: 2px solid var(--outkin-ink-strong);
     border-radius: 50%;
-    background: #d86c4b;
+    background: var(--outkin-coral-soft);
   }
 
   .mobile-menu-backdrop {
@@ -120,7 +120,7 @@ body {
     gap: 7px;
     max-height: min(70dvh, 620px);
     overflow: auto;
-    border: 1px solid #d6c8bb;
+    border: 1px solid var(--outkin-line);
     border-radius: 22px;
     padding: 12px;
     background: var(--outkin-paper-bright);
@@ -132,7 +132,7 @@ body {
     align-items: center;
     gap: 16px;
     padding: 5px 5px 10px;
-    border-bottom: 1px solid #eadfd5;
+    border-bottom: 1px solid var(--outkin-coral);
   }
   .mobile-menu-heading > div { display: grid; gap: 2px; }
   .mobile-menu-heading span { color: var(--outkin-berry); font-size: .7rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
@@ -140,10 +140,10 @@ body {
   .mobile-menu-heading > button {
     width: 40px;
     height: 40px;
-    border: 1px solid #d8ccc0;
+    border: 1px solid var(--outkin-line);
     border-radius: 50%;
     background: var(--outkin-paper-bright);
-    color: #5c5148;
+    color: var(--outkin-muted);
     font-size: 1.3rem;
   }
   .mobile-menu-sheet > button[role='menuitem'] {
@@ -153,11 +153,11 @@ body {
     grid-template-columns: 42px 1fr;
     align-items: center;
     gap: 12px;
-    border: 1px solid #e1d6cb;
+    border: 1px solid var(--outkin-coral);
     border-radius: 15px;
     padding: 10px 12px;
     background: var(--outkin-paper);
-    color: #413831;
+    color: var(--outkin-ink);
     text-align: left;
   }
   .mobile-menu-sheet > button[role='menuitem'] > span {
@@ -166,20 +166,20 @@ body {
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: #f2e9df;
-    color: #7c4a3b;
+    background: var(--outkin-coral-soft);
+    color: var(--outkin-coral);
     font-size: 1.05rem;
     font-weight: 900;
   }
   .mobile-menu-sheet > button[role='menuitem'] > div { display: grid; gap: 2px; min-width: 0; }
   .mobile-menu-sheet > button[role='menuitem'] strong { font-size: .92rem; }
-  .mobile-menu-sheet > button[role='menuitem'] small { color: #7b7168; line-height: 1.35; }
+  .mobile-menu-sheet > button[role='menuitem'] small { color: var(--outkin-muted); line-height: 1.35; }
   .mobile-menu-sheet em {
     display: inline-flex;
     margin-left: 5px;
     border-radius: 999px;
     padding: 2px 6px;
-    background: #a5513c;
+    background: var(--outkin-coral);
     color: white;
     font-size: .62rem;
     font-style: normal;
@@ -207,9 +207,9 @@ body {
     box-shadow: 0 28px 80px rgba(38,29,22,.3);
   }
   .mobile-install-card h2 { margin: 3px 0 12px; font-family: Georgia,'Times New Roman',serif; font-size: 2rem; }
-  .mobile-install-card > p:not(.eyebrow) { color: #665b52; line-height: 1.65; }
+  .mobile-install-card > p:not(.eyebrow) { color: var(--outkin-muted); line-height: 1.65; }
   .mobile-install-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 16px; border: 1px dashed var(--outkin-coral); border-radius: 13px; color: var(--outkin-berry); font-size: 1.4rem; }
-  .mobile-install-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 1px solid #d8ccc0; border-radius: 50%; background: var(--outkin-paper-bright); color: #62564e; font-size: 1.3rem; }
+  .mobile-install-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 1px solid var(--outkin-line); border-radius: 50%; background: var(--outkin-paper-bright); color: var(--outkin-muted); font-size: 1.3rem; }
 
   /* Global touch and viewport normalization. */
   .page-shell {
@@ -336,8 +336,8 @@ body {
     z-index: 8;
     margin-inline: -8px;
     padding: 10px 8px;
-    border-top: 1px solid #e3d8cc;
-    background: rgba(255,253,249,.96);
+    border-top: 1px solid var(--outkin-coral);
+    background: rgba(46,32,48,.96);
     backdrop-filter: blur(8px);
   }
   .letter-compose-footer .primary { width: 100%; }
@@ -377,9 +377,9 @@ body {
     gap: 7px;
     overflow-x: auto;
     padding: 8px;
-    border: 1px solid rgba(207,194,179,.9);
+    border: 1px solid rgba(91,70,89,.94);
     border-radius: 18px;
-    background: rgba(255,253,249,.94);
+    background: rgba(46,32,48,.94);
     box-shadow: 0 10px 28px rgba(46,36,29,.18);
     backdrop-filter: blur(10px);
     scrollbar-width: none;
@@ -490,6 +490,6 @@ body {
 
 /* Installed standalone window: use the full safe area cleanly. */
 @media (display-mode: standalone) {
-  body { background: #efe8dc; }
+  body { background: var(--outkin-cream); }
   .page-shell { padding-top: max(16px, calc(var(--pp-safe-top) + 6px)); }
 }

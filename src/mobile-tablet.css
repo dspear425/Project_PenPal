@@ -26,7 +26,7 @@
     border: 1px solid var(--outkin-plum);
     border-radius: 999px;
     padding: 10px 18px;
-    background: var(--outkin-ink-strong);
+    background: var(--outkin-plum);
     color: white;
     box-shadow: 0 12px 32px rgba(46,36,29,.28);
     font: inherit;
@@ -49,7 +49,7 @@
     height: 11px;
     border: 2px solid var(--outkin-ink-strong);
     border-radius: 50%;
-    background: #d86c4b;
+    background: var(--outkin-coral-soft);
   }
 
   .mobile-menu-backdrop {
@@ -73,7 +73,7 @@
     gap: 7px;
     max-height: min(72dvh, 650px);
     overflow: auto;
-    border: 1px solid #d6c8bb;
+    border: 1px solid var(--outkin-line);
     border-radius: 22px;
     padding: 12px;
     background: var(--outkin-paper-bright);
@@ -90,7 +90,7 @@
     align-items: center;
     gap: 16px;
     padding: 5px 5px 10px;
-    border-bottom: 1px solid #eadfd5;
+    border-bottom: 1px solid var(--outkin-coral);
   }
   .mobile-menu-heading > div { display: grid; gap: 2px; }
   .mobile-menu-heading span { color: var(--outkin-berry); font-size: .7rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
@@ -98,10 +98,10 @@
   .mobile-menu-heading > button {
     width: 40px;
     height: 40px;
-    border: 1px solid #d8ccc0;
+    border: 1px solid var(--outkin-line);
     border-radius: 50%;
     background: var(--outkin-paper-bright);
-    color: #5c5148;
+    color: var(--outkin-muted);
     font-size: 1.3rem;
   }
 
@@ -112,11 +112,11 @@
     grid-template-columns: 42px 1fr;
     align-items: center;
     gap: 12px;
-    border: 1px solid #e1d6cb;
+    border: 1px solid var(--outkin-coral);
     border-radius: 15px;
     padding: 10px 12px;
     background: var(--outkin-paper);
-    color: #413831;
+    color: var(--outkin-ink);
     text-align: left;
   }
   .mobile-menu-sheet > button[role='menuitem'] > span {
@@ -125,20 +125,20 @@
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: #f2e9df;
-    color: #7c4a3b;
+    background: var(--outkin-coral-soft);
+    color: var(--outkin-coral);
     font-size: 1.05rem;
     font-weight: 900;
   }
   .mobile-menu-sheet > button[role='menuitem'] > div { display: grid; gap: 2px; min-width: 0; }
   .mobile-menu-sheet > button[role='menuitem'] strong { font-size: .92rem; }
-  .mobile-menu-sheet > button[role='menuitem'] small { color: #7b7168; line-height: 1.35; }
+  .mobile-menu-sheet > button[role='menuitem'] small { color: var(--outkin-muted); line-height: 1.35; }
   .mobile-menu-sheet em {
     display: inline-flex;
     margin-left: 5px;
     border-radius: 999px;
     padding: 2px 6px;
-    background: #a5513c;
+    background: var(--outkin-coral);
     color: white;
     font-size: .62rem;
     font-style: normal;
@@ -165,9 +165,9 @@
     box-shadow: 0 28px 80px rgba(38,29,22,.3);
   }
   .mobile-install-card h2 { margin: 3px 0 12px; font-family: Georgia,'Times New Roman',serif; font-size: 2rem; }
-  .mobile-install-card > p:not(.eyebrow) { color: #665b52; line-height: 1.65; }
+  .mobile-install-card > p:not(.eyebrow) { color: var(--outkin-muted); line-height: 1.65; }
   .mobile-install-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 16px; border: 1px dashed var(--outkin-coral); border-radius: 13px; color: var(--outkin-berry); font-size: 1.4rem; }
-  .mobile-install-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 1px solid #d8ccc0; border-radius: 50%; background: var(--outkin-paper-bright); color: #62564e; font-size: 1.3rem; }
+  .mobile-install-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 1px solid var(--outkin-line); border-radius: 50%; background: var(--outkin-paper-bright); color: var(--outkin-muted); font-size: 1.3rem; }
 
   .page-shell { padding-bottom: calc(82px + var(--pp-safe-bottom)); }
 }

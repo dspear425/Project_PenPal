@@ -8,11 +8,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #d2c4b6;
+  border: 1px solid var(--outkin-line);
   border-radius: 999px;
   padding: 10px 14px;
   background: var(--outkin-paper-bright);
-  color: #4a4038;
+  color: var(--outkin-muted);
   box-shadow: 0 10px 28px rgba(69, 52, 39, .14);
   font: inherit;
   font-weight: 800;
@@ -25,7 +25,7 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #eee7df;
+  background: var(--outkin-coral-soft);
   color: var(--outkin-berry-dark);
   font-weight: 950;
 }
@@ -67,7 +67,7 @@
 
 .identity-header p:last-child {
   margin: 0;
-  color: #756b62;
+  color: var(--outkin-muted);
   line-height: 1.55;
 }
 
@@ -75,10 +75,10 @@
   flex: 0 0 auto;
   width: 38px;
   height: 38px;
-  border: 1px solid #d4c8bc;
+  border: 1px solid var(--outkin-line);
   border-radius: 999px;
   background: var(--outkin-paper-bright);
-  color: #5a5048;
+  color: var(--outkin-muted);
   font-size: 1.35rem;
   cursor: pointer;
 }
@@ -86,10 +86,10 @@
 .identity-required-note,
 .member-code-card {
   margin-top: 20px;
-  border: 1px solid #dfd1c3;
+  border: 1px solid var(--outkin-coral);
   border-radius: 16px;
   padding: 16px;
-  background: #fbf5ee;
+  background: var(--outkin-coral-soft);
 }
 
 .identity-required-note {
@@ -97,8 +97,8 @@
   gap: 4px;
 }
 
-.identity-required-note strong { color: #824936; }
-.identity-required-note span { color: #6f655d; line-height: 1.5; }
+.identity-required-note strong { color: var(--outkin-coral); }
+.identity-required-note span { color: var(--outkin-muted); line-height: 1.5; }
 
 .member-code-card {
   display: flex;
@@ -113,7 +113,7 @@
 }
 
 .member-code-card span {
-  color: #746960;
+  color: var(--outkin-muted);
   font-size: .78rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -124,10 +124,10 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 1.2rem;
   letter-spacing: .06em;
-  color: #4a382f;
+  color: var(--outkin-ink);
 }
 
-.member-code-card small { color: #7c7168; line-height: 1.45; }
+.member-code-card small { color: var(--outkin-muted); line-height: 1.45; }
 .identity-status { margin-top: 18px; }
 
 .identity-form {
@@ -139,12 +139,12 @@
 .identity-form label {
   display: grid;
   gap: 8px;
-  color: #443d36;
+  color: var(--outkin-ink);
   font-weight: 780;
 }
 
 .identity-form label > small {
-  color: #7b7168;
+  color: var(--outkin-muted);
   font-size: .8rem;
   font-weight: 500;
   line-height: 1.45;
@@ -152,7 +152,7 @@
 
 .identity-form input {
   width: 100%;
-  border: 1px solid #cfc4b8;
+  border: 1px solid var(--outkin-line);
   border-radius: 12px;
   padding: 12px 14px;
   background: var(--outkin-paper-bright);
@@ -167,7 +167,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  border: 1px solid #cfc4b8;
+  border: 1px solid var(--outkin-line);
   border-radius: 12px;
   background: var(--outkin-paper-bright);
   overflow: hidden;

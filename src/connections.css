@@ -25,7 +25,7 @@
 }
 
 .connection-section {
-  border-top: 1px solid #ddd2c6;
+  border-top: 1px solid var(--outkin-line);
   padding-top: 28px;
 }
 
@@ -49,7 +49,7 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #f3e9df;
+  background: var(--outkin-coral-soft);
   color: var(--outkin-berry-dark);
   font-size: .83rem;
   font-weight: 800;
@@ -57,7 +57,7 @@
 
 .connection-empty {
   margin: 0;
-  color: #7d736a;
+  color: var(--outkin-muted);
   line-height: 1.6;
 }
 
@@ -66,7 +66,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 24px;
-  border: 1px solid #ddd1c4;
+  border: 1px solid var(--outkin-coral);
   border-radius: 20px;
   padding: 22px;
   background: var(--outkin-paper-bright);
@@ -82,7 +82,7 @@
 .request-intro,
 .request-state {
   margin: 10px 0 0;
-  color: #6d645b;
+  color: var(--outkin-muted);
   line-height: 1.6;
   max-width: 680px;
 }
@@ -106,8 +106,8 @@
 
 .has-unread-letter,
 .connection-has-unread {
-  border-color: #b8755e;
-  box-shadow: 0 0 0 2px rgba(122,46,85, .08);
+  border-color: var(--outkin-coral);
+  box-shadow: 0 0 0 2px rgba(229,154,193, .08);
 }
 
 .connection-letter-badge {
@@ -117,7 +117,7 @@
   border-radius: 999px;
   padding: 6px 10px;
   background: var(--outkin-berry);
-  color: #fff;
+  color: var(--outkin-on-accent);
   font-size: .79rem;
   font-weight: 850;
 }
@@ -127,11 +127,11 @@
   align-items: center;
   gap: 14px;
   margin-top: 30px;
-  border: 1px solid #d6b4a5;
+  border: 1px solid var(--outkin-coral);
   border-radius: 16px;
   padding: 16px 18px;
-  background: #fbf0e9;
-  color: #563d34;
+  background: var(--outkin-coral-soft);
+  color: var(--outkin-muted);
 }
 
 .letter-alert-icon {
@@ -156,7 +156,7 @@
 }
 
 .letter-alert span:last-child {
-  color: #75675e;
+  color: var(--outkin-muted);
   font-size: .86rem;
 }
 
@@ -201,7 +201,7 @@
 }
 
 .blocked-member-item {
-  background: #fffaf7;
+  background: var(--outkin-coral-soft);
 }
 
 .blocked-empty-state {
@@ -209,7 +209,7 @@
   align-items: center;
   gap: 16px;
   margin-top: 34px;
-  border: 1px solid #ddd1c4;
+  border: 1px solid var(--outkin-coral);
   border-radius: 18px;
   padding: 22px;
   background: var(--outkin-paper-bright);
@@ -234,7 +234,7 @@
 
 .blocked-empty-state p {
   margin: 0;
-  color: #756d65;
+  color: var(--outkin-muted);
 }
 
 @media (max-width: 720px) {

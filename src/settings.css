@@ -6,11 +6,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #d2c4b6;
+  border: 1px solid var(--outkin-line);
   border-radius: 999px;
   padding: 10px 14px;
   background: var(--outkin-paper-bright);
-  color: #4a4038;
+  color: var(--outkin-muted);
   box-shadow: 0 10px 28px rgba(69, 52, 39, .14);
   font: inherit;
   font-weight: 800;
@@ -23,8 +23,8 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #eee8df;
-  color: #6f5548;
+  background: var(--outkin-gold-soft);
+  color: var(--outkin-muted);
 }
 
 .settings-overlay {
@@ -64,17 +64,17 @@
 .settings-header p:last-child {
   margin: 0;
   max-width: 720px;
-  color: #756b62;
+  color: var(--outkin-muted);
   line-height: 1.55;
 }
 
 .settings-close {
   width: 38px;
   height: 38px;
-  border: 1px solid #d4c8bc;
+  border: 1px solid var(--outkin-line);
   border-radius: 999px;
   background: var(--outkin-paper-bright);
-  color: #5a5048;
+  color: var(--outkin-muted);
   font-size: 1.35rem;
   cursor: pointer;
 }
@@ -85,15 +85,15 @@
   flex-wrap: wrap;
   margin-top: 24px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #e4d9cf;
+  border-bottom: 1px solid var(--outkin-coral);
 }
 
 .settings-tabs button {
-  border: 1px solid #d7cbbf;
+  border: 1px solid var(--outkin-line);
   border-radius: 999px;
   padding: 9px 14px;
   background: var(--outkin-paper-bright);
-  color: #554b43;
+  color: var(--outkin-muted);
   font: inherit;
   font-weight: 800;
   cursor: pointer;
@@ -110,7 +110,7 @@
 .settings-section-stack { display: grid; gap: 18px; }
 
 .settings-card {
-  border: 1px solid #ddd2c6;
+  border: 1px solid var(--outkin-line);
   border-radius: 18px;
   padding: 20px;
   background: var(--outkin-paper);
@@ -124,21 +124,21 @@
 
 .settings-card > p {
   margin: 5px 0 16px;
-  color: #746a62;
+  color: var(--outkin-muted);
   line-height: 1.55;
 }
 
 .settings-card label {
   display: grid;
   gap: 7px;
-  color: #443d36;
+  color: var(--outkin-ink);
   font-weight: 750;
 }
 
 .settings-card input,
 .settings-card select {
   width: 100%;
-  border: 1px solid #cfc4b8;
+  border: 1px solid var(--outkin-line);
   border-radius: 12px;
   padding: 12px 14px;
   background: var(--outkin-paper-bright);
@@ -150,12 +150,12 @@
 .settings-card input:focus,
 .settings-card select:focus {
   border-color: var(--outkin-berry);
-  box-shadow: 0 0 0 3px rgba(122,46,85,.09);
+  box-shadow: 0 0 0 3px rgba(229,154,193,.09);
 }
 
 .settings-card input[readonly] {
-  background: #f5f0ea;
-  color: #756b62;
+  background: var(--outkin-coral-soft);
+  color: var(--outkin-muted);
 }
 
 .settings-grid {
@@ -167,7 +167,7 @@
 .settings-grid label small,
 .settings-card > small,
 .settings-muted {
-  color: #83786f;
+  color: var(--outkin-muted);
   font-size: .82rem;
   font-weight: 500;
   line-height: 1.45;
@@ -175,7 +175,7 @@
 
 .settings-full-row { grid-column: 1 / -1; }
 .settings-card-heading { display:flex; justify-content:space-between; gap:18px; }
-.settings-card-heading p { margin: 4px 0 15px; color:#776d65; }
+.settings-card-heading p { margin: 4px 0 15px; color:var(--outkin-muted); }
 
 .settings-code-card {
   display: flex;
@@ -183,26 +183,26 @@
   justify-content: space-between;
   gap: 18px;
   margin: 8px 0 18px;
-  border: 1px solid #ddcfbe;
+  border: 1px solid var(--outkin-coral);
   border-radius: 14px;
   padding: 15px;
   background: var(--outkin-cream);
 }
 
 .settings-code-card > div { display:grid; gap:3px; }
-.settings-code-card span { color:#746a62; font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+.settings-code-card span { color:var(--outkin-muted); font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
 .settings-code-card strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:1.1rem; }
-.settings-code-card small { color:#7b7168; }
+.settings-code-card small { color:var(--outkin-muted); }
 
 .settings-username {
   display: flex;
   align-items: center;
-  border: 1px solid #cfc4b8;
+  border: 1px solid var(--outkin-line);
   border-radius: 12px;
   background: var(--outkin-paper-bright);
   overflow: hidden;
 }
-.settings-username:focus-within { border-color:var(--outkin-berry); box-shadow:0 0 0 3px rgba(122,46,85,.09); }
+.settings-username:focus-within { border-color:var(--outkin-berry); box-shadow:0 0 0 3px rgba(229,154,193,.09); }
 .settings-username span { padding-left:13px; color:var(--outkin-berry); font-weight:900; }
 .settings-username input { border:0; box-shadow:none !important; }
 
@@ -211,12 +211,12 @@
   align-items: start;
   gap: 12px !important;
   padding: 14px 0;
-  border-top: 1px solid #ece3da;
+  border-top: 1px solid var(--outkin-coral);
 }
 .settings-toggle:first-of-type { border-top: 0; }
 .settings-toggle input { width:18px; height:18px; margin-top:2px; }
 .settings-toggle span { display:grid; gap:3px; }
-.settings-toggle small { color:#7b7168; font-weight:500; line-height:1.45; }
+.settings-toggle small { color:var(--outkin-muted); font-weight:500; line-height:1.45; }
 
 .settings-select-row {
   grid-template-columns: 1fr 130px;
@@ -230,13 +230,13 @@
   align-items:center;
   justify-content:space-between;
   gap:14px;
-  border:1px solid #e1d7cd;
+  border:1px solid var(--outkin-line);
   border-radius:13px;
   padding:13px;
   background: var(--outkin-paper-bright);
 }
 .settings-block-list article > div { display:grid; gap:3px; }
-.settings-block-list small { color:#83786f; }
+.settings-block-list small { color:var(--outkin-muted); }
 
 .settings-save-row { display:flex; justify-content:flex-end; }
 
@@ -255,11 +255,11 @@
   gap:12px;
   margin-top:16px;
   padding-top:15px;
-  border-top:1px solid #e8ded4;
-  color:#71675f;
+  border-top:1px solid var(--outkin-coral);
+  color:var(--outkin-muted);
 }
 
-.settings-info-card { background:#f7f6f1; }
+.settings-info-card { background:var(--outkin-gold-soft); }
 
 .settings-essential-note,
 .settings-protected-note {
@@ -267,7 +267,7 @@
   gap:12px;
   align-items:flex-start;
   margin:16px 0;
-  border:1px solid #ddcfbe;
+  border:1px solid var(--outkin-coral);
   border-radius:14px;
   padding:14px;
   background:var(--outkin-cream);
@@ -275,11 +275,11 @@
 .settings-essential-note strong,
 .settings-protected-note strong { flex:0 0 auto; color:var(--outkin-berry-dark); }
 .settings-essential-note span,
-.settings-protected-note span { color:#6f655d; line-height:1.5; }
+.settings-protected-note span { color:var(--outkin-muted); line-height:1.5; }
 
 .settings-danger-card {
-  border-color:#dfbbb0;
-  background:#fff8f5;
+  border-color:var(--outkin-coral);
+  background:var(--outkin-coral-soft);
 }
 .settings-danger-card > label { margin:12px 0; }
 

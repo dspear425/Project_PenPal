@@ -34,7 +34,7 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.6rem;
   line-height: 1.15;
-  color: #2f2823;
+  color: var(--outkin-ink);
 }
 
 .connection-profile-link span {
@@ -46,12 +46,12 @@
 }
 
 .connection-profile-link:hover strong {
-  color: #7a4638;
+  color: var(--outkin-coral);
 }
 
 .connection-profile-link:focus-visible,
 .connection-profile-close:focus-visible {
-  outline: 3px solid rgba(122,46,85, .22);
+  outline: 3px solid rgba(229,154,193, .22);
   outline-offset: 4px;
   border-radius: 6px;
 }
@@ -72,7 +72,7 @@
   width: min(860px, 100%);
   max-height: 90vh;
   overflow: auto;
-  border: 1px solid #ddd1c4;
+  border: 1px solid var(--outkin-coral);
   border-radius: 26px;
   padding: clamp(24px, 4vw, 38px);
   background: var(--outkin-paper-bright);
@@ -85,10 +85,10 @@
   top: 22px;
   width: 42px;
   height: 42px;
-  border: 1px solid #d9cdc1;
+  border: 1px solid var(--outkin-line);
   border-radius: 50%;
   background: var(--outkin-paper-bright);
-  color: #665b52;
+  color: var(--outkin-muted);
   font-size: 1.35rem;
   cursor: pointer;
 }
@@ -105,7 +105,7 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(2rem, 5vw, 3.4rem);
   line-height: 1;
-  color: #2e2823;
+  color: var(--outkin-ink);
 }
 
 .connection-profile-username {
@@ -117,7 +117,7 @@
 
 .connection-profile-location {
   margin: 8px 0 0;
-  color: #71675e;
+  color: var(--outkin-muted);
 }
 
 .connection-profile-photo-note {
@@ -125,8 +125,8 @@
   margin-top: 10px;
   border-radius: 999px;
   padding: 6px 10px;
-  background: #f3e9df;
-  color: #7a5142;
+  background: var(--outkin-coral-soft);
+  color: var(--outkin-coral);
   font-size: .78rem;
   font-weight: 750;
 }
@@ -138,7 +138,7 @@
 }
 
 .connection-profile-body section {
-  border-top: 1px solid #e1d7cd;
+  border-top: 1px solid var(--outkin-line);
   padding-top: 22px;
 }
 
@@ -151,7 +151,7 @@
 .connection-profile-about p,
 .connection-profile-muted {
   margin: 0;
-  color: #655c54;
+  color: var(--outkin-muted);
   line-height: 1.7;
   white-space: pre-wrap;
 }
@@ -169,11 +169,11 @@
 }
 
 .connection-profile-tags span {
-  border: 1px solid #dccfc4;
+  border: 1px solid var(--outkin-line);
   border-radius: 999px;
   padding: 8px 11px;
-  background: #fff9f4;
-  color: #66574e;
+  background: var(--outkin-coral-soft);
+  color: var(--outkin-muted);
   font-size: .86rem;
   font-weight: 700;
 }
@@ -187,14 +187,14 @@
 .connection-profile-facts article {
   display: grid;
   gap: 7px;
-  border: 1px solid #ded3c8;
+  border: 1px solid var(--outkin-line);
   border-radius: 15px;
   padding: 14px;
   background: var(--outkin-paper);
 }
 
 .connection-profile-facts span {
-  color: #81766c;
+  color: var(--outkin-muted);
   font-size: .78rem;
   font-weight: 750;
   text-transform: uppercase;
@@ -202,7 +202,7 @@
 }
 
 .connection-profile-facts strong {
-  color: #443b34;
+  color: var(--outkin-ink);
   line-height: 1.4;
 }
 
@@ -212,7 +212,7 @@
   flex-wrap: wrap;
   margin-top: 28px;
   padding-top: 20px;
-  border-top: 1px solid #e1d7cd;
+  border-top: 1px solid var(--outkin-line);
 }
 
 .connection-profile-error h2 {
@@ -222,7 +222,7 @@
 }
 
 .connection-profile-error p {
-  color: #6e645b;
+  color: var(--outkin-muted);
   line-height: 1.6;
 }
 

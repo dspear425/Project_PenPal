@@ -5,9 +5,9 @@
   align-items: center;
   gap: .55rem;
   padding: .3rem .55rem .3rem .35rem;
-  border: 1px solid rgba(87, 60, 42, .18);
+  border: 1px solid rgba(229,154,193,.2);
   border-radius: 999px;
-  background: rgba(255, 251, 244, .92);
+  background: rgba(46,32,48,.94);
   box-shadow: 0 4px 14px rgba(52, 38, 26, .08);
   color: inherit;
   cursor: pointer;
@@ -49,9 +49,9 @@
 
 .staff-photo-privacy-note {
   padding: 1.1rem;
-  border: 1px solid rgba(87, 60, 42, .16);
+  border: 1px solid rgba(105,188,178,.22);
   border-radius: 16px;
-  background: rgba(250, 244, 233, .72);
+  background: rgba(36,24,39,.82);
 }
 
 .staff-photo-privacy-note h3 {

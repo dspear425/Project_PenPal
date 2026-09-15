@@ -4,7 +4,7 @@
 .auth-form > .primary { order:3; }
 
 .beta-invite-signup > span {
-  color:#7d736a;
+  color:var(--outkin-muted);
   font-size:.82rem;
   font-weight:500;
   line-height:1.45;

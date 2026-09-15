@@ -6,8 +6,8 @@
 }
 
 .request-dashboard-button.has-notification {
-  border-color: #a9634d;
-  box-shadow: 0 0 0 3px rgba(122,46,85, .08);
+  border-color: var(--outkin-coral);
+  box-shadow: 0 0 0 3px rgba(229,154,193, .08);
 }
 
 .request-notification-badge {
@@ -18,7 +18,7 @@
   display: inline-grid;
   place-items: center;
   background: var(--outkin-berry);
-  color: #fff;
+  color: var(--outkin-on-accent);
   font-size: .74rem;
   font-weight: 800;
   line-height: 1;

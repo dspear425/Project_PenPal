@@ -15,13 +15,13 @@
 }
 
 .turnstile-message {
-  color:#8a4338;
+  color:var(--outkin-coral);
   font-weight:750;
   line-height:1.4;
 }
 
 .turnstile-privacy {
-  color:#857a71;
+  color:var(--outkin-muted);
   font-size:.74rem;
   line-height:1.35;
 }

@@ -30,7 +30,7 @@
 .letter-history,
 .previous-correspondence-section,
 .compose-letter-section {
-  border-top: 1px solid #ddd2c6;
+  border-top: 1px solid var(--outkin-line);
   padding-top: 28px;
 }
 
@@ -54,7 +54,7 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #f3e9df;
+  background: var(--outkin-coral-soft);
   color: var(--outkin-berry-dark);
   font-size: .83rem;
   font-weight: 800;
@@ -64,11 +64,11 @@
   display: flex;
   gap: 14px;
   align-items: flex-start;
-  border: 1px solid #d8c6b7;
+  border: 1px solid var(--outkin-coral);
   border-radius: 18px;
   padding: 17px 19px;
-  background: #fbf6ef;
-  color: #54483f;
+  background: var(--outkin-gold-soft);
+  color: var(--outkin-muted);
 }
 
 .reconnected-note > span {
@@ -78,7 +78,7 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #f0e2d6;
+  background: var(--outkin-coral-soft);
   color: var(--outkin-berry);
   font-size: 1.15rem;
   font-weight: 900;
@@ -91,7 +91,7 @@
 
 .reconnected-note p {
   margin: 0;
-  color: #756a60;
+  color: var(--outkin-muted);
   line-height: 1.55;
 }
 
@@ -99,7 +99,7 @@
   display: flex;
   gap: 18px;
   align-items: center;
-  border: 1px dashed #c9b7a7;
+  border: 1px dashed var(--outkin-line);
   border-radius: 20px;
   padding: 24px;
   background: var(--outkin-paper);
@@ -125,7 +125,7 @@
 
 .first-letter-note p {
   margin: 7px 0 0;
-  color: #756b62;
+  color: var(--outkin-muted);
   line-height: 1.6;
 }
 
@@ -135,10 +135,10 @@
 }
 
 .letter-paper {
-  border: 1px solid #d9cec1;
+  border: 1px solid var(--outkin-line);
   border-radius: 18px;
   padding: clamp(22px, 4vw, 34px);
-  background: #fffdf8;
+  background: var(--outkin-gold-soft);
   box-shadow: 0 10px 28px rgba(81, 65, 49, .06);
 }
 
@@ -147,7 +147,7 @@
 }
 
 .sent-letter {
-  background: #f9f4ed;
+  background: var(--outkin-gold-soft);
 }
 
 .letter-meta {
@@ -175,7 +175,7 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.08rem;
   line-height: 1.85;
-  color: #38312b;
+  color: var(--outkin-ink);
 }
 
 .letter-footer {
@@ -183,14 +183,14 @@
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 14px;
-  border-top: 1px solid #ece3d9;
-  color: #8a8178;
+  border-top: 1px solid var(--outkin-coral);
+  color: var(--outkin-muted);
   font-size: .8rem;
 }
 
 .previous-correspondence-copy {
   margin: -5px 0 20px;
-  color: #786d63;
+  color: var(--outkin-muted);
   line-height: 1.6;
 }
 
@@ -200,10 +200,10 @@
 }
 
 .previous-period {
-  border: 1px solid #d8cec2;
+  border: 1px solid var(--outkin-line);
   border-radius: 20px;
   padding: clamp(20px, 4vw, 28px);
-  background: #faf6f0;
+  background: var(--outkin-gold-soft);
 }
 
 .previous-period-heading {
@@ -224,8 +224,8 @@
   flex: 0 0 auto;
   border-radius: 999px;
   padding: 7px 10px;
-  background: #eee2d7;
-  color: #755244;
+  background: var(--outkin-coral-soft);
+  color: var(--outkin-coral);
   font-size: .78rem;
   font-weight: 800;
 }
@@ -238,7 +238,7 @@
 .letter-form {
   display: grid;
   gap: 18px;
-  border: 1px solid #d9cec1;
+  border: 1px solid var(--outkin-line);
   border-radius: 22px;
   padding: clamp(22px, 4vw, 34px);
   background: var(--outkin-paper-bright);
@@ -248,13 +248,13 @@
   display: grid;
   gap: 8px;
   font-weight: 700;
-  color: #443d36;
+  color: var(--outkin-ink);
 }
 
 .letter-form input,
 .letter-form textarea {
   width: 100%;
-  border: 1px solid #cfc4b8;
+  border: 1px solid var(--outkin-line);
   border-radius: 14px;
   padding: 14px 16px;
   background: var(--outkin-paper);
@@ -273,7 +273,7 @@
 .letter-form input:focus,
 .letter-form textarea:focus {
   border-color: var(--outkin-berry);
-  box-shadow: 0 0 0 3px rgba(122,46,85,.12);
+  box-shadow: 0 0 0 3px rgba(229,154,193,.12);
 }
 
 .letter-compose-footer {
@@ -289,17 +289,17 @@
   align-items: baseline;
   gap: 6px;
   flex-wrap: wrap;
-  color: #756c63;
+  color: var(--outkin-muted);
 }
 
 .letter-draft-info strong {
-  color: #4d443d;
+  color: var(--outkin-muted);
 }
 
 .letter-draft-info span {
   margin-left: 8px;
   font-size: .86rem;
-  color: #91877d;
+  color: var(--outkin-muted);
 }
 
 @media (max-width: 640px) {
