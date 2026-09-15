@@ -624,6 +624,17 @@ export default function AppV6() {
                 <label>Country<input value={profile.country ?? ''} onChange={(event) => setProfile({ ...profile, country: event.target.value })} placeholder="United States" required /></label>
                 <label>State / region <span className="optional">optional</span><input value={profile.region ?? ''} onChange={(event) => setProfile({ ...profile, region: event.target.value })} placeholder="Alabama" /></label>
               </div>
+              <div className="onboarding-photo-row">
+                <ProfileAvatar avatarPath={dashboardAvatarPath} displayName={profile.display_name} size="medium" />
+                <div className="onboarding-photo-copy">
+                  <strong>Profile photo <span className="optional">optional</span></strong>
+                  <p>Add a photo if you like. You choose whether it appears in Discover, only to established connections, or to nobody else.</p>
+                  <small>Confirming a photo saves it separately. Your other answers stay in this form until you select Save profile.</small>
+                </div>
+                <button className="secondary onboarding-photo-button" type="button" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event('project-penpal:open-profile-photo'))}>
+                  {dashboardAvatarPath ? 'Change photo or privacy' : 'Add photo or set privacy'}
+                </button>
+              </div>
               <label>About me<textarea maxLength={2000} rows={6} value={profile.about_me ?? ''} onChange={(event) => setProfile({ ...profile, about_me: event.target.value })} placeholder="What would you want a potential friend to know about you?" /></label>
             </section>
 

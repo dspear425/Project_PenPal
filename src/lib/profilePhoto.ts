@@ -77,6 +77,6 @@ export async function signedProfilePhotoUrl(path: string): Promise<string | null
 
 export function initialsForName(name: string | null | undefined) {
   const words = (name ?? '').trim().split(/\s+/).filter(Boolean)
-  if (!words.length) return 'PP'
-  return words.slice(0, 2).map((word) => word[0]?.toUpperCase()).join('') || 'PP'
+  if (!words.length) return 'O'
+  return words.slice(0, 2).map((word) => word[0]?.toUpperCase()).join('') || 'O'
 }

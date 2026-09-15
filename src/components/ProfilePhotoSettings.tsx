@@ -41,6 +41,12 @@ export default function ProfilePhotoSettings({ userId }: Props) {
     if (open) void loadProfilePhoto()
   }, [open, userId])
 
+  useEffect(() => {
+    const openFromProfileForm = () => { setMessage(''); setOpen(true) }
+    window.addEventListener('project-penpal:open-profile-photo', openFromProfileForm)
+    return () => window.removeEventListener('project-penpal:open-profile-photo', openFromProfileForm)
+  }, [])
+
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
   }, [previewUrl])
@@ -143,7 +149,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
       setMessage(next === 'discover'
         ? 'Your photo can appear in Discover.'
         : next === 'connections'
-          ? 'Your photo is now limited to established pen pals.'
+          ? 'Your photo is now limited to established connections.'
           : 'Your photo is hidden from other members.')
     } catch (error) {
       setMessage(errorMessage(error))
@@ -234,7 +240,7 @@ export default function ProfilePhotoSettings({ userId }: Props) {
                   </label>
                   <label className={visibility === 'connections' ? 'selected' : ''}>
                     <input type="radio" name="photo-visibility" checked={visibility === 'connections'} onChange={() => void saveVisibility('connections')} disabled={working} />
-                    <span><strong>Pen pals only</strong><small>Your photo becomes available only after an accepted connection and remains available with preserved correspondence history.</small></span>
+                    <span><strong>Established connections</strong><small>Your photo becomes available only after an accepted connection and remains available with preserved correspondence history.</small></span>
                   </label>
                   <label className={visibility === 'hidden' ? 'selected' : ''}>
                     <input type="radio" name="photo-visibility" checked={visibility === 'hidden'} onChange={() => void saveVisibility('hidden')} disabled={working} />
