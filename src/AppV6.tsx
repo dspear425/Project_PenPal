@@ -606,7 +606,7 @@ export default function AppV6() {
             <button className="text-button top-signout" onClick={signOut}>Sign out</button>
           </div>
 
-          <p className="eyebrow">Build your pen-pal profile</p>
+          <p className="eyebrow">Build your friendship profile</p>
           <h1 className="onboarding-title">Tell future friends a little about you.</h1>
           <p className="hero-copy compact">
             We only ask for information that helps people match. Exact location and private contact details stay out of your public profile.
@@ -624,7 +624,7 @@ export default function AppV6() {
                 <label>Country<input value={profile.country ?? ''} onChange={(event) => setProfile({ ...profile, country: event.target.value })} placeholder="United States" required /></label>
                 <label>State / region <span className="optional">optional</span><input value={profile.region ?? ''} onChange={(event) => setProfile({ ...profile, region: event.target.value })} placeholder="Alabama" /></label>
               </div>
-              <label>About me<textarea maxLength={2000} rows={6} value={profile.about_me ?? ''} onChange={(event) => setProfile({ ...profile, about_me: event.target.value })} placeholder="What would you want a potential pen pal to know about you?" /></label>
+              <label>About me<textarea maxLength={2000} rows={6} value={profile.about_me ?? ''} onChange={(event) => setProfile({ ...profile, about_me: event.target.value })} placeholder="What would you want a potential friend to know about you?" /></label>
             </section>
 
             <section className="form-section">
@@ -715,17 +715,17 @@ export default function AppV6() {
 
         {mode === 'welcome' ? (
           <>
-            <p className="eyebrow">LGBTQ+-rooted friendship community</p>
+            <p className="eyebrow">LGBTQ+ people &amp; allies welcome</p>
             <h1>Find your people. Build your chosen family.</h1>
             <p className="hero-tagline">Friendships worth writing for.</p>
-            <p className="hero-copy hero-intro">Meet people who want something deeper than followers, swiping, or small talk — people you can write to, grow close to, celebrate life with, and maybe someday call family.</p>
+            <p className="hero-copy hero-intro">Whether family has turned away or you’re simply looking for people who truly care, you deserve friendship where you can be yourself. OutKin welcomes LGBTQ+ people and allies to meet, write, grow close at their own pace, and make room for chosen family to grow.</p>
             <div className="actions">
               <button className="primary" onClick={() => setMode('signup')}>Create account</button>
               <button className="secondary" onClick={() => setMode('signin')}>Sign in</button>
             </div>
             <div className="feature-grid">
-              <article><strong>Find your people</strong><span>Match on interests, communication style, chosen-family goals, supportive friendship, and the ways you like to show care.</span></article>
-              <article><strong>Grow at your own pace</strong><span>Build trust through thoughtful one-to-one correspondence, away from feeds, followers, and swiping.</span></article>
+              <article><strong>Find your people</strong><span>Meet people who value kindness, shared interests, supportive friendship, and the ways you like to show care.</span></article>
+              <article><strong>Grow at your own pace</strong><span>Build trust through thoughtful one-to-one correspondence, without pressure to share painful history or make instant family bonds.</span></article>
               <article><strong>Stay connected your way</strong><span>Write digital letters here or choose handwritten mail together once both people feel ready.</span></article>
             </div>
           </>
@@ -734,7 +734,7 @@ export default function AppV6() {
             <button className="back" onClick={() => { setMode('welcome'); setMessage('') }}>← Back</button>
             <p className="eyebrow">{mode === 'signup' ? 'Join the beta' : 'Welcome back'}</p>
             <h1>{mode === 'signup' ? 'Create your account.' : 'Sign in.'}</h1>
-            <p className="hero-copy compact">{mode === 'signup' ? 'We’ll start with email verification. Your pen-pal profile comes next.' : 'Sign in to continue your correspondence.'}</p>
+            <p className="hero-copy compact">{mode === 'signup' ? 'We’ll start with email verification. Your friendship profile comes next.' : 'Sign in to keep growing your connections.'}</p>
             <form className="auth-form" onSubmit={submitAuth}>
               <label>Email<input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
               <label>Password<input type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} required /></label>

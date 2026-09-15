@@ -56,11 +56,11 @@ export default function PublicEarlyAccessMessaging() {
       </div>
       <h2>Find people who could become part of your life.</h2>
       <p>
-        OutKin is for meaningful platonic friendship, mutual support, and connections that can naturally grow into chosen family—with thoughtful correspondence instead of feeds.
+        Whether you’re rebuilding after rejection or simply ready for more meaningful friendships, OutKin welcomes LGBTQ+ people and allies. Meet people who value kindness, write at your own pace, and let trust grow naturally over time.
       </p>
       <div className="public-early-access-points">
+        <span>LGBTQ+ people &amp; allies</span>
         <span>Chosen family & supportive friendship</span>
-        <span>Letters instead of feeds</span>
         <span>No swiping · no followers · no dating</span>
       </div>
       <div className="public-early-access-footer">
