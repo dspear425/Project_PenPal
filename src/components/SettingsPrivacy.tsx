@@ -153,10 +153,14 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
           discoverable: profile.discoverable,
           accepting_new_penpals: profile.accepting_new_penpals,
           max_penpals: profile.max_penpals,
-        }).eq('id', userId),
+        }).eq('id', userId).select('discoverable').single(),
       ])
-      if (identityResult.error) throw identityResult.error
       if (profileResult.error) throw profileResult.error
+      setProfile((previous) => ({ ...previous, discoverable: profileResult.data.discoverable }))
+      window.dispatchEvent(new CustomEvent('project-penpal:profile-visibility-changed', {
+        detail: { discoverable: profileResult.data.discoverable },
+      }))
+      if (identityResult.error) throw identityResult.error
       setIdentity(identityResult.data as Identity)
       setMessage('Privacy and account visibility settings saved.')
     } catch (error) {
@@ -355,7 +359,7 @@ export default function SettingsPrivacy({ userId, isModerator }: Props) {
 
                     <section className="settings-card">
                       <h3>Discovery & availability</h3>
-                      <label className="settings-toggle"><input type="checkbox" checked={profile.discoverable} onChange={(event) => setProfile({ ...profile, discoverable: event.target.checked })} /><span><strong>Show me in Discover</strong><small>Turn this off to hide your profile from new matches without deleting your account.</small></span></label>
+                      <label className="settings-toggle"><input type="checkbox" checked={profile.discoverable} onChange={(event) => setProfile({ ...profile, discoverable: event.target.checked })} /><span><strong>Show me in Discover</strong><small>Turn this off to pause new matches and requests. Existing connections can still see your profile and correspondence.</small></span></label>
                       <label className="settings-toggle"><input type="checkbox" checked={profile.accepting_new_penpals} onChange={(event) => setProfile({ ...profile, accepting_new_penpals: event.target.checked })} /><span><strong>Accept new pen-pal requests</strong><small>Existing pen pals can still write to you when this is off.</small></span></label>
                       <label className="settings-select-row">Pen-pal capacity<select value={profile.max_penpals} onChange={(event) => setProfile({ ...profile, max_penpals: Number(event.target.value) })}>{[1,2,3,4,5,6,7,8,9,10].map((number) => <option key={number} value={number}>{number}</option>)}</select></label>
                     </section>

@@ -87,7 +87,7 @@ export const helpArticles: HelpArticle[] = [
     contexts: ['discover', 'settings'],
     keywords: ['discoverable', 'availability', 'accepting', 'capacity', 'hide profile'],
     sections: [
-      { paragraphs: ['Discover normally shows completed, active profiles that are discoverable and currently accepting new pen pals. Members can hide themselves from Discover or stop accepting requests without affecting existing pen pals.'] },
+      { paragraphs: ['Discover normally shows completed, active profiles that are discoverable and currently accepting new connections. You can hide your profile from new matches and requests on your dashboard, when editing your profile, or in Settings. Hiding it does not delete your account or existing correspondence; established connections can still access your profile. Turn Discover visibility back on whenever you are ready.'] },
       { note: 'A pending request can remain reviewable even if the other member later turns off general Discover visibility.' },
     ],
   },
@@ -243,7 +243,7 @@ export const helpArticles: HelpArticle[] = [
     contexts: ['settings', 'profile'],
     keywords: ['privacy', 'discoverable', 'accepting requests', 'capacity', 'settings'],
     sections: [
-      { bullets: ['Show me in Discover controls whether new matches can normally browse your profile.', 'Accept new pen-pal requests controls whether new requests are allowed.', 'Pen-pal capacity limits how many active relationships you want at one time.'] },
+      { bullets: ['Show me in Discover controls whether new matches can normally browse your profile. You can turn it off temporarily from your dashboard or profile editor, too.', 'Accept new pen-pal requests controls whether new requests are allowed.', 'Pen-pal capacity limits how many active relationships you want at one time.'] },
       { paragraphs: ['Turning these settings off does not delete existing correspondence or automatically end current pen-pal relationships.'] },
     ],
   },

@@ -32,6 +32,7 @@ type Profile = {
   care_offered: string[]
   care_appreciated: string[]
   accepting_new_penpals: boolean
+  discoverable: boolean
   max_penpals: number
   onboarding_complete: boolean
 }
@@ -71,6 +72,7 @@ const emptyProfile: Profile = {
   care_offered: [],
   care_appreciated: [],
   accepting_new_penpals: true,
+  discoverable: true,
   max_penpals: 3,
   onboarding_complete: false,
 }
@@ -113,6 +115,7 @@ export default function AppV6() {
   const [pendingRequestCount, setPendingRequestCount] = useState(0)
   const [unreadLetterCount, setUnreadLetterCount] = useState(0)
   const [dashboardAvatarPath, setDashboardAvatarPath] = useState<string | null>(null)
+  const [visibilityBusy, setVisibilityBusy] = useState(false)
   const loadedUserId = useRef<string | null>(null)
 
   const age = useMemo(
@@ -147,6 +150,7 @@ export default function AppV6() {
         setPendingRequestCount(0)
         setUnreadLetterCount(0)
         setDashboardAvatarPath(null)
+        setVisibilityBusy(false)
         return
       }
 
@@ -173,6 +177,17 @@ export default function AppV6() {
   }, [])
 
   useEffect(() => {
+    const onVisibilityChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ discoverable?: boolean }>).detail
+      if (typeof detail?.discoverable === 'boolean') {
+        setProfile((previous) => ({ ...previous, discoverable: detail.discoverable! }))
+      }
+    }
+    window.addEventListener('project-penpal:profile-visibility-changed', onVisibilityChange)
+    return () => window.removeEventListener('project-penpal:profile-visibility-changed', onVisibilityChange)
+  }, [])
+
+  useEffect(() => {
     if (!session || mode !== 'onboarding' || !draftReady) return
 
     const timer = window.setTimeout(() => {
@@ -193,7 +208,7 @@ export default function AppV6() {
 
     const refreshDashboard = () => {
       void loadDashboardAttention(session.user.id)
-      void loadDashboardAvatar(session.user.id)
+      void loadDashboardProfileState(session.user.id)
     }
     refreshDashboard()
 
@@ -208,13 +223,16 @@ export default function AppV6() {
     }
   }, [session, mode])
 
-  async function loadDashboardAvatar(userId: string) {
+  async function loadDashboardProfileState(userId: string) {
     const { data, error } = await supabase
       .from('profiles')
-      .select('avatar_path')
+      .select('avatar_path, discoverable')
       .eq('id', userId)
       .maybeSingle()
-    if (!error) setDashboardAvatarPath(data?.avatar_path ?? null)
+    if (!error && data) {
+      setDashboardAvatarPath(data.avatar_path ?? null)
+      setProfile((previous) => ({ ...previous, discoverable: data.discoverable }))
+    }
   }
 
   async function loadDashboardAttention(userId: string) {
@@ -297,6 +315,7 @@ export default function AppV6() {
         care_offered: Array.isArray(profileData.care_offered) ? profileData.care_offered : [],
         care_appreciated: Array.isArray(profileData.care_appreciated) ? profileData.care_appreciated : [],
         accepting_new_penpals: profileData.accepting_new_penpals ?? true,
+        discoverable: profileData.discoverable ?? true,
         max_penpals: profileData.max_penpals ?? 3,
         onboarding_complete: profileData.onboarding_complete ?? false,
       }
@@ -426,6 +445,32 @@ export default function AppV6() {
     )
   }
 
+  async function toggleDiscoverVisibility() {
+    if (!session || visibilityBusy) return
+    const next = !profile.discoverable
+    setVisibilityBusy(true)
+    setMessage('')
+    try {
+      const { data, error } = await supabase.from('profiles')
+        .update({ discoverable: next })
+        .eq('id', session.user.id)
+        .select('discoverable')
+        .single()
+      if (error) throw error
+      setProfile((previous) => ({ ...previous, discoverable: data.discoverable }))
+      window.dispatchEvent(new CustomEvent('project-penpal:profile-visibility-changed', {
+        detail: { discoverable: data.discoverable },
+      }))
+      setMessage(data.discoverable
+        ? 'Your profile is visible in Discover again, if you are accepting new connections.'
+        : 'Your profile is hidden from Discover and new requests. Existing connections and letters are unchanged.')
+    } catch (error) {
+      setMessage(`Could not change profile visibility: ${errorMessage(error)}`)
+    } finally {
+      setVisibilityBusy(false)
+    }
+  }
+
   async function saveProfile(event: React.FormEvent) {
     event.preventDefault()
     if (!session) return
@@ -464,6 +509,7 @@ export default function AppV6() {
           care_offered: profile.care_offered,
           care_appreciated: profile.care_appreciated,
           accepting_new_penpals: profile.accepting_new_penpals,
+          discoverable: profile.discoverable,
           max_penpals: profile.max_penpals,
           onboarding_complete: true,
         },
@@ -572,6 +618,18 @@ export default function AppV6() {
             <article><strong>{selectedInterests.length}</strong><span>interests selected</span></article>
             <article><strong>{profile.max_penpals}</strong><span>writing connections · {correspondenceMethodLabel(profile.correspondence_method)}</span></article>
           </div>
+          <div className="dashboard-visibility-row">
+            <div>
+              <strong>{profile.discoverable ? 'Visible to new matches' : 'Hidden from new matches'}</strong>
+              <p>{profile.discoverable
+                ? 'You can take a break from Discover at any time.'
+                : 'People cannot find you in Discover or send new requests. Existing connections and letters remain available.'}</p>
+            </div>
+            <button className="secondary" type="button" disabled={visibilityBusy} onClick={() => void toggleDiscoverVisibility()}>
+              {visibilityBusy ? 'Saving…' : profile.discoverable ? 'Hide from Discover' : 'Show in Discover again'}
+            </button>
+          </div>
+          {message && <p className="status-message" role="status">{message}</p>}
           <div className="actions dashboard-actions">
             <button className="primary" onClick={() => setMode('discover')}>Discover matches</button>
             <button
@@ -704,6 +762,12 @@ export default function AppV6() {
                 <label className="check-row"><input type="checkbox" checked={profile.international_snail_mail} onChange={(event) => setProfile({ ...profile, international_snail_mail: event.target.checked })} /> I’m open to exchanging physical letters with people in other countries.</label>
               )}
               <label className="check-row"><input type="checkbox" checked={profile.accepting_new_penpals} onChange={(event) => setProfile({ ...profile, accepting_new_penpals: event.target.checked })} /> I’m open to new writing connections.</label>
+            </section>
+
+            <section className="form-section">
+              <div className="section-heading"><span>06</span><div><h2>Profile visibility</h2><p>Decide when you want new people to find you.</p></div></div>
+              <label className="check-row"><input type="checkbox" checked={profile.discoverable} onChange={(event) => setProfile({ ...profile, discoverable: event.target.checked })} /> Show my profile in Discover.</label>
+              <p className="visibility-help">Turn this off to take a break from new matches and requests. Existing connections can still see your profile and write to you; your letters are not deleted. This choice takes effect when you save your profile, and you can change it again whenever you like.</p>
             </section>
 
             <div className="save-row">
