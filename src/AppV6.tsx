@@ -570,7 +570,7 @@ export default function AppV6() {
           <div className="profile-summary">
             <article><strong>{profile.country}</strong><span>{profile.region || 'Region kept private'}</span></article>
             <article><strong>{selectedInterests.length}</strong><span>interests selected</span></article>
-            <article><strong>{profile.max_penpals}</strong><span>pen-pal capacity · {correspondenceMethodLabel(profile.correspondence_method)}</span></article>
+            <article><strong>{profile.max_penpals}</strong><span>writing connections · {correspondenceMethodLabel(profile.correspondence_method)}</span></article>
           </div>
           <div className="actions dashboard-actions">
             <button className="primary" onClick={() => setMode('discover')}>Discover matches</button>
@@ -685,14 +685,14 @@ export default function AppV6() {
                 <label>Correspondence format<select value={profile.correspondence_method} onChange={(event) => {
                   const next = event.target.value as CorrespondenceMethod
                   setProfile({ ...profile, correspondence_method: next, international_snail_mail: next === 'digital' ? false : profile.international_snail_mail })
-                }}><option value="digital">Digital letters only</option><option value="both">Digital + snail mail</option><option value="snail_mail">Snail mail preferred</option></select><span className="field-help">Mailing addresses are never public and are shared only after mutual consent with an established pen pal.</span></label>
-                <label>Pen-pal capacity<select value={profile.max_penpals} onChange={(event) => setProfile({ ...profile, max_penpals: Number(event.target.value) })}>{[1,2,3,4,5,6,7,8,9,10].map((number) => <option key={number} value={number}>{number}</option>)}</select></label>
+                }}><option value="digital">Digital letters only</option><option value="both">Digital + snail mail</option><option value="snail_mail">Snail mail preferred</option></select><span className="field-help">Mailing addresses are never public and are shared only after mutual consent with an established connection.</span></label>
+                <label>Ongoing writing connections<select value={profile.max_penpals} onChange={(event) => setProfile({ ...profile, max_penpals: Number(event.target.value) })}>{[1,2,3,4,5,6,7,8,9,10].map((number) => <option key={number} value={number}>{number}</option>)}</select><span className="field-help">How many people you’d like to correspond with at one time.</span></label>
                 <label>Language(s)<input value={profile.languages.join(', ')} onChange={(event) => setProfile({ ...profile, languages: event.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} placeholder="English, Spanish" /></label>
               </div>
               {profile.correspondence_method !== 'digital' && (
-                <label className="check-row"><input type="checkbox" checked={profile.international_snail_mail} onChange={(event) => setProfile({ ...profile, international_snail_mail: event.target.checked })} /> I’m open to exchanging physical letters with pen pals in other countries.</label>
+                <label className="check-row"><input type="checkbox" checked={profile.international_snail_mail} onChange={(event) => setProfile({ ...profile, international_snail_mail: event.target.checked })} /> I’m open to exchanging physical letters with people in other countries.</label>
               )}
-              <label className="check-row"><input type="checkbox" checked={profile.accepting_new_penpals} onChange={(event) => setProfile({ ...profile, accepting_new_penpals: event.target.checked })} /> I’m currently accepting new pen pals.</label>
+              <label className="check-row"><input type="checkbox" checked={profile.accepting_new_penpals} onChange={(event) => setProfile({ ...profile, accepting_new_penpals: event.target.checked })} /> I’m open to new writing connections.</label>
             </section>
 
             <div className="save-row">
