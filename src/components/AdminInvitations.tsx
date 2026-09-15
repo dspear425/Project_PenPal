@@ -416,7 +416,7 @@ export default function AdminInvitations() {
           <section className="admin-beta-readiness-section">
             <div className={`admin-beta-ready-banner ${readyForBeta ? 'ready' : 'attention'}`}>
               <span aria-hidden="true">{readyForBeta ? '✓' : '!'}</span>
-              <div><strong>{readyForBeta ? 'Project PenPal is ready for closed-beta invitations.' : 'A few beta-readiness items still need attention.'}</strong><p>These checks come from the live Supabase configuration and production account state.</p></div>
+              <div><strong>{readyForBeta ? 'OutKin is ready for closed-beta invitations.' : 'A few beta-readiness items still need attention.'}</strong><p>These checks come from the live Supabase configuration and production account state.</p></div>
             </div>
 
             {!readiness ? <p className="connection-empty">Readiness data is unavailable.</p> : (
@@ -438,7 +438,7 @@ export default function AdminInvitations() {
               <ul>
                 <li>Newest Cloudflare production deployment shows <strong>Success</strong>.</li>
                 <li>Private/incognito signup rejects a bad invite and accepts a fresh one-use invite.</li>
-                <li>Email verification returns to the production Project PenPal URL.</li>
+                <li>Email verification returns to the production OutKin URL.</li>
                 <li>A new member can complete onboarding, open Discover, and reach Help → Beta feedback.</li>
                 <li>Check one phone-sized browser view before sending the first batch of invitations.</li>
               </ul>

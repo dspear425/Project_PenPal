@@ -29,7 +29,7 @@ export default function SettingsLegalShortcut() {
     <section className="settings-card settings-legal-card">
       <div>
         <h3>Legal & safety</h3>
-        <p>Review the policies that govern Project PenPal and the safety rules for photos, correspondence, and physical mail.</p>
+        <p>Review the policies that govern OutKin and the safety rules for photos, correspondence, and physical mail.</p>
       </div>
       <div className="settings-policy-links">
         <button type="button" onClick={() => openLegalCenter('terms')}>Terms</button>

@@ -56,7 +56,7 @@ export default function BetaInviteSignup() {
         placeholder="PP-XXXX-XXXX-XXXX-XXXX-XXXX"
         required
       />
-      <span>Project PenPal is currently in closed beta. A valid invitation is required to create an account.</span>
+      <span>OutKin is currently in closed beta. A valid invitation is required to create an account.</span>
     </label>,
     target,
   )

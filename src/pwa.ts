@@ -59,7 +59,7 @@ window.matchMedia('(display-mode: standalone)').addEventListener?.('change', ann
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.warn('Project PenPal service worker registration failed.', error)
+      console.warn('OutKin service worker registration failed.', error)
     })
   })
 }

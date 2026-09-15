@@ -239,7 +239,7 @@ export default function SupportCenter({ userId }: Props) {
             <div className="support-header">
               <div>
                 <p className="eyebrow">Help & support</p>
-                <h2 id="support-title">Contact Project PenPal.</h2>
+                <h2 id="support-title">Contact OutKin.</h2>
                 <p>Reach the moderation team without reporting another member.</p>
               </div>
               <button className="support-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
@@ -261,7 +261,7 @@ export default function SupportCenter({ userId }: Props) {
                 </div>
                 <div className="support-thread-list">
                   {threads.length === 0 ? (
-                    <div className="support-empty"><span>✉</span><h3>No support conversations yet.</h3><p>Use New message whenever you need help from the Project PenPal team.</p></div>
+                    <div className="support-empty"><span>✉</span><h3>No support conversations yet.</h3><p>Use New message whenever you need help from the OutKin team.</p></div>
                   ) : threads.map((thread) => {
                     const unread = unreadByThread.get(thread.id) ?? 0
                     return (
@@ -307,7 +307,7 @@ export default function SupportCenter({ userId }: Props) {
                   <div className="support-message-list">
                     {messages.map((item) => (
                       <article className={`support-message ${item.sender_role}`} key={item.id}>
-                        <div><strong>{item.sender_role === 'member' ? 'You' : 'Project PenPal moderator'}</strong><time>{formatDate(item.created_at)}</time></div>
+                        <div><strong>{item.sender_role === 'member' ? 'You' : 'OutKin moderator'}</strong><time>{formatDate(item.created_at)}</time></div>
                         <p>{item.body}</p>
                       </article>
                     ))}

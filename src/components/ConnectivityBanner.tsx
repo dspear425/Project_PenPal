@@ -20,7 +20,7 @@ export default function ConnectivityBanner() {
       <span aria-hidden="true">↯</span>
       <div>
         <strong>You’re offline.</strong>
-        <span>Project PenPal can reopen its app shell, but account data and sending letters require a connection.</span>
+        <span>OutKin can reopen its app shell, but account data and sending letters require a connection.</span>
       </div>
     </div>
   )

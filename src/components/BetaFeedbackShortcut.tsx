@@ -103,7 +103,7 @@ export default function BetaFeedbackShortcut() {
       setSubject('')
       setBody('')
       setKind('general')
-      setMessage('Thanks — your beta feedback was sent privately to the Project PenPal team. You can review replies later in Help → My conversations.')
+      setMessage('Thanks — your beta feedback was sent privately to the OutKin team. You can review replies later in Help → My conversations.')
     } catch (error) {
       setMessage(errorMessage(error))
     } finally {
@@ -126,7 +126,7 @@ export default function BetaFeedbackShortcut() {
         <div className="beta-feedback-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !working) setOpen(false) }}>
           <section className="beta-feedback-panel" role="dialog" aria-modal="true" aria-labelledby="beta-feedback-title">
             <header>
-              <div><p className="eyebrow">Closed beta</p><h2 id="beta-feedback-title">Tell us what you notice.</h2><p>Report a rough edge, share an idea, or tell us what is working well. Feedback is private between your account and Project PenPal staff.</p></div>
+              <div><p className="eyebrow">Closed beta</p><h2 id="beta-feedback-title">Tell us what you notice.</h2><p>Report a rough edge, share an idea, or tell us what is working well. Feedback is private between your account and OutKin staff.</p></div>
               <button className="support-close" type="button" onClick={() => setOpen(false)} disabled={working}>×</button>
             </header>
 

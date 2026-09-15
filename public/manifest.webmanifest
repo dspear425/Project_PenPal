@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Project PenPal",
-  "short_name": "PenPal",
-  "description": "Friendship-first correspondence for meaningful platonic friendship, supportive connections, chosen family, and digital or handwritten letters.",
+  "name": "OutKin",
+  "short_name": "OutKin",
+  "description": "OutKin is a friendship-first community for meaningful platonic friendship, supportive connections, chosen family, and digital or handwritten letters.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

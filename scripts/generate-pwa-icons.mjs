@@ -123,4 +123,4 @@ for (const size of [180, 192, 512]) {
   writeFileSync(resolve(outputDir, `icon-${size}.png`), drawIcon(size))
 }
 
-console.log('Generated Project PenPal PWA icons: 180, 192, 512.')
+console.log('Generated OutKin PWA icons: 180, 192, 512.')
