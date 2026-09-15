@@ -7,7 +7,7 @@
   margin: 2px 0 0;
   padding: 0 !important;
   border-radius: 4px;
-  accent-color: #8a4e3d;
+  accent-color: var(--outkin-berry);
   box-shadow: none !important;
 }
 

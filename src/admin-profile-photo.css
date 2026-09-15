@@ -3,7 +3,7 @@
   border: 1px solid #dac9ba;
   border-radius: 16px;
   padding: 18px;
-  background: #fffaf6;
+  background: var(--outkin-paper);
 }
 
 .admin-profile-photo-heading {
@@ -46,7 +46,7 @@
   padding: 16px;
   border: 1px solid #e1d6cb;
   border-radius: 14px;
-  background: white;
+  background: var(--outkin-paper-bright);
 }
 
 .admin-profile-photo-current .profile-avatar-large {
@@ -100,7 +100,7 @@
 }
 
 .admin-photo-moderation-controls label > span {
-  color: #8a4e3d;
+  color: var(--outkin-berry);
   font-size: .78rem;
 }
 
@@ -110,16 +110,16 @@
   border: 1px solid #cfc4b8;
   border-radius: 12px;
   padding: 11px 13px;
-  background: white;
-  color: #302a25;
+  background: var(--outkin-paper-bright);
+  color: var(--outkin-ink);
   font: inherit;
   outline: none;
 }
 
 .admin-photo-moderation-controls select:focus,
 .admin-photo-moderation-controls textarea:focus {
-  border-color: #8a4e3d;
-  box-shadow: 0 0 0 3px rgba(138, 78, 61, .09);
+  border-color: var(--outkin-berry);
+  box-shadow: 0 0 0 3px rgba(122,46,85, .09);
 }
 
 .admin-photo-action-row {
@@ -133,7 +133,7 @@
   border: 1px solid #ddcfbe;
   border-radius: 12px;
   padding: 12px;
-  background: #fbf5ed;
+  background: var(--outkin-cream);
   color: #6f655d;
 }
 
@@ -157,7 +157,7 @@
   border: 1px solid #e1d7cd;
   border-radius: 12px;
   padding: 12px;
-  background: white;
+  background: var(--outkin-paper-bright);
 }
 
 .admin-profile-photo-reports article > div {
@@ -169,7 +169,7 @@
 
 .admin-profile-photo-reports small { color: #82776e; }
 .admin-profile-photo-reports p { margin: 0; color: #5e554d; line-height: 1.5; }
-.admin-profile-photo-reports em { color: #8a4e3d; font-size: .8rem; font-style: normal; font-weight: 800; }
+.admin-profile-photo-reports em { color: var(--outkin-berry); font-size: .8rem; font-style: normal; font-weight: 800; }
 
 @media (max-width: 680px) {
   .admin-profile-photo-heading { flex-direction: column; }

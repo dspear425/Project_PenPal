@@ -8,7 +8,7 @@
   border: 1px solid #c9bbae;
   border-radius: 999px;
   padding: 10px 14px;
-  background: #2f2924;
+  background: var(--outkin-ink-strong);
   color: white;
   box-shadow: 0 10px 26px rgba(50,39,31,.16);
   font: inherit;
@@ -33,7 +33,7 @@
   overflow: auto;
   border-radius: 26px;
   padding: clamp(24px,3vw,36px);
-  background: #fffdf9;
+  background: var(--outkin-paper-bright);
   box-shadow: 0 28px 80px rgba(38,29,22,.28);
 }
 
@@ -57,7 +57,7 @@
   border:1px solid #ddd2c6;
   border-radius:18px;
   padding:18px;
-  background:#fffaf6;
+  background:var(--outkin-paper);
 }
 
 .admin-directory-search label {
@@ -75,8 +75,8 @@
   border:1px solid #cfc4b8;
   border-radius:11px;
   padding:11px 13px;
-  background:white;
-  color:#302a25;
+  background: var(--outkin-paper-bright);
+  color:var(--outkin-ink);
   font:inherit;
   outline:none;
 }
@@ -110,7 +110,7 @@
   border:1px solid #ddd2c6;
   border-radius:14px;
   padding:14px;
-  background:white;
+  background: var(--outkin-paper-bright);
   color:#443b34;
   cursor:pointer;
 }
@@ -118,14 +118,14 @@
 .admin-directory-result > div { display:flex;justify-content:space-between;gap:10px;align-items:center; }
 .admin-directory-result > span { color:#665d55;font-size:.86rem; }
 .admin-directory-result small { color:#867b72; }
-.admin-directory-result.selected { border-color:#a56853;background:#fff7f1;box-shadow:0 0 0 2px rgba(138,78,61,.08); }
+.admin-directory-result.selected { border-color:var(--outkin-coral);background:var(--outkin-paper);box-shadow:0 0 0 2px rgba(122,46,85,.08); }
 
 .admin-directory-case {
   min-height:480px;
   border:1px solid #ddd2c6;
   border-radius:18px;
   padding:20px;
-  background:#fffdfa;
+  background:var(--outkin-paper);
 }
 
 .admin-directory-case-heading {
@@ -154,7 +154,7 @@
 .admin-private-info-card span { color:#7f7167;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;font-weight:800; }
 .admin-private-info-card strong { overflow-wrap:anywhere; }
 
-.admin-case-account-actions { margin-top:20px;border:1px solid #ddc9bd;border-radius:15px;padding:16px;background:#fff9f5; }
+.admin-case-account-actions { margin-top:20px;border:1px solid #ddc9bd;border-radius:15px;padding:16px;background:var(--outkin-paper); }
 .admin-case-account-actions h4 { margin:0;font-family:Georgia,'Times New Roman',serif;font-size:1.2rem; }
 .admin-case-account-actions > p { margin:7px 0 12px;color:#756a61;line-height:1.5; }
 .admin-case-account-actions > label { display:grid;gap:6px;max-width:280px;margin-top:10px;font-weight:780; }
@@ -164,7 +164,7 @@
   border:1px solid #ded4ca;
   border-radius:13px;
   padding:13px;
-  background:white;
+  background: var(--outkin-paper-bright);
 }
 .admin-case-support-list article > div { display:flex;justify-content:space-between;gap:10px;align-items:center; }
 .admin-case-support-list article small { display:block;margin-top:6px;color:#82776e; }

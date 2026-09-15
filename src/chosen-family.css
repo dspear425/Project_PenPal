@@ -4,7 +4,7 @@
   border:1px solid #dbcdbd;
   border-radius:16px;
   padding:16px 18px;
-  background:#fffaf4;
+  background:var(--outkin-paper);
   max-width:860px;
 }
 
@@ -33,7 +33,7 @@
   border:1px solid #ded3c8;
   border-radius:18px;
   padding:18px;
-  background:#fffdf9;
+  background:var(--outkin-paper-bright);
 }
 
 .care-preference-grid h3 {
@@ -63,7 +63,7 @@
 
 .chosen-family-safety-note strong {
   flex:0 0 auto;
-  color:#704537;
+  color:var(--outkin-plum);
 }
 
 .connection-intention-badges {
@@ -79,7 +79,7 @@
   border:1px solid #dec8ba;
   border-radius:999px;
   padding:5px 9px;
-  background:#fff7f1;
+  background:var(--outkin-paper);
   color:#754b3e;
   font-size:.75rem;
   font-weight:800;
@@ -96,11 +96,11 @@
   border:1px solid #e1d5ca;
   border-radius:14px;
   padding:12px 14px;
-  background:#fffaf6;
+  background:var(--outkin-paper);
 }
 
 .care-profile-summary strong {
-  color:#704537;
+  color:var(--outkin-plum);
   font-size:.82rem;
 }
 

@@ -3,7 +3,7 @@
   border: 1px solid #d9cbbb;
   border-radius: 22px;
   padding: clamp(20px, 3vw, 30px);
-  background: linear-gradient(145deg, #fffaf3, #fffdf9);
+  background: linear-gradient(145deg, #fffaf3, var(--outkin-paper-bright));
 }
 
 .snail-mail-heading {
@@ -75,7 +75,7 @@
   border: 1px solid #ddcfbf;
   border-radius: 16px;
   padding: 16px 18px;
-  background: #fbf5ed;
+  background: var(--outkin-cream);
 }
 
 .snail-mail-info p,
@@ -110,7 +110,7 @@
   border: 1px solid #dfd2c5;
   border-radius: 18px;
   padding: 18px;
-  background: white;
+  background: var(--outkin-paper-bright);
 }
 
 .snail-address-card-heading {
@@ -132,8 +132,8 @@
   align-items: center;
   border-radius: 999px;
   padding: 6px 9px;
-  background: #edf4eb;
-  color: #4f6849 !important;
+  background: var(--outkin-teal-soft);
+  color: var(--outkin-teal-dark) !important;
   font-size: .7rem !important;
   text-transform: none !important;
   letter-spacing: 0 !important;
@@ -149,7 +149,7 @@
   border: 1px solid #e3d8ce;
   border-radius: 14px;
   padding: 15px;
-  background: #fffdf9;
+  background: var(--outkin-paper-bright);
   color: #403832;
   font-style: normal;
   line-height: 1.45;
@@ -175,14 +175,14 @@
   border: 1px solid #d1c5b9;
   border-radius: 12px;
   padding: 12px 13px;
-  background: #fffdf9;
+  background: var(--outkin-paper-bright);
   color: #2d2925;
   outline: none;
 }
 
 .snail-address-form input:focus {
-  border-color: #8a4e3d;
-  box-shadow: 0 0 0 3px rgba(138,78,61,.1);
+  border-color: var(--outkin-berry);
+  box-shadow: 0 0 0 3px rgba(122,46,85,.1);
 }
 
 .snail-address-grid {
@@ -216,7 +216,7 @@
   border: 1px dashed #d8cabd;
   border-radius: 14px;
   padding: 20px;
-  background: #fffdfa;
+  background: var(--outkin-paper);
 }
 
 .snail-waiting-address > span { font-size: 1.6rem; }

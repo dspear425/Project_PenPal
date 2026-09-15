@@ -4,7 +4,7 @@
 
 .admin-card {
   width: min(1420px, 100%);
-  background: #fff;
+  background: var(--outkin-paper-bright);
   border-radius: 28px;
   padding: clamp(28px, 4vw, 54px);
   box-shadow: 0 24px 70px rgba(73, 55, 39, .12);
@@ -21,7 +21,7 @@
 .admin-brand-tag {
   display: block;
   margin-top: 2px;
-  color: #8a4e3d;
+  color: var(--outkin-berry);
   font-size: .7rem;
   font-weight: 900;
   letter-spacing: .12em;
@@ -31,7 +31,7 @@
 .admin-role-badge {
   border-radius: 999px;
   padding: 6px 10px;
-  background: #2f2924;
+  background: var(--outkin-ink-strong);
   color: white;
   font-size: .72rem;
   font-weight: 850;
@@ -57,7 +57,7 @@
   border: 1px solid #ded4ca;
   border-radius: 16px;
   padding: 16px;
-  background: #fffaf5;
+  background: var(--outkin-paper);
 }
 
 .admin-stats strong {
@@ -85,7 +85,7 @@
   border: 1px solid #d8cdc1;
   border-radius: 999px;
   padding: 9px 13px;
-  background: white;
+  background: var(--outkin-paper-bright);
   color: #554b43;
   font-weight: 760;
   cursor: pointer;
@@ -97,8 +97,8 @@
 }
 
 .admin-filter.selected {
-  background: #8a4e3d;
-  border-color: #8a4e3d;
+  background: var(--outkin-berry);
+  border-color: var(--outkin-berry);
   color: white;
 }
 
@@ -128,7 +128,7 @@
   border: 1px solid #ded4ca;
   border-radius: 16px;
   padding: 16px;
-  background: #fffdf9;
+  background: var(--outkin-paper-bright);
   color: #3a332d;
   text-align: left;
   cursor: pointer;
@@ -136,8 +136,8 @@
 
 .admin-report-card:hover,
 .admin-report-card.selected {
-  border-color: #aa6b56;
-  box-shadow: 0 0 0 2px rgba(138, 78, 61, .08);
+  border-color: var(--outkin-coral);
+  box-shadow: 0 0 0 2px rgba(122,46,85, .08);
 }
 
 .admin-report-card.selected {
@@ -184,12 +184,12 @@
   letter-spacing: .05em;
 }
 
-.admin-status-pill.open { background: #f8e7dd; color: #8a4e3d; }
+.admin-status-pill.open { background: #f8e7dd; color: var(--outkin-berry); }
 .admin-status-pill.reviewing { background: #eee7d4; color: #685c31; }
-.admin-status-pill.resolved { background: #e6efe7; color: #3f6847; }
+.admin-status-pill.resolved { background: var(--outkin-teal-soft); color: var(--outkin-teal-dark); }
 .admin-status-pill.dismissed { background: #eceae8; color: #68615b; }
 
-.account-status.active { background: #e6efe7; color: #3f6847; }
+.account-status.active { background: var(--outkin-teal-soft); color: var(--outkin-teal-dark); }
 .account-status.suspended { background: #f3ead0; color: #765f18; }
 .account-status.banned { background: #f4dddd; color: #8a3434; }
 
@@ -198,7 +198,7 @@
   border: 1px solid #ded4ca;
   border-radius: 22px;
   padding: clamp(20px, 3vw, 32px);
-  background: #fffdfa;
+  background: var(--outkin-paper);
 }
 
 .admin-detail-empty,
@@ -248,11 +248,11 @@
   border: 1px solid #e1d8cf;
   border-radius: 14px;
   padding: 15px;
-  background: white;
+  background: var(--outkin-paper-bright);
 }
 
 .admin-people-grid article > span:first-child {
-  color: #8a4e3d;
+  color: var(--outkin-berry);
   font-size: .72rem;
   font-weight: 850;
   text-transform: uppercase;
@@ -299,7 +299,7 @@
   border: 1px solid #e0d5ca;
   border-radius: 14px;
   padding: 15px;
-  background: white;
+  background: var(--outkin-paper-bright);
 }
 
 .admin-evidence-letter > div,
@@ -339,15 +339,15 @@
   border: 1px solid #cec2b7;
   border-radius: 12px;
   padding: 12px 14px;
-  background: white;
-  color: #302a25;
+  background: var(--outkin-paper-bright);
+  color: var(--outkin-ink);
   outline: none;
 }
 
 .admin-label textarea:focus,
 .admin-label select:focus {
-  border-color: #8a4e3d;
-  box-shadow: 0 0 0 3px rgba(138, 78, 61, .1);
+  border-color: var(--outkin-berry);
+  box-shadow: 0 0 0 3px rgba(122,46,85, .1);
 }
 
 .admin-suspend-label {

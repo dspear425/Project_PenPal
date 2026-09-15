@@ -53,7 +53,7 @@
   border-radius: 24px;
   padding: clamp(30px, 5vw, 52px);
   text-align: center;
-  background: #fffaf4;
+  background: var(--outkin-paper);
 }
 
 .empty-envelope {
@@ -64,7 +64,7 @@
   margin: 0 auto 18px;
   border: 1px dashed #9b6250;
   border-radius: 14px;
-  color: #8a4e3d;
+  color: var(--outkin-berry);
   font-size: 28px;
   transform: rotate(-2deg);
 }
@@ -95,7 +95,7 @@
   border: 1px solid #ddd1c4;
   border-radius: 24px;
   padding: 26px;
-  background: #fffdf9;
+  background: var(--outkin-paper-bright);
   display: flex;
   flex-direction: column;
   min-height: 390px;
@@ -109,7 +109,7 @@
 }
 
 .person-kicker {
-  color: #8a4e3d;
+  color: var(--outkin-berry);
   font-size: .78rem;
   text-transform: uppercase;
   letter-spacing: .09em;
@@ -229,16 +229,16 @@
   border: 1px solid #cfc4b8;
   border-radius: 14px;
   padding: 13px 14px;
-  background: #fffdf9;
-  color: #2d2a26;
+  background: var(--outkin-paper-bright);
+  color: var(--outkin-ink);
   outline: none;
   font: inherit;
   line-height: 1.5;
 }
 
 .request-composer textarea:focus {
-  border-color: #8a4e3d;
-  box-shadow: 0 0 0 3px rgba(138,78,61,.12);
+  border-color: var(--outkin-berry);
+  box-shadow: 0 0 0 3px rgba(122,46,85,.12);
 }
 
 .request-composer-actions {

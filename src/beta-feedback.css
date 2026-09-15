@@ -21,7 +21,7 @@
   overflow:auto;
   border-radius:24px;
   padding:clamp(24px,4vw,34px);
-  background:#fffdf9;
+  background:var(--outkin-paper-bright);
   box-shadow:0 28px 80px rgba(38,29,22,.28);
 }
 
@@ -66,8 +66,8 @@
   border:1px solid #cfc4b8;
   border-radius:13px;
   padding:12px 14px;
-  background:white;
-  color:#302a25;
+  background: var(--outkin-paper-bright);
+  color:var(--outkin-ink);
   font:inherit;
   outline:none;
 }
@@ -75,7 +75,7 @@
 .beta-feedback-form textarea { resize:vertical;line-height:1.5; }
 .beta-feedback-form input:focus,
 .beta-feedback-form select:focus,
-.beta-feedback-form textarea:focus { border-color:#8a4e3d;box-shadow:0 0 0 3px rgba(138,78,61,.1); }
+.beta-feedback-form textarea:focus { border-color:var(--outkin-berry);box-shadow:0 0 0 3px rgba(122,46,85,.1); }
 .beta-feedback-actions { display:flex;gap:9px;flex-wrap:wrap; }
 
 @media(max-width:800px){

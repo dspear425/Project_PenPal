@@ -6,10 +6,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #704233;
+  border: 1px solid var(--outkin-plum);
   border-radius: 999px;
   padding: 10px 15px;
-  background: #2f2924;
+  background: var(--outkin-ink-strong);
   color: #fff;
   font-weight: 850;
   letter-spacing: .03em;

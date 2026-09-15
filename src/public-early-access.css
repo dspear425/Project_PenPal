@@ -4,7 +4,7 @@
   border:1px solid #d9c8bb;
   border-radius:20px;
   padding:clamp(18px,3vw,26px);
-  background:linear-gradient(180deg,#fffaf5 0%,#f8efe7 100%);
+  background:linear-gradient(180deg,var(--outkin-paper) 0%,#f8efe7 100%);
   box-shadow:0 14px 34px rgba(78,55,42,.08);
 }
 
@@ -20,7 +20,7 @@
   display:inline-flex;
   border-radius:999px;
   padding:6px 10px;
-  background:#8a4e3d;
+  background:var(--outkin-berry);
   color:white;
   font-size:.74rem;
   font-weight:900;
@@ -38,7 +38,7 @@
   font-family:Georgia,'Times New Roman',serif;
   font-size:clamp(1.5rem,3.5vw,2.1rem);
   line-height:1.1;
-  color:#342b26;
+  color:var(--outkin-ink);
 }
 
 .public-early-access-card>p {
@@ -59,7 +59,7 @@
   border:1px solid #d8c7ba;
   border-radius:999px;
   padding:7px 10px;
-  background:white;
+  background: var(--outkin-paper-bright);
   color:#68483a;
   font-size:.82rem;
   font-weight:800;
