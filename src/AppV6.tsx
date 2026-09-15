@@ -715,17 +715,18 @@ export default function AppV6() {
 
         {mode === 'welcome' ? (
           <>
-            <p className="eyebrow">Friendship-first correspondence</p>
-            <h1>Friendships worth writing for.</h1>
-            <p className="hero-copy">Meet people around the world who want genuine platonic friendship, meaningful conversation, and connections that can grow over time — sometimes even into chosen family.</p>
+            <p className="eyebrow">LGBTQ+-rooted friendship community</p>
+            <h1>Find your people. Build your chosen family.</h1>
+            <p className="hero-tagline">Friendships worth writing for.</p>
+            <p className="hero-copy hero-intro">Meet people who want something deeper than followers, swiping, or small talk — people you can write to, grow close to, celebrate life with, and maybe someday call family.</p>
             <div className="actions">
               <button className="primary" onClick={() => setMode('signup')}>Create account</button>
               <button className="secondary" onClick={() => setMode('signin')}>Sign in</button>
             </div>
             <div className="feature-grid">
-              <article><strong>Friendship with intention</strong><span>Match on interests, communication style, chosen-family goals, supportive friendship, and the ways you like to show care.</span></article>
-              <article><strong>Letters, not feeds</strong><span>A calmer space built around real one-to-one correspondence.</span></article>
-              <article><strong>Digital or handwritten</strong><span>Build trust here, then exchange mailing addresses only when both pen pals choose to.</span></article>
+              <article><strong>Find your people</strong><span>Match on interests, communication style, chosen-family goals, supportive friendship, and the ways you like to show care.</span></article>
+              <article><strong>Grow at your own pace</strong><span>Build trust through thoughtful one-to-one correspondence, away from feeds, followers, and swiping.</span></article>
+              <article><strong>Stay connected your way</strong><span>Write digital letters here or choose handwritten mail together once both people feel ready.</span></article>
             </div>
           </>
         ) : (

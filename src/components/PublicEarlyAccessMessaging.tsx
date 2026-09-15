@@ -56,7 +56,7 @@ export default function PublicEarlyAccessMessaging() {
       </div>
       <h2>Find people who could become part of your life.</h2>
       <p>
-        OutKin is for meaningful platonic friendship—from traditional pen pals to supportive friendships and chosen family that grow naturally over time.
+        OutKin is for meaningful platonic friendship, mutual support, and connections that can naturally grow into chosen family—with thoughtful correspondence instead of feeds.
       </p>
       <div className="public-early-access-points">
         <span>Chosen family & supportive friendship</span>
