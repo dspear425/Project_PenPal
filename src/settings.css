@@ -284,10 +284,8 @@
 .settings-danger-card > label { margin:12px 0; }
 
 .forgot-password-launcher {
-  position: fixed;
-  right: 22px;
-  bottom: 20px;
-  z-index: 35;
+  display: block;
+  margin: 18px max(22px, calc((100vw - 920px) / 2)) 0 auto;
   border: 0;
   background: transparent;
   color: var(--outkin-berry-dark);
@@ -318,6 +316,6 @@
   .settings-code-card,.settings-subaction,.settings-essential-note,.settings-protected-note { align-items:flex-start; flex-direction:column; }
   .settings-select-row { grid-template-columns:1fr; }
   .settings-block-list article { align-items:flex-start; flex-direction:column; }
-  .forgot-password-launcher { right:14px; bottom:12px; }
+  .forgot-password-launcher { margin-right:14px; }
   .forgot-password-panel { border-radius:22px 22px 12px 12px; }
 }

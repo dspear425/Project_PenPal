@@ -1,15 +1,11 @@
 .public-legal-footer {
-  position: fixed;
-  z-index: 34;
-  left: 50%;
-  bottom: max(10px, var(--pp-safe-bottom));
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 7px 14px;
   flex-wrap: wrap;
   width: min(760px, calc(100% - 28px));
+  margin: 18px auto max(24px, var(--pp-safe-bottom));
   color: var(--outkin-muted);
   font-size: .76rem;
 }
@@ -28,10 +24,6 @@
 
 @media (max-width: 800px) {
   .public-legal-footer {
-    position: static;
-    transform: none;
-    width: auto;
-    margin: -58px 18px 14px;
-    padding-bottom: max(6px, var(--pp-safe-bottom));
+    margin-bottom: calc(82px + var(--pp-safe-bottom));
   }
 }
