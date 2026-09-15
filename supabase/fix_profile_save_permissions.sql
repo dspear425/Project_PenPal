@@ -1,4 +1,4 @@
--- Project PenPal: repair member profile-save column privileges
+-- OutKin: repair member profile-save column privileges
 -- Run after the snail-mail migrations.
 --
 -- Settings & Privacy intentionally removed broad UPDATE/INSERT privileges from
@@ -20,6 +20,8 @@ grant insert (
   about_me,
   languages,
   friendship_goals,
+  care_offered,
+  care_appreciated,
   communication_style,
   correspondence_frequency,
   correspondence_method,
@@ -42,6 +44,8 @@ grant update (
   about_me,
   languages,
   friendship_goals,
+  care_offered,
+  care_appreciated,
   communication_style,
   correspondence_frequency,
   correspondence_method,
