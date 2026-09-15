@@ -1,16 +1,16 @@
 const CACHE_PREFIX = 'outkin-shell-'
 const LEGACY_CACHE_PREFIX = 'project-penpal-shell-'
-const CACHE_VERSION = 'v18'
+const CACHE_VERSION = 'v19'
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`
 const APP_SHELL = [
   '/',
   '/index.html',
   '/about.html',
   '/manifest.webmanifest',
-  '/app-icon.svg',
-  '/icon-180.png',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/app-icon.svg?v=6',
+  '/icon-180.png?v=6',
+  '/icon-192.png?v=6',
+  '/icon-512.png?v=6',
 ]
 
 self.addEventListener('install', (event) => {

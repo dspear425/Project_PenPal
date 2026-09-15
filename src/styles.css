@@ -57,7 +57,7 @@ button { cursor: pointer; }
 .stamp {
   width: 44px; height: 44px; display: grid; place-items: center;
   border: 0; border-radius: 10px; color: transparent; font-size: 0;
-  background: url('/app-icon.svg') center / cover no-repeat;
+  background: url('/app-icon.svg?v=6') center / cover no-repeat;
   box-shadow: 0 5px 14px rgba(81,33,63,.18);
   transform: rotate(-2deg);
 }
