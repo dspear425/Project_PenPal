@@ -8,10 +8,12 @@ const outputDir = resolve(root, 'public')
 mkdirSync(outputDir, { recursive: true })
 
 const palette = {
-  paper: [244, 239, 230, 255],
-  white: [255, 253, 249, 255],
-  rust: [138, 78, 61, 255],
-  soft: [199, 155, 133, 255],
+  plum: [81, 33, 63, 255],
+  berry: [122, 46, 85, 255],
+  teal: [79, 119, 115, 255],
+  paper: [255, 250, 243, 255],
+  coral: [201, 111, 99, 255],
+  gold: [181, 138, 73, 255],
 }
 
 function crc32(buffer) {
@@ -53,6 +55,38 @@ function makeCanvas(size) {
       for (let px = x0; px < x1; px += 1) setPixel(px, py, color)
     }
   }
+  const fillCircle = (centerX, centerY, radius, color) => {
+    const x0 = Math.max(0, Math.floor(centerX - radius))
+    const y0 = Math.max(0, Math.floor(centerY - radius))
+    const x1 = Math.min(size, Math.ceil(centerX + radius))
+    const y1 = Math.min(size, Math.ceil(centerY + radius))
+    const radiusSquared = radius * radius
+    for (let py = y0; py < y1; py += 1) {
+      for (let px = x0; px < x1; px += 1) {
+        const dx = px + 0.5 - centerX
+        const dy = py + 0.5 - centerY
+        if (dx * dx + dy * dy <= radiusSquared) setPixel(px, py, color)
+      }
+    }
+  }
+  const fillRoundedRect = (x, y, width, height, radius, color) => {
+    const x0 = Math.max(0, Math.floor(x))
+    const y0 = Math.max(0, Math.floor(y))
+    const x1 = Math.min(size, Math.ceil(x + width))
+    const y1 = Math.min(size, Math.ceil(y + height))
+    const safeRadius = Math.min(radius, width / 2, height / 2)
+    for (let py = y0; py < y1; py += 1) {
+      for (let px = x0; px < x1; px += 1) {
+        const sampleX = px + 0.5
+        const sampleY = py + 0.5
+        const nearestX = Math.max(x + safeRadius, Math.min(sampleX, x + width - safeRadius))
+        const nearestY = Math.max(y + safeRadius, Math.min(sampleY, y + height - safeRadius))
+        const dx = sampleX - nearestX
+        const dy = sampleY - nearestY
+        if (dx * dx + dy * dy <= safeRadius * safeRadius) setPixel(px, py, color)
+      }
+    }
+  }
   const line = (x0, y0, x1, y1, thickness, color) => {
     const dx = x1 - x0
     const dy = y1 - y0
@@ -61,38 +95,54 @@ function makeCanvas(size) {
     for (let step = 0; step <= steps; step += 1) {
       const x = x0 + (dx * step) / steps
       const y = y0 + (dy * step) / steps
-      fillRect(x - radius, y - radius, radius * 2 + 1, radius * 2 + 1, color)
+      fillCircle(x, y, radius, color)
     }
   }
-  return { pixels, fillRect, line }
+  return { pixels, fillCircle, fillRect, fillRoundedRect, line }
 }
 
 function drawIcon(size) {
-  const { pixels, fillRect, line } = makeCanvas(size)
-  fillRect(0, 0, size, size, palette.paper)
+  const { pixels, fillCircle, fillRect, fillRoundedRect, line } = makeCanvas(size)
+  fillRect(0, 0, size, size, palette.plum)
 
-  const left = size * 0.17
-  const right = size * 0.83
-  const top = size * 0.25
-  const bottom = size * 0.76
+  const left = size * 0.148
+  const right = size * 0.852
+  const top = size * 0.277
+  const bottom = size * 0.73
   const border = Math.max(4, size * 0.035)
+  const radius = size * 0.074
   const centerX = size / 2
-  const foldY = size * 0.55
+  const foldY = size * 0.555
 
-  fillRect(left, top, right - left, bottom - top, palette.rust)
-  fillRect(left + border, top + border, right - left - border * 2, bottom - top - border * 2, palette.white)
+  fillRoundedRect(left, top, right - left, bottom - top, radius, palette.coral)
+  fillRoundedRect(
+    left + border,
+    top + border,
+    right - left - border * 2,
+    bottom - top - border * 2,
+    Math.max(2, radius - border),
+    palette.paper,
+  )
 
-  line(left + border, top + border, centerX, foldY, border * 0.75, palette.rust)
-  line(right - border, top + border, centerX, foldY, border * 0.75, palette.rust)
-  line(left + border, bottom - border, centerX - size * 0.08, foldY + size * 0.02, border * 0.5, palette.soft)
-  line(right - border, bottom - border, centerX + size * 0.08, foldY + size * 0.02, border * 0.5, palette.soft)
+  line(left + border * 1.2, top + border * 1.2, centerX, foldY, border * 0.75, palette.berry)
+  line(right - border * 1.2, top + border * 1.2, centerX, foldY, border * 0.75, palette.berry)
+  line(left + border * 1.2, bottom - border * 1.2, centerX - size * 0.082, size * 0.516, border * 0.52, palette.teal)
+  line(right - border * 1.2, bottom - border * 1.2, centerX + size * 0.082, size * 0.516, border * 0.52, palette.teal)
 
-  const badgeSize = size * 0.17
-  const badgeX = size * 0.72
-  const badgeY = size * 0.13
-  fillRect(badgeX, badgeY, badgeSize, badgeSize, palette.rust)
-  line(badgeX + badgeSize * 0.25, badgeY + badgeSize / 2, badgeX + badgeSize * 0.75, badgeY + badgeSize / 2, border * 0.42, palette.white)
-  line(badgeX + badgeSize / 2, badgeY + badgeSize * 0.25, badgeX + badgeSize / 2, badgeY + badgeSize * 0.75, border * 0.42, palette.white)
+  const badgeX = size * 0.77
+  const badgeY = size * 0.258
+  const badgeRadius = size * 0.086
+  const nodeRadius = Math.max(3, size * 0.016)
+  const nodeTop = { x: badgeX, y: badgeY - size * 0.041 }
+  const nodeLeft = { x: badgeX - size * 0.043, y: badgeY + size * 0.027 }
+  const nodeRight = { x: badgeX + size * 0.043, y: badgeY + size * 0.027 }
+  fillCircle(badgeX, badgeY, badgeRadius, palette.gold)
+  line(nodeTop.x, nodeTop.y, nodeLeft.x, nodeLeft.y, size * 0.016, palette.plum)
+  line(nodeLeft.x, nodeLeft.y, nodeRight.x, nodeRight.y, size * 0.016, palette.plum)
+  line(nodeRight.x, nodeRight.y, nodeTop.x, nodeTop.y, size * 0.016, palette.plum)
+  fillCircle(nodeTop.x, nodeTop.y, nodeRadius, palette.plum)
+  fillCircle(nodeLeft.x, nodeLeft.y, nodeRadius, palette.plum)
+  fillCircle(nodeRight.x, nodeRight.y, nodeRadius, palette.plum)
 
   const raw = Buffer.alloc((size * 4 + 1) * size)
   for (let y = 0; y < size; y += 1) {

@@ -56,10 +56,12 @@ button { cursor: pointer; }
 .compact-brand { margin-bottom: 0; }
 .stamp {
   width: 44px; height: 44px; display: grid; place-items: center;
-  border: 1.5px dashed var(--outkin-coral); border-radius: 10px; color: var(--outkin-berry); font-size: 22px;
-  transform: rotate(-3deg);
+  border: 0; border-radius: 10px; color: transparent; font-size: 0;
+  background: url('/app-icon.svg') center / cover no-repeat;
+  box-shadow: 0 5px 14px rgba(81,33,63,.18);
+  transform: rotate(-2deg);
 }
-.brand-name { font-weight: 700; letter-spacing: .01em; }
+.brand-name { color: var(--outkin-plum); font-family: Georgia, 'Times New Roman', serif; font-size: 1.08rem; font-weight: 700; letter-spacing: -.01em; }
 .eyebrow { margin: 0 0 12px; color: var(--outkin-berry); font-size: .82rem; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
 h1 { margin: 0; max-width: 720px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2.7rem, 7vw, 5.8rem); line-height: .98; font-weight: 600; color: var(--outkin-ink-strong); }
 .dashboard-title, .onboarding-title { font-size: clamp(2.35rem, 5vw, 4.5rem); }

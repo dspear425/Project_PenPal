@@ -1,6 +1,6 @@
 const CACHE_PREFIX = 'outkin-shell-'
 const LEGACY_CACHE_PREFIX = 'project-penpal-shell-'
-const CACHE_VERSION = 'v17'
+const CACHE_VERSION = 'v18'
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`
 const APP_SHELL = [
   '/',

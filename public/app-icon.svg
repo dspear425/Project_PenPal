@@ -1,8 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="OutKin envelope icon">
-  <rect width="512" height="512" rx="112" fill="#f4efe6"/>
-  <rect x="86" y="118" width="340" height="276" rx="38" fill="#fffdf9" stroke="#8a4e3d" stroke-width="18"/>
-  <path d="M104 151 256 279 408 151" fill="none" stroke="#8a4e3d" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M104 365 213 259M408 365 299 259" fill="none" stroke="#c79b85" stroke-width="16" stroke-linecap="round"/>
-  <circle cx="392" cy="104" r="45" fill="#8a4e3d"/>
-  <path d="M373 104h38M392 85v38" stroke="#fffdf9" stroke-width="10" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="OutKin envelope and connection icon">
+  <rect width="512" height="512" rx="112" fill="#51213f"/>
+  <rect x="76" y="142" width="360" height="232" rx="38" fill="#fffaf3" stroke="#c96f63" stroke-width="18"/>
+  <path d="M98 164 256 284 414 164" fill="none" stroke="#7a2e55" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M98 352 214 264M414 352 298 264" fill="none" stroke="#4f7773" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="394" cy="132" r="44" fill="#b58a49"/>
+  <path d="m394 111-22 35h44Z" fill="none" stroke="#51213f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="394" cy="111" r="8" fill="#51213f"/>
+  <circle cx="372" cy="146" r="8" fill="#51213f"/>
+  <circle cx="416" cy="146" r="8" fill="#51213f"/>
 </svg>
