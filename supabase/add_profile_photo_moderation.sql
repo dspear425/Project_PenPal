@@ -513,7 +513,7 @@ begin
       action_id,
       'warning',
       'Profile photo removed',
-      'Your profile photo was removed because it did not meet Project PenPal profile-photo guidelines. Reason: '
+      'Your profile photo was removed because it did not meet OutKin profile-photo guidelines. Reason: '
         || clean_reason
         || ' You may upload another appropriate photo. If you believe this was a mistake, contact moderation through Help.'
     )

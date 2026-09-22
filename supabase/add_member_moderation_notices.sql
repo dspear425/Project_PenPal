@@ -91,13 +91,13 @@ begin
     notice_title := 'Account warning';
     notice_message := coalesce(
       nullif(trim(new.reason), ''),
-      'A Project PenPal moderator issued a warning about activity on your account. Please review our community expectations before continuing.'
+      'An OutKin moderator issued a warning about activity on your account. Please review our community expectations before continuing.'
     );
   elsif new.action_type = 'suspend' then
     notice_kind := 'suspension';
     notice_title := 'Account temporarily suspended';
     notice_message := concat(
-      coalesce(nullif(trim(new.reason), ''), 'Your account has been temporarily suspended by Project PenPal moderation.'),
+      coalesce(nullif(trim(new.reason), ''), 'Your account has been temporarily suspended by OutKin moderation.'),
       case
         when new.suspension_until is not null
           then ' The suspension is scheduled to end on ' || to_char(new.suspension_until at time zone 'UTC', 'Mon DD, YYYY at HH24:MI "UTC"') || '.'
@@ -109,14 +109,14 @@ begin
     notice_title := 'Account banned';
     notice_message := coalesce(
       nullif(trim(new.reason), ''),
-      'Your Project PenPal account has been banned by moderation.'
+      'Your OutKin account has been banned by moderation.'
     );
   elsif new.action_type = 'restore' then
     notice_kind := 'restored';
     notice_title := 'Account access restored';
     notice_message := coalesce(
       nullif(trim(new.reason), ''),
-      'Your Project PenPal account has been restored and normal access is available again.'
+      'Your OutKin account has been restored and normal access is available again.'
     );
   else
     return new;
@@ -172,13 +172,13 @@ select
     when 'restore' then 'Account access restored'
   end,
   case ma.action_type
-    when 'warning' then coalesce(nullif(trim(ma.reason), ''), 'A Project PenPal moderator issued a warning about activity on your account. Please review our community expectations before continuing.')
+    when 'warning' then coalesce(nullif(trim(ma.reason), ''), 'An OutKin moderator issued a warning about activity on your account. Please review our community expectations before continuing.')
     when 'suspend' then concat(
-      coalesce(nullif(trim(ma.reason), ''), 'Your account has been temporarily suspended by Project PenPal moderation.'),
+      coalesce(nullif(trim(ma.reason), ''), 'Your account has been temporarily suspended by OutKin moderation.'),
       case when ma.suspension_until is not null then ' The suspension is scheduled to end on ' || to_char(ma.suspension_until at time zone 'UTC', 'Mon DD, YYYY at HH24:MI "UTC"') || '.' else '' end
     )
-    when 'ban' then coalesce(nullif(trim(ma.reason), ''), 'Your Project PenPal account has been banned by moderation.')
-    when 'restore' then coalesce(nullif(trim(ma.reason), ''), 'Your Project PenPal account has been restored and normal access is available again.')
+    when 'ban' then coalesce(nullif(trim(ma.reason), ''), 'Your OutKin account has been banned by moderation.')
+    when 'restore' then coalesce(nullif(trim(ma.reason), ''), 'Your OutKin account has been restored and normal access is available again.')
   end,
   ma.created_at
 from public.moderation_actions ma

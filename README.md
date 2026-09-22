@@ -1,6 +1,8 @@
-# Project PenPal
+# OutKin
 
-A friendship-first pen pal application for meaningful, long-form platonic correspondence.
+An LGBTQ+-rooted, friendship-first community for meaningful correspondence,
+supportive friendship, and chosen family. The public site is
+[joinoutkin.com](https://joinoutkin.com/).
 
 ## Stack
 - React
