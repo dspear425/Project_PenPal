@@ -8,6 +8,12 @@ crosses between members.
 Record the date, browser/device, account aliases, result, and any screenshot or
 error text for every failure. Do not use real mailing addresses during testing.
 
+Start with the automated subset in `docs/playwright-smoke-tests.md`. Playwright
+covers public branding/PWA health, signed-in profile controls, and an opt-in
+request/accept/letter/reply journey. Keep this checklist for email delivery,
+Turnstile behavior, uploads/cropping, responsive visual review, safety actions,
+moderation, destructive account cleanup, and other judgment-heavy checks.
+
 ## 1. Public entry and signup
 
 - [ ] Home page, About page, title, metadata preview, icon, and installed PWA say OutKin.

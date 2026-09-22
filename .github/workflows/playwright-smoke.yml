@@ -1,0 +1,48 @@
+name: Playwright public smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: Deployment URL to test
+        required: true
+        default: https://joinoutkin.com
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  public-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run public smoke tests
+        run: npm run test:e2e:public
+        env:
+          OUTKIN_E2E_BASE_URL: ${{ inputs.target_url }}
+
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-evidence
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14

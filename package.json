@@ -7,7 +7,15 @@
     "icons": "node scripts/generate-pwa-icons.mjs",
     "dev": "node scripts/generate-pwa-icons.mjs && vite",
     "build": "node scripts/generate-pwa-icons.mjs && tsc -b && vite build",
-    "preview": "npm run build && test -f dist/index.html && vite preview --host 127.0.0.1 --port 4173 --strictPort"
+    "preview": "npm run build && test -f dist/index.html && vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "test:e2e:install": "playwright install chromium",
+    "test:e2e": "playwright test",
+    "test:e2e:public": "playwright test --project=public-chromium",
+    "test:e2e:member": "playwright test --project=member-a",
+    "test:e2e:flow": "playwright test --project=connection-flow",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:auth:a": "playwright codegen --save-storage=playwright/.auth/user-a.json https://joinoutkin.com",
+    "test:e2e:auth:b": "playwright codegen --save-storage=playwright/.auth/user-b.json https://joinoutkin.com"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
@@ -16,6 +24,7 @@
     "react-router-dom": "^7.8.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.2",
