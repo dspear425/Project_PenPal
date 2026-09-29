@@ -26,7 +26,7 @@ test.describe('public launch surface', () => {
     await expect(consent).not.toBeChecked()
     await expect(consent).toHaveAttribute('required', '')
 
-    await page.getByRole('button', { name: 'Terms', exact: true }).click()
+    await page.getByRole('main').getByRole('button', { name: 'Terms', exact: true }).click()
     await expect(page.getByRole('dialog', { name: 'Legal & safety center.' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Terms of Service' })).toBeVisible()
     await page.getByRole('button', { name: 'Close Legal and Safety Center' }).click()
